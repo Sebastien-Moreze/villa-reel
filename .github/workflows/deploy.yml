@@ -1,0 +1,123 @@
+name: Deploy
+
+on:
+  push:
+    branches:
+      - main
+    tags:
+      - "v*.*.*"
+
+env:
+  IMAGE_NAME: ghcr.io/${{ github.repository_owner }}/villa-reel
+
+jobs:
+  build-and-push:
+    name: Build and push Docker image
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Login to GitHub Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GHCR_TOKEN }}
+
+      - name: Build and push
+        id: build-and-push
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: ./Dockerfile
+          push: true
+          tags: |
+            ${{ env.IMAGE_NAME }}:${{ github.sha }}
+            ${{ env.IMAGE_NAME }}:latest
+            ${{ env.IMAGE_NAME }}:${{ github.ref_name }}
+          build-args: |
+            DATABASE_URL=${{ secrets.DATABASE_URL }}
+            NEXTAUTH_SECRET=${{ secrets.NEXTAUTH_SECRET }}
+            STRIPE_SK=${{ secrets.STRIPE_SK }}
+            STRIPE_WEBHOOK_SECRET=${{ secrets.STRIPE_WEBHOOK_SECRET }}
+            RESEND_API_KEY=${{ secrets.RESEND_API_KEY }}
+
+  deploy:
+    name: Deploy to server (SSH)
+    runs-on: ubuntu-latest
+    needs: build-and-push
+    env:
+      IMAGE_NAME: ${{ env.IMAGE_NAME }}
+      IMAGE_TAG: ${{ github.sha }}
+      CONTAINER_NAME: villa-reel-app
+      HEALTHCHECK_URL: ${{ vars.HEALTHCHECK_URL || 'http://localhost:3000/' }}
+      APP_DIR: ${{ vars.APP_DIR }}
+    steps:
+      - name: Deploy over SSH
+        uses: appleboy/ssh-action@v1.2.0
+        env:
+          GHCR_TOKEN: ${{ secrets.GHCR_TOKEN }}
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+          NEXTAUTH_SECRET: ${{ secrets.NEXTAUTH_SECRET }}
+          STRIPE_SK: ${{ secrets.STRIPE_SK }}
+          STRIPE_WEBHOOK_SECRET: ${{ secrets.STRIPE_WEBHOOK_SECRET }}
+          RESEND_API_KEY: ${{ secrets.RESEND_API_KEY }}
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USER }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          port: ${{ secrets.SSH_PORT }}
+          script: |
+            set -e
+
+            APP_DIR="${APP_DIR:-~/villa-reel}"
+            cd "$APP_DIR"
+
+            echo "Logging in to GHCR..."
+            echo "$GHCR_TOKEN" | docker login ghcr.io -u "${GITHUB_ACTOR}" --password-stdin
+
+            IMAGE="${IMAGE_NAME}:${IMAGE_TAG}"
+            CONTAINER_NAME="${CONTAINER_NAME:-villa-reel-app}"
+
+            echo "Ensuring .env file is up to date..."
+            cat > .env <<EOF
+DATABASE_URL=$DATABASE_URL
+NEXTAUTH_SECRET=$NEXTAUTH_SECRET
+STRIPE_SK=$STRIPE_SK
+STRIPE_WEBHOOK_SECRET=$STRIPE_WEBHOOK_SECRET
+RESEND_API_KEY=$RESEND_API_KEY
+EOF
+
+            echo "Pulling latest images with Docker Compose..."
+            docker compose -f docker-compose.prod.yml pull
+
+            echo "Recreating services with Docker Compose..."
+            docker compose -f docker-compose.prod.yml up -d
+
+            echo "Trying to run Prisma migrate deploy (best effort)..."
+            if docker compose -f docker-compose.prod.yml exec -T app npx prisma migrate deploy; then
+              echo "Prisma migrations applied."
+            else
+              echo "Prisma migrate deploy failed or Prisma is not configured. Continuing."
+            fi
+
+            echo "Health check on ${HEALTHCHECK_URL}..."
+            for i in {1..30}; do
+              if curl -fsS "${HEALTHCHECK_URL}"; then
+                echo "Application is healthy."
+                exit 0
+              fi
+              echo "Health check attempt ${i}/30 failed, retrying..."
+              sleep 2
+            done
+
+            echo "Health check failed after multiple attempts."
+            exit 1
+
