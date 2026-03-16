@@ -1,0 +1,56 @@
+services:
+  db:
+    image: postgres:15-alpine
+    container_name: villa-reel-db
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-villa_reel}
+      POSTGRES_USER: ${POSTGRES_USER:-villa_reel}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-villa_reel_password}
+    ports:
+      - "5432:5432"
+    volumes:
+      - villa-reel-db-data:/var/lib/postgresql/data
+    networks:
+      - villa-reel-network
+
+  adminer:
+    image: adminer:latest
+    container_name: villa-reel-adminer
+    restart: unless-stopped
+    depends_on:
+      - db
+    ports:
+      - "8080:8080"
+    networks:
+      - villa-reel-network
+
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: villa-reel-app
+    restart: unless-stopped
+    depends_on:
+      - db
+    env_file:
+      - .env
+    environment:
+      NODE_ENV: development
+      PORT: 3000
+    ports:
+      - "3000:3000"
+    volumes:
+      - .:/app
+      - /app/node_modules
+    command: npm run dev
+    networks:
+      - villa-reel-network
+
+volumes:
+  villa-reel-db-data:
+
+networks:
+  villa-reel-network:
+    driver: bridge
+
