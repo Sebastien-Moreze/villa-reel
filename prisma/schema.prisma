@@ -1,0 +1,263 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum ReservationStatus {
+  PENDING
+  CONFIRMED
+  CANCELLED
+  COMPLETED
+}
+
+enum PaymentStatus {
+  AWAITING
+  DEPOSIT_PAID
+  FULLY_PAID
+  REFUNDED
+}
+
+enum BlockedReason {
+  OWNER
+  MAINTENANCE
+  RESERVATION
+}
+
+enum PromoCodeType {
+  PERCENT
+  FIXED
+}
+
+enum AdminRole {
+  SUPER_ADMIN
+  MANAGER
+}
+
+enum Locale {
+  FR
+  EN
+}
+
+enum ReviewStatus {
+  PENDING
+  APPROVED
+  REJECTED
+}
+
+model Villa {
+  id              Int             @id @default(autoincrement())
+  slug            String          @unique
+  nameFr          String
+  nameEn          String
+  descriptionFr   String
+  descriptionEn   String
+  address         String
+  city            String
+  zipCode         String
+  latitude        Float?
+  longitude       Float?
+  maxGuests       Int
+  bedrooms        Int
+  bathrooms       Int
+  surface         Int
+  pricePerNight   Decimal         @db.Decimal(10, 2)
+  cleaningFee     Decimal         @db.Decimal(10, 2)
+  deposit         Decimal         @db.Decimal(10, 2)
+  minStay         Int
+  maxStay         Int?
+  checkInTime     String
+  checkOutTime    String
+  isActive        Boolean         @default(true)
+  isFeatured      Boolean         @default(false)
+
+  images          VillaImage[]
+  amenities       VillaAmenity[]
+  reservations    Reservation[]
+  blockedDates    BlockedDate[]
+  reviews         Review[]
+  seasonalPrices  SeasonalPrice[]
+
+  createdAt       DateTime        @default(now())
+  updatedAt       DateTime        @updatedAt
+}
+
+model VillaImage {
+  id        Int    @id @default(autoincrement())
+  villaId   Int
+  url       String
+  altFr     String?
+  altEn     String?
+  position  Int    @default(0)
+
+  villa     Villa  @relation(fields: [villaId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Amenity {
+  id          Int            @id @default(autoincrement())
+  key         String         @unique
+  labelFr     String
+  labelEn     String
+  icon        String?
+  villas      VillaAmenity[]
+}
+
+model VillaAmenity {
+  villaId   Int
+  amenityId Int
+
+  villa     Villa   @relation(fields: [villaId], references: [id], onDelete: Cascade)
+  amenity   Amenity @relation(fields: [amenityId], references: [id], onDelete: Cascade)
+
+  @@id([villaId, amenityId])
+}
+
+model Reservation {
+  id                    Int              @id @default(autoincrement())
+  confirmationCode      String           @unique
+
+  villaId               Int
+  villa                 Villa            @relation(fields: [villaId], references: [id], onDelete: Cascade)
+
+  guestName             String
+  guestEmail            String
+  guestPhone            String?
+  guestAddress          String?
+
+  checkIn               DateTime
+  checkOut              DateTime
+  nbGuests              Int
+
+  // nbNights est calculé côté app (checkOut - checkIn)
+  nbNights              Int
+
+  pricePerNight         Decimal          @db.Decimal(10, 2)
+  cleaningFee           Decimal          @db.Decimal(10, 2)
+  discount              Decimal?         @db.Decimal(10, 2)
+  totalAmount           Decimal          @db.Decimal(10, 2)
+  depositAmount         Decimal?         @db.Decimal(10, 2)
+  balanceAmount         Decimal?         @db.Decimal(10, 2)
+
+  status                ReservationStatus @default(PENDING)
+  paymentStatus         PaymentStatus     @default(AWAITING)
+
+  stripePaymentIntentId String?
+  stripeDepositIntentId String?
+
+  cancellationReason    String?
+  cancelledAt           DateTime?
+
+  promoCodeId           Int?
+  promoCode             PromoCode?       @relation(fields: [promoCodeId], references: [id])
+
+  locale                Locale           @default(FR)
+
+  review                Review?
+
+  createdAt             DateTime         @default(now())
+  updatedAt             DateTime         @updatedAt
+}
+
+model BlockedDate {
+  id        Int           @id @default(autoincrement())
+  villaId   Int
+  villa     Villa         @relation(fields: [villaId], references: [id], onDelete: Cascade)
+
+  startDate DateTime
+  endDate   DateTime
+
+  reason    BlockedReason
+  notes     String?
+
+  createdAt DateTime      @default(now())
+  updatedAt DateTime      @updatedAt
+}
+
+model SeasonalPrice {
+  id            Int      @id @default(autoincrement())
+  villaId       Int
+  villa         Villa    @relation(fields: [villaId], references: [id], onDelete: Cascade)
+
+  name          String
+  startDate     DateTime
+  endDate       DateTime
+  pricePerNight Decimal  @db.Decimal(10, 2)
+  minStay       Int
+
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+}
+
+model Review {
+  id                  Int           @id @default(autoincrement())
+  villaId             Int
+  villa               Villa         @relation(fields: [villaId], references: [id], onDelete: Cascade)
+
+  reservationId       Int           @unique
+  reservation         Reservation   @relation(fields: [reservationId], references: [id], onDelete: Cascade)
+
+  guestName           String
+
+  rating              Int
+  ratingCleanliness   Int
+  ratingComfort       Int
+  ratingLocation      Int
+  ratingCommunication Int
+
+  comment             String?
+  status              ReviewStatus  @default(PENDING)
+
+  createdAt           DateTime      @default(now())
+  approvedAt          DateTime?
+}
+
+model PromoCode {
+  id          Int           @id @default(autoincrement())
+  code        String        @unique
+  type        PromoCodeType
+  value       Decimal       @db.Decimal(10, 2)
+  maxUses     Int?
+  usedCount   Int           @default(0)
+  startDate   DateTime?
+  endDate     DateTime?
+  minNights   Int?
+  isActive    Boolean       @default(true)
+  description String?
+
+  reservations Reservation[]
+
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+}
+
+model AdminUser {
+  id             Int       @id @default(autoincrement())
+  email          String    @unique
+  hashedPassword String
+  name           String?
+  role           AdminRole @default(MANAGER)
+
+  lastLoginAt    DateTime?
+  createdAt      DateTime  @default(now())
+}
+
+model ContactMessage {
+  id         Int      @id @default(autoincrement())
+  firstName  String
+  lastName   String
+  email      String
+  phone      String?
+  address    String?
+  subject    String
+  message    String
+  locale     Locale   @default(FR)
+  isRead     Boolean  @default(false)
+  createdAt  DateTime @default(now())
+}
+

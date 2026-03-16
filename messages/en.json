@@ -1,0 +1,47 @@
+{
+  "nav.home": "Home",
+  "nav.villa": "The Villa",
+  "nav.business": "Business",
+  "nav.events": "Events",
+  "nav.partners": "Partners",
+  "nav.contact": "Contact",
+  "nav.book": "Book now",
+
+  "hero.title": "VILLA R.E.E.L",
+  "hero.subtitle": "Between Alps and Tropics",
+  "hero.ctaPrimary": "Book now",
+  "hero.ctaSecondary": "Discover the villa",
+
+  "forms.checkIn": "Check-in",
+  "forms.checkOut": "Check-out",
+  "forms.guests": "Guests",
+  "forms.submit": "Send",
+
+  "reservation.step1": "Dates",
+  "reservation.step2": "Summary",
+  "reservation.step3": "Guest",
+  "reservation.step4": "Payment",
+  "reservation.step5": "Confirmation",
+
+  "reservation.errors.invalidRange": "Check-out date must be after check-in date.",
+  "reservation.errors.minStay": "Minimum stay of {min} nights.",
+  "reservation.errors.maxStay": "Maximum stay of {max} nights.",
+
+  "emails.subject.reservationConfirmed": "Your Villa R.E.E.L reservation is confirmed!",
+  "emails.subject.balanceReminder": "Reminder: remaining balance for your stay",
+  "emails.subject.arrivalReminder": "Your stay starts in 7 days!",
+  "emails.subject.reviewRequest": "How was your stay?",
+  "emails.subject.contactConfirmation": "We have received your message",
+  "emails.subject.contactNotification": "New contact message – Villa R.E.E.L",
+
+  "admin.title": "Admin interface",
+  "admin.nav.dashboard": "Dashboard",
+  "admin.nav.reservations": "Reservations",
+  "admin.nav.calendar": "Calendar",
+  "admin.nav.reviews": "Reviews",
+  "admin.nav.promotions": "Promotions",
+  "admin.nav.messages": "Messages",
+  "admin.nav.content": "Content",
+  "admin.nav.settings": "Settings"
+}
+

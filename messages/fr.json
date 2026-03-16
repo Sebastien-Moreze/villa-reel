@@ -1,0 +1,47 @@
+{
+  "nav.home": "Accueil",
+  "nav.villa": "La Villa",
+  "nav.business": "Entreprises",
+  "nav.events": "Événements",
+  "nav.partners": "Collaborateurs",
+  "nav.contact": "Contact",
+  "nav.book": "Réserver",
+
+  "hero.title": "VILLA R.E.E.L",
+  "hero.subtitle": "Entre Alpes et Tropiques",
+  "hero.ctaPrimary": "Réserver maintenant",
+  "hero.ctaSecondary": "Découvrir la villa",
+
+  "forms.checkIn": "Arrivée",
+  "forms.checkOut": "Départ",
+  "forms.guests": "Voyageurs",
+  "forms.submit": "Envoyer",
+
+  "reservation.step1": "Dates",
+  "reservation.step2": "Récapitulatif",
+  "reservation.step3": "Voyageur",
+  "reservation.step4": "Paiement",
+  "reservation.step5": "Confirmation",
+
+  "reservation.errors.invalidRange": "La date de départ doit être postérieure à la date d'arrivée.",
+  "reservation.errors.minStay": "Séjour minimum de {min} nuits.",
+  "reservation.errors.maxStay": "Séjour maximum de {max} nuits.",
+
+  "emails.subject.reservationConfirmed": "Votre réservation Villa R.E.E.L est confirmée !",
+  "emails.subject.balanceReminder": "Rappel : solde de votre réservation à régler",
+  "emails.subject.arrivalReminder": "Votre séjour commence dans 7 jours !",
+  "emails.subject.reviewRequest": "Comment s'est passé votre séjour ?",
+  "emails.subject.contactConfirmation": "Nous avons bien reçu votre message",
+  "emails.subject.contactNotification": "Nouveau message de contact – Villa R.E.E.L",
+
+  "admin.title": "Interface administrateur",
+  "admin.nav.dashboard": "Dashboard",
+  "admin.nav.reservations": "Réservations",
+  "admin.nav.calendar": "Calendrier",
+  "admin.nav.reviews": "Avis",
+  "admin.nav.promotions": "Promotions",
+  "admin.nav.messages": "Messages",
+  "admin.nav.content": "Contenu",
+  "admin.nav.settings": "Paramètres"
+}
+
