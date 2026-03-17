@@ -19,7 +19,7 @@ type PageProps = {
   params: { locale: string };
 };
 
-export default function ReservationPage({ params }: PageProps) {
+export default function ReservationPage({ params: _params }: PageProps) {
   const villaId = 1;
   const [step, setStep] = useState(0);
 
@@ -34,7 +34,7 @@ export default function ReservationPage({ params }: PageProps) {
   const [total, setTotal] = useState(0);
   const [depositAmount, setDepositAmount] = useState(0);
 
-  const [maxGuests, setMaxGuests] = useState(20);
+  const [maxGuests, _setMaxGuests] = useState(20);
   const [confirmationCode, setConfirmationCode] = useState<string | null>(null);
 
   const progress = ((step + 1) / STEPS.length) * 100;

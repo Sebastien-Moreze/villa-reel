@@ -11,7 +11,6 @@ async function main() {
   const args = parseArgs(process.argv.slice(2));
 
   if (!args.email || !args.password) {
-    // eslint-disable-next-line no-console
     console.error(
       "Usage: npx tsx scripts/create-admin.ts --email admin@villa-reel.fr --password yourPassword [--role SUPER_ADMIN|MANAGER]",
     );
@@ -32,8 +31,6 @@ async function main() {
       role: args.role ?? "SUPER_ADMIN",
     },
   });
-
-  // eslint-disable-next-line no-console
   console.log("Admin user created/updated:", {
     id: admin.id,
     email: admin.email,
@@ -64,7 +61,6 @@ function parseArgs(argv: string[]): Args {
 
 main()
   .catch((err) => {
-    // eslint-disable-next-line no-console
     console.error(err);
     process.exit(1);
   })

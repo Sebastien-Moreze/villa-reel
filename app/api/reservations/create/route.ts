@@ -138,7 +138,6 @@ export async function POST(request: Request) {
 
 async function generateUniqueConfirmationCode(tx: Prisma.TransactionClient) {
   // Simple REEL-XXXXXX code
-  // eslint-disable-next-line no-constant-condition
   while (true) {
     const random = Math.floor(Math.random() * 1_000_000)
       .toString()

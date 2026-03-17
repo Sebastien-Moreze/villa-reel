@@ -30,7 +30,6 @@ export function ReservationStep1({ villaId, onChange }: Props) {
   const [checkIn, setCheckIn] = useState<string | null>(null);
   const [checkOut, setCheckOut] = useState<string | null>(null);
   const [guests, setGuests] = useState(2);
-  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -87,8 +86,6 @@ export function ReservationStep1({ villaId, onChange }: Props) {
     const start = parseISO(checkIn);
     const end = parseISO(checkOut);
     const nights = Math.max(differenceInCalendarDays(end, start), 0);
-
-    void error;
 
     const total =
       nights * bookingInfo.pricePerNight +
@@ -166,9 +163,9 @@ export function ReservationStep1({ villaId, onChange }: Props) {
         </div>
       )}
 
-      {(computedError ?? error) && (
+      {computedError && (
         <p className="text-[11px] font-semibold text-red-600">
-          {computedError ?? error}
+          {computedError}
         </p>
       )}
 

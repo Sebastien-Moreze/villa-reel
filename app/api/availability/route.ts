@@ -87,7 +87,7 @@ export async function GET(request: Request) {
   try {
     const data = await getAvailability(villaId, year, month);
     return NextResponse.json(data);
-  } catch (error) {
+  } catch {
     return NextResponse.json(
       { error: "Failed to fetch availability" },
       { status: 500 },

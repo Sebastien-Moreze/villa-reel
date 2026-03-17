@@ -1,5 +1,6 @@
 'use client';
 
+import { useState } from "react";
 import { loadStripe } from "@stripe/stripe-js";
 import {
   Elements,
@@ -71,7 +72,7 @@ function PaymentForm({ depositAmount, onPaid }: Props) {
         const code = result.paymentIntent.id;
         onPaid(code);
       }
-    } catch (err) {
+    } catch {
       setError("Une erreur est survenue pendant le paiement.");
       setLoading(false);
     }

@@ -10,10 +10,9 @@ export async function GET() {
 
   try {
     // Simple ping DB
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const _result = await prisma.$queryRaw`SELECT 1`;
     dbStatus = "connected";
-  } catch (error) {
+  } catch {
     dbStatus = "disconnected";
   }
 
