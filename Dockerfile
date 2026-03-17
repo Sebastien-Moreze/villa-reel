@@ -1,15 +1,17 @@
 ### deps
-FROM node:18-alpine AS deps
+FROM node:24-alpine AS deps
 WORKDIR /app
 
 # libc6-compat est recommandé pour certaines dépendances natives
-RUN apk add --no-cache libc6-compat
+RUN apk add --no-cache libc6-compat python3 make g++ openssl
 
 COPY package.json package-lock.json ./
-RUN npm ci
+# On ignore les scripts ici (ex: postinstall prisma generate) car le schéma Prisma
+# n'est pas encore copié dans cette étape.
+RUN npm ci --ignore-scripts
 
 ### builder
-FROM node:18-alpine AS builder
+FROM node:24-alpine AS builder
 WORKDIR /app
 
 COPY --from=deps /app/node_modules ./node_modules
@@ -35,7 +37,7 @@ RUN npx prisma generate
 RUN npm run build
 
 ### runner
-FROM node:18-alpine AS runner
+FROM node:24-alpine AS runner
 WORKDIR /app
 
 ENV NODE_ENV=production
