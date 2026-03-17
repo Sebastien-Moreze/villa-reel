@@ -20,8 +20,14 @@ async function main() {
   });
 
   // Amenities
-  const wifi = await prisma.amenity.create({
-    data: {
+  const wifi = await prisma.amenity.upsert({
+    where: { key: "wifi" },
+    update: {
+      labelFr: "Wi-Fi",
+      labelEn: "Wi-Fi",
+      icon: "wifi",
+    },
+    create: {
       key: "wifi",
       labelFr: "Wi-Fi",
       labelEn: "Wi-Fi",
@@ -29,8 +35,14 @@ async function main() {
     },
   });
 
-  const pool = await prisma.amenity.create({
-    data: {
+  const pool = await prisma.amenity.upsert({
+    where: { key: "pool" },
+    update: {
+      labelFr: "Piscine",
+      labelEn: "Swimming pool",
+      icon: "pool",
+    },
+    create: {
       key: "pool",
       labelFr: "Piscine",
       labelEn: "Swimming pool",
@@ -39,8 +51,35 @@ async function main() {
   });
 
   // Villa
-  const villa = await prisma.villa.create({
-    data: {
+  const villa = await prisma.villa.upsert({
+    where: { slug: "villa-reel" },
+    update: {
+      nameFr: "VILLA R.E.E.L",
+      nameEn: "VILLA R.E.E.L",
+      descriptionFr:
+        "Une villa d'exception entre montagne et jardin tropical, pensée pour vos séjours, événements professionnels et collaborations créatives.",
+      descriptionEn:
+        "An exceptional villa between mountains and tropical garden, designed for your stays, professional events and creative collaborations.",
+      address: "1281 route de Moussy",
+      city: "Reigner-Esery",
+      zipCode: "74930",
+      latitude: 46.1167,
+      longitude: 6.2167,
+      maxGuests: 8,
+      bedrooms: 4,
+      bathrooms: 3,
+      surface: 180,
+      pricePerNight: 350,
+      cleaningFee: 80,
+      deposit: 500,
+      minStay: 3,
+      maxStay: 21,
+      checkInTime: "16:00",
+      checkOutTime: "10:00",
+      isActive: true,
+      isFeatured: true,
+    },
+    create: {
       slug: "villa-reel",
       nameFr: "VILLA R.E.E.L",
       nameEn: "VILLA R.E.E.L",
@@ -78,16 +117,8 @@ async function main() {
       },
       amenities: {
         create: [
-          {
-            amenity: {
-              connect: { id: wifi.id },
-            },
-          },
-          {
-            amenity: {
-              connect: { id: pool.id },
-            },
-          },
+          { amenity: { connect: { id: wifi.id } } },
+          { amenity: { connect: { id: pool.id } } },
         ],
       },
       seasonalPrices: {
@@ -105,8 +136,18 @@ async function main() {
   });
 
   // Promo code
-  const promo = await prisma.promoCode.create({
-    data: {
+  const promo = await prisma.promoCode.upsert({
+    where: { code: "WELCOME10" },
+    update: {
+      type: PromoCodeType.PERCENT,
+      value: 10,
+      maxUses: 100,
+      startDate: new Date(),
+      isActive: true,
+      description: "10% de réduction sur votre premier séjour",
+      minNights: 3,
+    },
+    create: {
       code: "WELCOME10",
       type: PromoCodeType.PERCENT,
       value: 10,
@@ -129,8 +170,31 @@ async function main() {
   const cleaningFeeNumber = Number(villa.cleaningFee);
   const totalAmountNumber = 7 * pricePerNightNumber + cleaningFeeNumber;
 
-  const reservation = await prisma.reservation.create({
-    data: {
+  const reservation = await prisma.reservation.upsert({
+    where: { confirmationCode: "VR-DEMO-0001" },
+    update: {
+      villaId: villa.id,
+      guestName: "John Doe",
+      guestEmail: "john.doe@example.com",
+      guestPhone: "+33 6 12 34 56 78",
+      guestAddress: "123 Rue de Démonstration, 75000 Paris, France",
+      checkIn: inSevenDays,
+      checkOut: inFourteenDays,
+      nbGuests: 4,
+      nbNights: 7,
+      pricePerNight: villa.pricePerNight,
+      cleaningFee: villa.cleaningFee,
+      discount: 0,
+      totalAmount: totalAmountNumber,
+      depositAmount: 500,
+      balanceAmount: totalAmountNumber - 500,
+      status: "CONFIRMED",
+      paymentStatus: "FULLY_PAID",
+      stripePaymentIntentId: "pi_demo_123",
+      locale: Locale.FR,
+      promoCodeId: promo.id,
+    },
+    create: {
       confirmationCode: "VR-DEMO-0001",
       villaId: villa.id,
       guestName: "John Doe",
@@ -155,17 +219,20 @@ async function main() {
     },
   });
 
-  await prisma.contactMessage.create({
-    data: {
-      firstName: "Alice",
-      lastName: "Martin",
-      email: "alice@example.com",
-      phone: "+33 6 11 22 33 44",
-      subject: "Demande d'informations",
-      message:
-        "Bonjour, je souhaiterais connaître les disponibilités pour le mois d'août.",
-      locale: Locale.FR,
-    },
+  await prisma.contactMessage.createMany({
+    data: [
+      {
+        firstName: "Alice",
+        lastName: "Martin",
+        email: "alice@example.com",
+        phone: "+33 6 11 22 33 44",
+        subject: "Demande d'informations",
+        message:
+          "Bonjour, je souhaiterais connaître les disponibilités pour le mois d'août.",
+        locale: Locale.FR,
+      },
+    ],
+    skipDuplicates: true,
   });
 
   console.log("Seed completed. Admin id:", admin.id, "Villa id:", villa.id, "Reservation id:", reservation.id);
