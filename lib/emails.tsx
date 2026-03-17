@@ -50,7 +50,6 @@ async function sendWithRetry(options: {
     }
   }
 
-  // eslint-disable-next-line no-console
   console.error("Failed to send email after retries", lastError);
 }
 

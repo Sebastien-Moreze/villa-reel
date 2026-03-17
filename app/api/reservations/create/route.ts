@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { z } from "zod";
+import type { Prisma } from "@prisma/client";
 
 const reservationSchema = z.object({
   villaId: z.number().int().positive(),
@@ -46,7 +47,7 @@ export async function POST(request: Request) {
   const checkIn = new Date(data.checkIn);
   const checkOut = new Date(data.checkOut);
 
-  if (!(checkIn instanceof Date) || !(checkOut instanceof Date)) {
+  if (Number.isNaN(checkIn.getTime()) || Number.isNaN(checkOut.getTime())) {
     return NextResponse.json(
       { error: "Invalid dates" },
       { status: 400 },
@@ -121,7 +122,7 @@ export async function POST(request: Request) {
     });
 
     return NextResponse.json({ reservationId: result.id, confirmationCode: result.confirmationCode });
-  } catch (error: any) {
+  } catch (error: unknown) {
     if (error instanceof Error && error.message === "DATES_UNAVAILABLE") {
       return NextResponse.json(
         { error: "Dates not available" },
@@ -135,8 +136,7 @@ export async function POST(request: Request) {
   }
 }
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-async function generateUniqueConfirmationCode(tx: any) {
+async function generateUniqueConfirmationCode(tx: Prisma.TransactionClient) {
   // Simple REEL-XXXXXX code
   // eslint-disable-next-line no-constant-condition
   while (true) {

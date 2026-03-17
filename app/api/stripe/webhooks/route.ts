@@ -35,8 +35,10 @@ export async function POST(request: Request) {
       sig ?? "",
       webhookSecret,
     );
-  } catch (err: any) {
-    console.error("Stripe webhook signature error", err.message);
+  } catch (err: unknown) {
+    const message =
+      err instanceof Error ? err.message : "Unknown Stripe webhook error";
+    console.error("Stripe webhook signature error", message);
     return NextResponse.json({ error: "Invalid signature" }, { status: 400 });
   }
 

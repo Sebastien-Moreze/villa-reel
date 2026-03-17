@@ -42,7 +42,7 @@ async function main() {
 }
 
 function parseArgs(argv: string[]): Args {
-  const out: any = {};
+  const out: Partial<Args> = {};
   for (let i = 0; i < argv.length; i++) {
     const arg = argv[i];
     if (arg === "--email") {
@@ -52,11 +52,14 @@ function parseArgs(argv: string[]): Args {
       out.password = argv[i + 1];
       i++;
     } else if (arg === "--role") {
-      out.role = argv[i + 1];
+      const value = argv[i + 1];
+      if (value === "SUPER_ADMIN" || value === "MANAGER") {
+        out.role = value;
+      }
       i++;
     }
   }
-  return out;
+  return out as Args;
 }
 
 main()
