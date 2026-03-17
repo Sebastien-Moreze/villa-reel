@@ -1,0 +1,321 @@
+# Villa R.E.E.L — Cursor Rules
+# Site de réservation de villa de luxe — Haute-Savoie, France
+# Méthode Merise documentée dans /VillaREEL_MCD_MLD.pdf
+
+## PROJET
+
+Villa R.E.E.L (Rodrigue & Estelle En Locations) est un site de réservation en ligne
+pour une villa de luxe à Reigner-Esery (74930), Haute-Savoie, France.
+Capacité : jusqu'à 12 voyageurs. Langues : Français (défaut) + Anglais.
+
+---
+
+## STACK TECHNIQUE
+
+| Outil              | Version  | Usage                              |
+|--------------------|----------|------------------------------------|
+| Next.js            | 16.x     | App Router, SSR, API Routes        |
+| TypeScript         | 5.x      | Typage strict partout              |
+| Tailwind CSS       | 4.x      | Styling — classes utilitaires      |
+| Prisma             | 6.x      | ORM — PostgreSQL                   |
+| next-intl          | 4.x      | i18n FR/EN — App Router            |
+| NextAuth           | 4.x      | Auth admin (JWT, Prisma adapter)   |
+| Stripe             | 20.x     | Paiements (acompte 30% + solde)    |
+| Resend             | 6.x      | Emails transactionnels             |
+| react-email        | 5.x      | Templates emails React             |
+| react-hook-form    | 7.x      | Formulaires + validation           |
+| Zod                | 4.x      | Schemas de validation              |
+| date-fns           | 4.x      | Manipulation de dates              |
+| react-day-picker   | 9.x      | Calendrier de disponibilité        |
+| recharts           | 2.x      | Graphiques admin                   |
+| bcrypt             | 5.x      | Hashage mot de passe admin         |
+| Docker             | —        | Déploiement production             |
+
+---
+
+## ARCHITECTURE DES DOSSIERS
+
+```
+villa-reel/
+├── app/
+│   ├── [locale]/           # Pages publiques (fr / en)
+│   │   ├── page.tsx        # Accueil
+│   │   ├── villa/          # Détail villa + calendrier + tarifs
+│   │   ├── reservation/    # Tunnel réservation 5 étapes
+│   │   │   ├── ReservationStep1.tsx  # Dates + voyageurs
+│   │   │   ├── ReservationStep2.tsx  # Récapitulatif
+│   │   │   ├── ReservationStep3.tsx  # Infos voyageur (form)
+│   │   │   ├── ReservationStep4.tsx  # Paiement Stripe
+│   │   │   └── ReservationStep5.tsx  # Confirmation
+│   │   ├── collaborateurs/ # ViniLux + Félicien Christe
+│   │   ├── galerie/        # Galerie photo full HD
+│   │   ├── contact/        # Formulaire + RGPD
+│   │   ├── entreprises/    # Page séminaires entreprises
+│   │   └── evenements/     # Page événements privés
+│   ├── admin/              # Backoffice protégé (NextAuth)
+│   │   ├── dashboard/      # KPIs + graphiques recharts
+│   │   ├── reservations/   # Liste + détail réservations
+│   │   ├── calendar/       # Gestion disponibilités
+│   │   └── login/          # Auth admin
+│   └── api/
+│       ├── auth/[...nextauth]/  # NextAuth handler
+│       ├── availability/        # GET dates bloquées
+│       ├── reservations/create/ # POST nouvelle réservation
+│       ├── villa/booking-info/  # GET infos tarifaires villa
+│       ├── promo/validate/      # POST validation code promo
+│       ├── stripe/
+│       │   ├── create-payment-intent/
+│       │   ├── create-deposit-intent/   # Acompte 30%
+│       │   ├── create-deposit-hold/
+│       │   ├── schedule-balance/        # Solde à J-30
+│       │   └── webhooks/               # Stripe webhooks
+│       └── health/              # Health check Docker
+├── components/
+│   ├── home/               # HeroSection, FeaturesSection, GallerySection,
+│   │                       # ReviewsBanner, PromoSection
+│   ├── layout/             # Navbar, Footer, LanguageSwitcher, PromoBanner
+│   ├── admin/              # AdminShell, DashboardChart
+│   ├── villa/              # AvailabilityCalendar
+│   └── galerie/            # GalerieGrid
+├── emails/                 # Templates react-email
+│   ├── ReservationConfirmation.tsx
+│   ├── BalanceReminder.tsx       # Rappel solde J-35
+│   ├── ArrivalReminder.tsx
+│   ├── ReviewRequest.tsx
+│   ├── ContactConfirmation.tsx
+│   └── ContactNotification.tsx
+├── lib/
+│   ├── prisma.ts           # Client Prisma singleton
+│   ├── auth.ts             # NextAuth config
+│   ├── emails.ts           # Helpers envoi Resend
+│   ├── gallery.ts          # Gestion galerie photos
+│   └── i18n.ts             # Config locales
+├── messages/
+│   ├── fr.json             # Traductions français
+│   └── en.json             # Traductions anglais
+├── prisma/
+│   ├── schema.prisma       # Schéma Prisma (source de vérité BDD)
+│   └── seed.ts             # Données initiales
+└── scripts/
+    ├── create-admin.ts     # Création compte admin
+    └── deploy.sh           # Script déploiement
+```
+
+---
+
+## SCHÉMA BASE DE DONNÉES (Prisma — PostgreSQL)
+
+### Modèles principaux
+
+- **Villa** — Une seule villa, id=1. Champs bilingues (nameFr/nameEn, descriptionFr/descriptionEn).
+- **Reservation** — confirmationCode unique, statut ENUM (PENDING/CONFIRMED/CANCELLED/COMPLETED),
+  paymentStatus ENUM (AWAITING/DEPOSIT_PAID/FULLY_PAID/REFUNDED).
+- **SeasonalPrice** — Périodes tarifaires (basse/haute/fêtes) liées à la villa.
+- **BlockedDate** — Blocages manuels (OWNER/MAINTENANCE/RESERVATION).
+- **PromoCode** — type PERCENT ou FIXED, maxUses, startDate/endDate.
+- **Review** — 5 critères de notation (rating, ratingCleanliness, ratingComfort,
+  ratingLocation, ratingCommunication), statut PENDING/APPROVED/REJECTED.
+- **AdminUser** — role SUPER_ADMIN | MANAGER, hashedPassword avec bcrypt.
+- **ContactMessage** — Messages formulaire contact (non lié à une réservation).
+- **VillaImage** — Photos liées à la villa, position pour tri.
+- **Amenity / VillaAmenity** — Équipements (relation N:N via table pivot).
+
+### Relations clés
+```
+Villa        1:N   Reservation
+Villa        1:N   SeasonalPrice
+Villa        1:N   BlockedDate
+Villa        1:N   VillaImage
+Villa        N:N   Amenity (via VillaAmenity)
+Reservation  1:1   Review
+Reservation  N:1   PromoCode (optionnel)
+```
+
+---
+
+## DESIGN SYSTEM — TAILWIND
+
+### Couleurs (définies dans tailwind.config.ts)
+```
+primary    = #1A6B3A   (vert forêt — couleur principale)
+secondary  = #009B8D   (turquoise — accents)
+cta        = #E05C3A   (corail — boutons d'action, urgence)
+background = #F4F7F4   (crème — fond des pages)
+```
+Couleur or/gold (#C8A050) utilisée en CSS direct pour éléments premium.
+
+### Typographie (via CSS variables dans layout.tsx)
+```
+font-display   → Playfair Display (serif) — titres, headings
+font-sans      → Montserrat (sans-serif) — corps de texte
+```
+
+### Breakpoints personnalisés
+```
+sm: 480px | md: 768px | lg: 1024px | xl: 1280px
+```
+
+---
+
+## INTERNATIONALISATION (next-intl)
+
+- Routes : `/fr/*` (défaut) et `/en/*`
+- Config : `i18n.ts` + `middleware.ts`
+- Traductions : `messages/fr.json` et `messages/en.json`
+- Usage dans les composants :
+```tsx
+import { useTranslations } from 'next-intl';
+const t = useTranslations('HomePage');
+// <h1>{t('title')}</h1>
+```
+- Usage côté serveur :
+```tsx
+import { getTranslations } from 'next-intl/server';
+const t = await getTranslations('Villa');
+```
+- Champs bilingues en BDD : nameFr/nameEn, descriptionFr/descriptionEn, altFr/altEn.
+
+---
+
+## TUNNEL DE RÉSERVATION (5 étapes)
+
+```
+Étape 1 — ReservationStep1  : Sélection dates + nb voyageurs
+                               → API /api/villa/booking-info + /api/availability
+Étape 2 — ReservationStep2  : Récapitulatif (prix détaillé, code promo)
+                               → API /api/promo/validate
+Étape 3 — ReservationStep3  : Infos voyageur (react-hook-form + Zod)
+Étape 4 — ReservationStep4  : Paiement acompte 30% via Stripe Elements
+                               → API /api/stripe/create-deposit-intent
+                               → API /api/reservations/create (après paiement)
+Étape 5 — ReservationStep5  : Confirmation + email via Resend
+```
+
+### Règles métier paiement
+- Acompte = 30% du montant total TTC
+- Solde = 70% restant, dû à J-30 avant arrivée
+- Rappel email automatique à J-35 (BalanceReminder.tsx)
+- TVA 10% sur hébergement (applicable en France)
+- Stripe webhook → mise à jour statut réservation en BDD
+
+---
+
+## VARIABLES D'ENVIRONNEMENT REQUISES
+
+```env
+DATABASE_URL=postgresql://...
+NEXTAUTH_SECRET=...
+NEXTAUTH_URL=http://localhost:3000
+
+STRIPE_SECRET_KEY=sk_...
+STRIPE_PUBLISHABLE_KEY=pk_...
+STRIPE_WEBHOOK_SECRET=whsec_...
+
+RESEND_API_KEY=re_...
+RESEND_FROM_EMAIL=noreply@villareel.fr
+
+NEXT_PUBLIC_APP_URL=http://localhost:3000
+```
+
+---
+
+## CONVENTIONS DE CODE
+
+### TypeScript
+- Typage strict activé (`tsconfig.json` — strict: true)
+- Pas de `any` sauf cas exceptionnel justifié
+- Interfaces pour les props de composants (pas `type` pour les props React)
+- Zod schemas dans les API routes pour validation input
+
+### Composants React
+- `'use client'` obligatoire pour les composants avec hooks ou événements
+- Composants serveur par défaut dans `app/`
+- Props typées avec interface nommée `Props` ou `ComponentNameProps`
+- Imports : React implicite (pas besoin de `import React from 'react'` en Next.js 13+)
+
+### API Routes (App Router)
+```ts
+// Pattern standard pour une API route
+export async function GET(request: Request) {
+  try {
+    const { searchParams } = new URL(request.url);
+    // ... logique
+    return Response.json({ data });
+  } catch (error) {
+    return Response.json({ error: 'Internal Server Error' }, { status: 500 });
+  }
+}
+```
+
+### Prisma
+- Client singleton dans `lib/prisma.ts`
+- Toujours utiliser `prisma` importé depuis `@/lib/prisma`
+- Pas de requêtes Prisma directement dans les composants (uniquement dans API routes ou server actions)
+
+### Nommage fichiers
+- Composants : PascalCase (`HeroSection.tsx`)
+- Pages : `page.tsx` (convention Next.js App Router)
+- Utilities : camelCase (`emails.ts`, `gallery.ts`)
+- Routes API : `route.ts` (convention Next.js)
+
+### Styles
+- Tailwind classes uniquement (pas de CSS custom sauf `globals.css`)
+- `cn()` de `clsx` + `tailwind-merge` pour les classes conditionnelles
+- Classes de couleurs : `text-primary`, `bg-secondary`, `bg-cta` (pas de couleurs hardcodées)
+
+---
+
+## CONTEXTE MÉTIER
+
+### Villa
+- Nom commercial : Villa R.E.E.L (Rodrigue & Estelle En Locations)
+- Localisation : Les Granges de Confiance, Reigner-Esery, 74930, Haute-Savoie, FR
+- Capacité : 12 voyageurs maximum
+- Équipements premium : piscine, jacuzzi, salle de sport, terrasse rooftop
+
+### Tarifs (SeasonalPrice)
+- Basse saison : ~1 500 EUR/nuit
+- Haute saison : ~2 200 EUR/nuit
+- Fêtes (Noël/Nouvel An) : ~3 000 EUR/nuit
+
+### Collaborateurs (page /collaborateurs)
+- **ViniLux** — Oenologue suisse, partenaire pour accords mets-vins (vinilux.ch)
+- **Félicien Christe** — Chef privé, cuisine gastronomique sur mesure
+
+### RGPD
+- Bandeau cookies obligatoire
+- Politique de confidentialité + CGV liées au formulaire de contact et réservation
+- Données voyageurs : conservation limitée à la durée légale
+
+---
+
+## COMMANDES UTILES
+
+```bash
+# Développement
+npm run dev
+
+# BDD
+npm run prisma:migrate     # Appliquer migrations
+npm run prisma:generate    # Regénérer client Prisma
+npm run prisma:seed        # Données de test
+
+# Admin
+npx tsx scripts/create-admin.ts
+
+# Lint
+npm run lint
+
+# Build
+npm run build
+```
+
+---
+
+## À NE PAS FAIRE
+
+- Ne jamais exposer les variables d'environnement secrets côté client
+- Ne jamais faire de requêtes Prisma dans les composants client
+- Ne pas utiliser `getServerSideProps` (ancien pattern Pages Router) — on est en App Router
+- Ne pas hardcoder les textes — utiliser les fichiers `messages/fr.json` / `messages/en.json`
+- Ne pas modifier `prisma/schema.prisma` sans créer une migration (`prisma migrate dev`)
