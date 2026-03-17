@@ -21,7 +21,7 @@ export async function POST(request: Request) {
   }
 
   const stripe = new Stripe(secret, {
-    apiVersion: "2024-06-20",
+    apiVersion: "2026-02-25.clover",
   });
 
   const sig = request.headers.get("stripe-signature");
@@ -68,6 +68,7 @@ export async function POST(request: Request) {
       case "payment_intent.payment_failed": {
         const intent = event.data.object as Stripe.PaymentIntent;
         const reservationId = intent.metadata?.reservationId;
+        const type = intent.metadata?.type;
         if (!reservationId) break;
 
         await prisma.reservation.update({
@@ -77,7 +78,8 @@ export async function POST(request: Request) {
             status: "PENDING",
           },
         });
-        // TODO: envoyer un email d'échec de paiement
+
+        await sendPaymentFailureEmail(Number(reservationId), type ?? "deposit");
         break;
       }
       case "charge.refunded": {
@@ -109,6 +111,42 @@ export async function POST(request: Request) {
       { status: 500 },
     );
   }
+}
+
+async function sendPaymentFailureEmail(reservationId: number, type: string) {
+  const resendApiKey = process.env.RESEND_API_KEY;
+  const fromEmail = process.env.CONTACT_EMAIL;
+  if (!resendApiKey || !fromEmail) return;
+
+  const resend = new Resend(resendApiKey);
+  const reservation = await prisma.reservation.findUnique({ where: { id: reservationId } });
+  if (!reservation) return;
+
+  const isBalance = type === "balance";
+  const subject = isBalance
+    ? "Échec du paiement du solde – Villa R.E.E.L"
+    : "Échec du paiement de l'acompte – Villa R.E.E.L";
+
+  const retryUrl = isBalance
+    ? `${process.env.NEXT_PUBLIC_APP_URL}/reservation/solde/${reservation.confirmationCode}`
+    : `${process.env.NEXT_PUBLIC_APP_URL}/reservation/acompte/${reservation.confirmationCode}`;
+
+  const html = `
+    <p>Bonjour ${reservation.guestName},</p>
+    <p>Nous avons rencontré un problème lors du traitement de votre paiement
+    (${isBalance ? "solde" : "acompte"}) pour votre réservation à la Villa R.E.E.L.</p>
+    <p>Code de confirmation : <strong>${reservation.confirmationCode}</strong></p>
+    <p>Veuillez réessayer via ce lien sécurisé : <a href="${retryUrl}">${retryUrl}</a></p>
+    <p>Si le problème persiste, n'hésitez pas à nous contacter directement.</p>
+    <p>Cordialement,<br/>Villa R.E.E.L</p>
+  `;
+
+  await resend.emails.send({
+    from: `Villa R.E.E.L <${fromEmail}>`,
+    to: [reservation.guestEmail],
+    subject,
+    html,
+  });
 }
 
 async function sendPaymentEmail(reservationId: number, type: string) {

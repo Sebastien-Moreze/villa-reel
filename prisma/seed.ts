@@ -11,8 +11,9 @@ async function main() {
     update: {},
     create: {
       email: "admin@villareel.fr",
-      // À remplacer par un hash Bcrypt dans la vraie vie
-      hashedPassword: "changeme",
+      // Hash bcrypt (rounds=12) du mot de passe initial : VillaREEL_Admin2026!
+      // À changer immédiatement après le premier déploiement
+      hashedPassword: "$2b$12$aB.py.1H8apo/Vkntym2mO.F.MCzmq/EZjJ.TiC4jge4DkvRp6DHa",
       name: "Admin Villa R.E.E.L",
       role: AdminRole.SUPER_ADMIN,
     },
@@ -40,18 +41,18 @@ async function main() {
   // Villa
   const villa = await prisma.villa.create({
     data: {
-      slug: "villa-reel-demo",
-      nameFr: "Villa R.E.E.L Démo",
-      nameEn: "Villa R.E.E.L Demo",
+      slug: "villa-reel",
+      nameFr: "VILLA R.E.E.L",
+      nameEn: "VILLA R.E.E.L",
       descriptionFr:
-        "Magnifique villa en bord de mer pour des séjours inoubliables.",
+        "Une villa d'exception entre montagne et jardin tropical, pensée pour vos séjours, événements professionnels et collaborations créatives.",
       descriptionEn:
-        "Beautiful seaside villa for unforgettable stays.",
-      address: "1 Rue de la Plage",
-      city: "Nice",
-      zipCode: "06000",
-      latitude: 43.7102,
-      longitude: 7.2620,
+        "An exceptional villa between mountains and tropical garden, designed for your stays, professional events and creative collaborations.",
+      address: "1281 route de Moussy",
+      city: "Reigner-Esery",
+      zipCode: "74930",
+      latitude: 46.1167,
+      longitude: 6.2167,
       maxGuests: 8,
       bedrooms: 4,
       bathrooms: 3,

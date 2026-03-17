@@ -135,7 +135,8 @@ export async function POST(request: Request) {
   }
 }
 
-async function generateUniqueConfirmationCode(tx: typeof prisma) {
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+async function generateUniqueConfirmationCode(tx: any) {
   // Simple REEL-XXXXXX code
   // eslint-disable-next-line no-constant-condition
   while (true) {

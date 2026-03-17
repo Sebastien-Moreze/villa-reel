@@ -174,7 +174,7 @@ async function createBlock(formData: FormData) {
 
   const start = formData.get("startDate") as string;
   const end = formData.get("endDate") as string;
-  const reason = (formData.get("reason") as string) || "OWNER";
+  const reason = ((formData.get("reason") as string) || "OWNER") as import("@prisma/client").BlockedReason;
   const notes = (formData.get("notes") as string) || undefined;
 
   if (!start || !end) return;

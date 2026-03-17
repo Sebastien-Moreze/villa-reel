@@ -8,8 +8,13 @@
     "start": "next start",
     "lint": "eslint",
     "prisma:migrate": "prisma migrate dev --name init",
+    "prisma:deploy": "prisma migrate deploy",
     "prisma:generate": "prisma generate",
-    "prisma:seed": "ts-node prisma/seed.ts"
+    "prisma:seed": "npx tsx prisma/seed.ts",
+    "prisma:reset": "prisma migrate reset --force",
+    "prisma:studio": "prisma studio",
+    "create-admin": "npx tsx scripts/create-admin.ts",
+    "setup": "prisma migrate deploy && prisma generate && npx tsx prisma/seed.ts"
   },
   "dependencies": {
     "@auth/prisma-adapter": "^2.11.1",

@@ -1,6 +1,6 @@
-\"use client\";
+"use client";
 
-import { useEffect, useState } from \"react\";
+import { useEffect, useState } from "react";
 
 type Props = {
   villaId: number;
@@ -19,9 +19,9 @@ type BookingInfo = {
 
 export function ReservationStep2({ villaId, checkIn, checkOut, nights, baseTotal, onChange }: Props) {
   const [bookingInfo, setBookingInfo] = useState<BookingInfo | null>(null);
-  const [promoCode, setPromoCode] = useState(\"\");
+  const [promoCode, setPromoCode] = useState("");
   const [discount, setDiscount] = useState(0);
-  const [status, setStatus] = useState<\"idle\" | \"checking\" | \"valid\" | \"invalid\">(\"idle\");
+  const [status, setStatus] = useState<"idle" | "checking" | "valid" | "invalid">("idle");
 
   useEffect(() => {
     const load = async () => {
@@ -52,35 +52,35 @@ export function ReservationStep2({ villaId, checkIn, checkOut, nights, baseTotal
     const code = promoCode.trim();
     if (!code) {
       setDiscount(0);
-      setStatus(\"idle\");
+      setStatus("idle");
       return;
     }
-    setStatus(\"checking\");
+    setStatus("checking");
     try {
-      const res = await fetch(\"/api/promo/validate\", {
-        method: \"POST\",
-        headers: { \"Content-Type\": \"application/json\" },
+      const res = await fetch("/api/promo/validate", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ code, villaId, checkIn, checkOut }),
       });
       if (!res.ok) {
-        setStatus(\"invalid\");
+        setStatus("invalid");
         setDiscount(0);
         return;
       }
       const data = await res.json();
       if (!data.valid) {
-        setStatus(\"invalid\");
+        setStatus("invalid");
         setDiscount(0);
         return;
       }
-      setStatus(\"valid\");
-      if (data.type === \"PERCENT\") {
+      setStatus("valid");
+      if (data.type === "PERCENT") {
         setDiscount(Math.round((baseTotal * data.value) / 100));
       } else {
         setDiscount(data.value);
       }
     } catch {
-      setStatus(\"invalid\");
+      setStatus("invalid");
       setDiscount(0);
     }
   };
@@ -89,72 +89,72 @@ export function ReservationStep2({ villaId, checkIn, checkOut, nights, baseTotal
   const depositAmount = Math.round(total * 0.3);
 
   return (
-    <div className=\"space-y-4 text-xs text-neutral-800\">
-      <p className=\"text-sm font-semibold text-neutral-900\">Récapitulatif de votre séjour</p>
+    <div className="space-y-4 text-xs text-neutral-800">
+      <p className="text-sm font-semibold text-neutral-900">Récapitulatif de votre séjour</p>
 
       {bookingInfo && (
-        <div className=\"rounded-2xl border border-neutral-200 bg-white p-3 text-[11px]\">
-          <div className=\"flex items-center justify-between\">
+        <div className="rounded-2xl border border-neutral-200 bg-white p-3 text-[11px]">
+          <div className="flex items-center justify-between">
             <span>Nombre de nuits</span>
-            <span className=\"font-semibold\">{nights} nuit(s)</span>
+            <span className="font-semibold">{nights} nuit(s)</span>
           </div>
-          <div className=\"mt-1 flex items-center justify-between\">
+          <div className="mt-1 flex items-center justify-between">
             <span>
               {bookingInfo.pricePerNight} € x {nights} nuit(s)
             </span>
             <span>{bookingInfo.pricePerNight * nights} €</span>
           </div>
-          <div className=\"mt-1 flex items-center justify-between\">
+          <div className="mt-1 flex items-center justify-between">
             <span>Ménage</span>
             <span>{bookingInfo.cleaningFee} €</span>
           </div>
-          <div className=\"mt-1 flex items-center justify-between\">
+          <div className="mt-1 flex items-center justify-between">
             <span>Caution</span>
             <span>{bookingInfo.deposit} €</span>
           </div>
           {discount > 0 && (
-            <div className=\"mt-1 flex items-center justify-between text-primary\">
+            <div className="mt-1 flex items-center justify-between text-primary">
               <span>Remise promo</span>
               <span>- {discount} €</span>
             </div>
           )}
-          <div className=\"mt-2 border-t border-neutral-200 pt-2 font-semibold text-neutral-900\">
-            <div className=\"flex items-center justify-between\">
+          <div className="mt-2 border-t border-neutral-200 pt-2 font-semibold text-neutral-900">
+            <div className="flex items-center justify-between">
               <span>Total séjour</span>
               <span>{total} €</span>
             </div>
           </div>
-          <div className=\"mt-1 flex items-center justify-between text-primary\">
+          <div className="mt-1 flex items-center justify-between text-primary">
             <span>Acompte (30% à régler maintenant)</span>
-            <span className=\"font-semibold\">{depositAmount} €</span>
+            <span className="font-semibold">{depositAmount} €</span>
           </div>
         </div>
       )}
 
-      <div className=\"flex flex-col gap-1\">
-        <label className=\"text-[11px] font-semibold text-neutral-600\">Code promo</label>
+      <div className="flex flex-col gap-1">
+        <label className="text-[11px] font-semibold text-neutral-600">Code promo</label>
         <input
-          type=\"text\"
+          type="text"
           value={promoCode}
           onChange={(e) => setPromoCode(e.target.value)}
           onBlur={handleBlurPromo}
-          className=\"w-48 rounded-lg border border-neutral-200 px-3 py-2 text-xs uppercase outline-none focus:border-primary focus:ring-1 focus:ring-primary\"
-          placeholder=\"WELCOME10\"
+          className="w-48 rounded-lg border border-neutral-200 px-3 py-2 text-xs uppercase outline-none focus:border-primary focus:ring-1 focus:ring-primary"
+          placeholder="WELCOME10"
         />
-        {status === \"checking\" && (
-          <p className=\"text-[10px] text-neutral-500\">Vérification du code promo...</p>
+        {status === "checking" && (
+          <p className="text-[10px] text-neutral-500">Vérification du code promo...</p>
         )}
-        {status === \"valid\" && (
-          <p className=\"text-[10px] text-primary\">Code promo appliqué.</p>
+        {status === "valid" && (
+          <p className="text-[10px] text-primary">Code promo appliqué.</p>
         )}
-        {status === \"invalid\" && (
-          <p className=\"text-[10px] text-red-600\">Code promo invalide ou expiré.</p>
+        {status === "invalid" && (
+          <p className="text-[10px] text-red-600">Code promo invalide ou expiré.</p>
         )}
       </div>
 
-      <div className=\"rounded-xl bg-neutral-50 p-3 text-[10px] text-neutral-600\">
-        <p className=\"font-semibold\">Politique d&apos;annulation</p>
-        <p className=\"mt-1\">
+      <div className="rounded-xl bg-neutral-50 p-3 text-[10px] text-neutral-600">
+        <p className="font-semibold">Politique d&apos;annulation</p>
+        <p className="mt-1">
           Acompte de 30% non remboursable à moins de 30 jours de l&apos;arrivée. Solde à régler 14 jours
           avant l&apos;arrivée. Conditions détaillées précisées dans les CGV.
         </p>

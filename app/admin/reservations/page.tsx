@@ -1,6 +1,7 @@
 import { prisma } from "@/lib/prisma";
 import { requireAuth, isAdmin } from "@/lib/auth";
 import { ReservationStatus } from "@prisma/client";
+import { revalidatePath } from "next/cache";
 
 type PageProps = {
   searchParams: {
@@ -85,16 +86,14 @@ export default async function AdminReservationsPage({
         </button>
       </form>
 
-      <form
-        action={exportCsv}
-        className="mt-3 text-[11px] text-neutral-400"
-      >
-        <input type="hidden" name="status" value={searchParams.status ?? ""} />
-        <input type="hidden" name="q" value={q ?? ""} />
-        <button className="rounded-full border border-neutral-700 px-3 py-1.5 text-[11px] text-neutral-200 hover:border-primary">
-          Exporter en CSV
-        </button>
-      </form>
+      <div className="mt-3">
+        <a
+          href={`/api/admin/reservations/export?status=${searchParams.status ?? ""}&q=${q ?? ""}`}
+          className="inline-block rounded-full border border-neutral-700 px-3 py-1.5 text-[11px] text-neutral-200 hover:border-primary"
+        >
+          ↓ Exporter en CSV
+        </a>
+      </div>
 
       <div className="mt-4 overflow-hidden rounded-2xl border border-neutral-800 bg-[#050505]">
         <table className="w-full border-collapse text-[11px] text-neutral-200">
@@ -162,24 +161,22 @@ export default async function AdminReservationsPage({
                     >
                       Détail
                     </a>
-                    <button
-                      type="button"
-                      className="rounded-full border border-neutral-700 px-2 py-0.5 text-[10px] text-neutral-200 hover:border-primary"
-                    >
-                      Confirmer
-                    </button>
-                    <button
-                      type="button"
-                      className="rounded-full border border-neutral-700 px-2 py-0.5 text-[10px] text-neutral-200 hover:border-cta"
-                    >
-                      Annuler
-                    </button>
-                    <button
-                      type="button"
-                      className="rounded-full border border-neutral-700 px-2 py-0.5 text-[10px] text-neutral-200 hover:border-primary"
-                    >
-                      Email
-                    </button>
+                    {r.status === "PENDING" && (
+                      <form action={confirmReservation}>
+                        <input type="hidden" name="id" value={r.id} />
+                        <button className="rounded-full border border-neutral-700 px-2 py-0.5 text-[10px] text-neutral-200 hover:border-primary hover:text-primary">
+                          Confirmer
+                        </button>
+                      </form>
+                    )}
+                    {(r.status === "PENDING" || r.status === "CONFIRMED") && (
+                      <form action={cancelReservation}>
+                        <input type="hidden" name="id" value={r.id} />
+                        <button className="rounded-full border border-neutral-700 px-2 py-0.5 text-[10px] text-neutral-200 hover:border-cta hover:text-cta">
+                          Annuler
+                        </button>
+                      </form>
+                    )}
                   </div>
                 </td>
               </tr>
@@ -215,63 +212,27 @@ export default async function AdminReservationsPage({
   );
 }
 
-async function exportCsv(formData: FormData) {
+async function confirmReservation(formData: FormData) {
   "use server";
-  const status = formData.get("status") as string | null;
-  const q = (formData.get("q") as string | null)?.trim();
-
-  const where = {
-    ...(status && status !== "ALL" && { status: status as ReservationStatus }),
-    ...(q && {
-      OR: [
-        { guestName: { contains: q, mode: "insensitive" as const } },
-        { guestEmail: { contains: q, mode: "insensitive" as const } },
-        {
-          confirmationCode: {
-            contains: q,
-            mode: "insensitive" as const,
-          },
-        },
-      ],
-    }),
-  };
-
-  const reservations = await prisma.reservation.findMany({
-    where,
-    orderBy: { checkIn: "desc" },
+  const id = Number(formData.get("id"));
+  await prisma.reservation.update({
+    where: { id },
+    data: { status: "CONFIRMED" },
   });
+  revalidatePath("/admin/reservations");
+}
 
-  const rows = [
-    [
-      "id",
-      "confirmationCode",
-      "guestName",
-      "guestEmail",
-      "checkIn",
-      "checkOut",
-      "nbGuests",
-      "totalAmount",
-      "status",
-      "paymentStatus",
-    ],
-    ...reservations.map((r) => [
-      r.id,
-      r.confirmationCode,
-      r.guestName,
-      r.guestEmail,
-      r.checkIn.toISOString(),
-      r.checkOut.toISOString(),
-      r.nbGuests,
-      r.totalAmount.toString(),
-      r.status,
-      r.paymentStatus,
-    ]),
-  ];
-
-  const csv = rows.map((r) => r.join(",")).join("\n");
-
-  // TODO: retourner en streaming ou mettre en storage; pour l'instant, log
-  // eslint-disable-next-line no-console
-  console.log("CSV export\n", csv);
+async function cancelReservation(formData: FormData) {
+  "use server";
+  const id = Number(formData.get("id"));
+  await prisma.reservation.update({
+    where: { id },
+    data: {
+      status: "CANCELLED",
+      cancellationReason: "Annulée depuis le backoffice admin",
+      cancelledAt: new Date(),
+    },
+  });
+  revalidatePath("/admin/reservations");
 }
 

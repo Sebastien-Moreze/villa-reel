@@ -1,6 +1,6 @@
 import { requireAuth, isAdmin } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
-import { DashboardChart } from "@/components/admin/DashboardChart";
+import { DashboardChart, type ChartDataPoint } from "@/components/admin/DashboardChart";
 
 export default async function AdminDashboardPage() {
   await requireAuth();
@@ -56,6 +56,26 @@ export default async function AdminDashboardPage() {
       ? Math.round((occupiedNights / totalNightsInMonth) * 100)
       : 0;
 
+  // ── Last 12 months revenue ────────────────────────────────────────────────
+  const MONTH_LABELS_FR = ["Jan","Fév","Mar","Avr","Mai","Juin","Juil","Août","Sep","Oct","Nov","Déc"];
+  const chartData: ChartDataPoint[] = [];
+  for (let i = 11; i >= 0; i--) {
+    const d = new Date(now.getFullYear(), now.getMonth() - i, 1);
+    const start = new Date(d.getFullYear(), d.getMonth(), 1);
+    const end = new Date(d.getFullYear(), d.getMonth() + 1, 0, 23, 59, 59);
+    const agg = await prisma.reservation.aggregate({
+      _sum: { totalAmount: true },
+      where: {
+        status: { in: ["CONFIRMED", "COMPLETED"] },
+        checkIn: { gte: start, lte: end },
+      },
+    });
+    chartData.push({
+      month: MONTH_LABELS_FR[d.getMonth()],
+      revenue: Number(agg._sum.totalAmount ?? 0),
+    });
+  }
+
   const upcomingReservations = await prisma.reservation.findMany({
     where: {
       checkIn: { gte: now },
@@ -106,7 +126,7 @@ export default async function AdminDashboardPage() {
           <p className="mb-3 text-[11px] text-neutral-500">
             Vue synthétique sur les 12 derniers mois.
           </p>
-          <DashboardChart />
+          <DashboardChart data={chartData} />
         </div>
 
         <div className="space-y-4">

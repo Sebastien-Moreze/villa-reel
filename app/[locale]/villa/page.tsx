@@ -63,11 +63,11 @@ export default async function VillaPage({ params }: PageProps) {
               <span className="text-yellow-300">★★★★★</span>
               <span>Villa d&apos;exception</span>
             </div>
-            <h1 className="text-3xl font-semibold tracking-tight md:text-4xl">
+            <h1 className="text-3xl font-semibold uppercase tracking-tight md:text-4xl">
               {locale === "en" ? villa.nameEn : villa.nameFr}
             </h1>
             <p className="mt-2 text-xs text-neutral-100/90 md:text-sm">
-              {villa.address}, {villa.city} ({villa.zipCode})
+              1281 route de Moussy, 74930 Reigner-Esery, France
             </p>
           </div>
         </div>

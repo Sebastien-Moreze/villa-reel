@@ -10,22 +10,16 @@ import {
   YAxis,
 } from "recharts";
 
-const data = [
-  { month: "Jan", revenue: 1200 },
-  { month: "Fév", revenue: 1800 },
-  { month: "Mar", revenue: 2200 },
-  { month: "Avr", revenue: 900 },
-  { month: "Mai", revenue: 2600 },
-  { month: "Juin", revenue: 3100 },
-  { month: "Juil", revenue: 0 },
-  { month: "Août", revenue: 0 },
-  { month: "Sep", revenue: 0 },
-  { month: "Oct", revenue: 0 },
-  { month: "Nov", revenue: 0 },
-  { month: "Déc", revenue: 0 },
-];
+export type ChartDataPoint = {
+  month: string;
+  revenue: number;
+};
 
-export function DashboardChart() {
+type DashboardChartProps = {
+  data: ChartDataPoint[];
+};
+
+export function DashboardChart({ data }: DashboardChartProps) {
   return (
     <div className="h-56 w-full text-[11px] text-neutral-200">
       <ResponsiveContainer width="100%" height="100%">
@@ -47,6 +41,9 @@ export function DashboardChart() {
               fontSize: 11,
             }}
             labelStyle={{ color: "#e5e7eb" }}
+            formatter={(value: number) =>
+              value.toLocaleString("fr-FR", { style: "currency", currency: "EUR" })
+            }
           />
           <Area
             type="monotone"

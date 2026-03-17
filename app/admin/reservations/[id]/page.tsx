@@ -1,5 +1,7 @@
 import { prisma } from "@/lib/prisma";
 import { requireAuth, isAdmin } from "@/lib/auth";
+import { revalidatePath } from "next/cache";
+import { sendBalanceReminderEmail } from "@/lib/emails";
 
 type PageProps = {
   params: { id: string };
@@ -19,7 +21,7 @@ export default async function ReservationDetailPage({ params }: PageProps) {
   const id = Number(params.id);
   const reservation = await prisma.reservation.findUnique({
     where: { id },
-    include: { villa: true, promoCode: true },
+    include: { villa: true, promoCode: true, review: true },
   });
 
   if (!reservation) {
@@ -30,131 +32,298 @@ export default async function ReservationDetailPage({ params }: PageProps) {
     );
   }
 
+  const now = new Date();
+
+  const timeline = [
+    { label: "Réservation créée",         date: reservation.createdAt,  done: true,                                                                    color: "bg-primary" },
+    { label: "Acompte 30% encaissé",       date: null as Date | null,    done: ["DEPOSIT_PAID","FULLY_PAID","REFUNDED"].includes(reservation.paymentStatus), color: "bg-secondary" },
+    { label: `Solde dû (J-30)`,            date: null as Date | null,    done: reservation.paymentStatus === "FULLY_PAID",                              color: "bg-secondary" },
+    { label: `Arrivée ${reservation.checkIn.toLocaleDateString("fr-FR")}`,  date: reservation.checkIn,  done: reservation.checkIn <= now,  color: "bg-yellow-500" },
+    { label: `Départ ${reservation.checkOut.toLocaleDateString("fr-FR")}`, date: reservation.checkOut, done: reservation.checkOut <= now, color: "bg-cta"         },
+    { label: "Séjour terminé",             date: null as Date | null,    done: reservation.status === "COMPLETED",                                      color: "bg-neutral-500" },
+  ];
+
+  const expectedEmails = [
+    { label: "Confirmation de réservation", desc: "À la création / confirmation",           sent: ["CONFIRMED","COMPLETED"].includes(reservation.status) },
+    { label: "Rappel solde (J-35)",          desc: "35 jours avant l'arrivée (automatique)", sent: ["FULLY_PAID","REFUNDED"].includes(reservation.paymentStatus) },
+    { label: "Confirmation solde payé",      desc: "Après encaissement du solde",             sent: reservation.paymentStatus === "FULLY_PAID" },
+    { label: "Rappel d'arrivée",             desc: "3 jours avant l'arrivée",                sent: reservation.checkIn <= now },
+    { label: "Demande d'avis",               desc: "2 jours après le départ",                sent: reservation.checkOut < now && reservation.status === "COMPLETED" },
+  ];
+
+  const statusCls: Record<string, string> = {
+    PENDING:   "bg-yellow-400/10 text-yellow-400",
+    CONFIRMED: "bg-primary/20 text-primary",
+    CANCELLED: "bg-cta/10 text-cta",
+    COMPLETED: "bg-secondary/20 text-secondary",
+  };
+  const paymentCls: Record<string, string> = {
+    AWAITING:     "bg-yellow-400/10 text-yellow-400",
+    DEPOSIT_PAID: "bg-blue-400/10 text-blue-400",
+    FULLY_PAID:   "bg-primary/20 text-primary",
+    REFUNDED:     "bg-neutral-700 text-neutral-400",
+  };
+
   return (
     <div className="mx-auto max-w-5xl px-4 py-6 md:px-6">
-      <h1 className="text-lg font-semibold text-neutral-50">
-        Détail réservation
-      </h1>
-      <p className="mt-1 text-[11px] text-neutral-400">
-        Code {reservation.confirmationCode} – {reservation.guestName}
-      </p>
-
-      <div className="mt-4 grid gap-4 md:grid-cols-[2fr,1.2fr]">
-        <section className="space-y-4 rounded-2xl border border-neutral-800 bg-[#050505] p-4 text-[11px] text-neutral-200">
-          <h2 className="text-xs font-semibold text-neutral-100">
-            Informations voyageur
-          </h2>
-          <p>
-            <span className="text-neutral-400">Nom :</span>{" "}
-            <span className="font-semibold">{reservation.guestName}</span>
-          </p>
-          <p>
-            <span className="text-neutral-400">Email :</span>{" "}
-            {reservation.guestEmail}
-          </p>
-          {reservation.guestPhone && (
-            <p>
-              <span className="text-neutral-400">Téléphone :</span>{" "}
-              {reservation.guestPhone}
-            </p>
-          )}
-          {reservation.guestAddress && (
-            <p>
-              <span className="text-neutral-400">Adresse :</span>{" "}
-              {reservation.guestAddress}
-            </p>
-          )}
-          <p>
-            <span className="text-neutral-400">Séjour :</span>{" "}
-            {reservation.checkIn.toLocaleDateString("fr-FR")} →{" "}
-            {reservation.checkOut.toLocaleDateString("fr-FR")} (
-            {reservation.nbNights} nuits, {reservation.nbGuests} personnes)
-          </p>
-          <p>
-            <span className="text-neutral-400">Villa :</span>{" "}
-            {reservation.villa.nameFr}
-          </p>
-          {reservation.promoCode && (
-            <p>
-              <span className="text-neutral-400">Code promo :</span>{" "}
-              {reservation.promoCode.code}
-            </p>
-          )}
-        </section>
-
-        <section className="space-y-3 rounded-2xl border border-neutral-800 bg-[#050505] p-4 text-[11px] text-neutral-200">
-          <h2 className="text-xs font-semibold text-neutral-100">
-            Paiements
-          </h2>
-          <p>
-            <span className="text-neutral-400">Total séjour :</span>{" "}
-            {Number(reservation.totalAmount).toLocaleString("fr-FR", {
-              style: "currency",
-              currency: "EUR",
-            })}
-          </p>
-          <p>
-            <span className="text-neutral-400">Acompte :</span>{" "}
-            {Number(reservation.depositAmount ?? 0).toLocaleString("fr-FR", {
-              style: "currency",
-              currency: "EUR",
-            })}
-          </p>
-          <p>
-            <span className="text-neutral-400">Solde :</span>{" "}
-            {Number(reservation.balanceAmount ?? 0).toLocaleString("fr-FR", {
-              style: "currency",
-              currency: "EUR",
-            })}
-          </p>
-          <p>
-            <span className="text-neutral-400">Statut paiement :</span>{" "}
+      {/* Header */}
+      <div className="flex flex-wrap items-start justify-between gap-3">
+        <div>
+          <a href="/admin/reservations" className="text-[11px] text-neutral-500 hover:text-neutral-300">
+            ← Réservations
+          </a>
+          <h1 className="mt-1 text-lg font-semibold text-neutral-50">{reservation.confirmationCode}</h1>
+          <p className="text-[11px] text-neutral-400">{reservation.guestName} · {reservation.villa.nameFr}</p>
+        </div>
+        <div className="flex flex-wrap gap-2">
+          <span className={`rounded-full px-3 py-1 text-[11px] font-semibold ${statusCls[reservation.status]}`}>
+            {reservation.status}
+          </span>
+          <span className={`rounded-full px-3 py-1 text-[11px] font-semibold ${paymentCls[reservation.paymentStatus]}`}>
             {reservation.paymentStatus}
-          </p>
-          <div className="mt-3 flex flex-wrap gap-2">
-            <button
-              type="button"
-              className="rounded-full border border-neutral-700 px-3 py-1 text-[11px] text-neutral-200 hover:border-primary"
-            >
-              Marquer payé
-            </button>
-            <button
-              type="button"
-              className="rounded-full border border-neutral-700 px-3 py-1 text-[11px] text-neutral-200 hover:border-cta"
-            >
-              Rembourser
-            </button>
-            <button
-              type="button"
-              className="rounded-full border border-neutral-700 px-3 py-1 text-[11px] text-neutral-200 hover:border-primary"
-            >
-              Envoyer rappel
-            </button>
-          </div>
-        </section>
+          </span>
+        </div>
       </div>
 
-      <div className="mt-4 grid gap-4 md:grid-cols-2">
-        <section className="rounded-2xl border border-neutral-800 bg-[#050505] p-4 text-[11px] text-neutral-200">
-          <h2 className="text-xs font-semibold text-neutral-100">
-            Timeline des paiements
-          </h2>
-          <p className="mt-2 text-neutral-500">
-            Historique détaillé à implémenter (journal des PaymentIntents,
-            captures et remboursements).
-          </p>
-        </section>
-        <section className="rounded-2xl border border-neutral-800 bg-[#050505] p-4 text-[11px] text-neutral-200">
-          <h2 className="text-xs font-semibold text-neutral-100">
-            Historique des emails
-          </h2>
-          <p className="mt-2 text-neutral-500">
-            À connecter avec votre système d&apos;emails (confirmation,
-            rappels, arrivée, avis...).
-          </p>
-        </section>
+      <div className="mt-5 grid gap-4 md:grid-cols-[1.4fr,1fr]">
+        {/* Gauche */}
+        <div className="space-y-4">
+          <Card title="Voyageur">
+            <Row label="Nom"        value={reservation.guestName} />
+            <Row label="Email"      value={reservation.guestEmail} />
+            {reservation.guestPhone   && <Row label="Téléphone" value={reservation.guestPhone} />}
+            {reservation.guestAddress && <Row label="Adresse"   value={reservation.guestAddress} />}
+            <Row label="Séjour" value={`${reservation.checkIn.toLocaleDateString("fr-FR")} → ${reservation.checkOut.toLocaleDateString("fr-FR")} · ${reservation.nbNights} nuits · ${reservation.nbGuests} pers.`} />
+            <Row label="Langue" value={reservation.locale} />
+            {reservation.promoCode && (
+              <Row label="Promo" value={`${reservation.promoCode.code} (${reservation.promoCode.type === "PERCENT" ? `−${reservation.promoCode.value}%` : `−${reservation.promoCode.value} €`})`} />
+            )}
+          </Card>
+
+          <Card title="Finances">
+            <Row label="Prix / nuit"  value={`${Number(reservation.pricePerNight).toLocaleString("fr-FR")} €`} />
+            <Row label="Ménage"       value={`${Number(reservation.cleaningFee).toLocaleString("fr-FR")} €`} />
+            {Number(reservation.discount ?? 0) > 0 && (
+              <Row label="Remise" value={`−${Number(reservation.discount).toLocaleString("fr-FR")} €`} highlight />
+            )}
+            <Row label="Total TTC"    value={`${Number(reservation.totalAmount).toLocaleString("fr-FR")} €`} bold />
+            <Row label="Acompte (30%)" value={`${Number(reservation.depositAmount ?? 0).toLocaleString("fr-FR")} €`} />
+            <Row label="Solde"        value={`${Number(reservation.balanceAmount ?? 0).toLocaleString("fr-FR")} €`} />
+            {reservation.stripePaymentIntentId && (
+              <Row label="Stripe ID" value={reservation.stripePaymentIntentId} mono />
+            )}
+          </Card>
+
+          <Card title="Actions">
+            <div className="flex flex-wrap gap-2 pt-1">
+              {reservation.paymentStatus === "DEPOSIT_PAID" && (
+                <form action={markAsPaid}>
+                  <input type="hidden" name="id" value={id} />
+                  <button className="rounded-full bg-primary px-3 py-1.5 text-[11px] font-semibold text-white hover:opacity-90">
+                    Marquer solde payé
+                  </button>
+                </form>
+              )}
+              {reservation.status === "PENDING" && (
+                <form action={confirmAction}>
+                  <input type="hidden" name="id" value={id} />
+                  <button className="rounded-full border border-primary px-3 py-1.5 text-[11px] text-primary hover:bg-primary/10">
+                    Confirmer
+                  </button>
+                </form>
+              )}
+              {reservation.paymentStatus === "DEPOSIT_PAID" && (
+                <form action={sendBalanceReminder}>
+                  <input type="hidden" name="id" value={id} />
+                  <button className="rounded-full border border-secondary px-3 py-1.5 text-[11px] text-secondary hover:bg-secondary/10">
+                    Envoyer rappel solde
+                  </button>
+                </form>
+              )}
+              {reservation.status === "COMPLETED" && !reservation.review && (
+                <form action={sendReviewRequest}>
+                  <input type="hidden" name="id" value={id} />
+                  <button className="rounded-full border border-neutral-700 px-3 py-1.5 text-[11px] text-neutral-300 hover:border-secondary hover:text-secondary">
+                    Demander un avis
+                  </button>
+                </form>
+              )}
+              {["PENDING","CONFIRMED"].includes(reservation.status) && (
+                <form action={cancelAction}>
+                  <input type="hidden" name="id" value={id} />
+                  <button className="rounded-full border border-neutral-700 px-3 py-1.5 text-[11px] text-neutral-400 hover:border-cta hover:text-cta">
+                    Annuler
+                  </button>
+                </form>
+              )}
+              {["DEPOSIT_PAID","FULLY_PAID"].includes(reservation.paymentStatus) && reservation.stripePaymentIntentId && (
+                <form action={processRefund}>
+                  <input type="hidden" name="id" value={id} />
+                  <button className="rounded-full border border-neutral-700 px-3 py-1.5 text-[11px] text-neutral-400 hover:border-cta hover:text-cta">
+                    Rembourser via Stripe
+                  </button>
+                </form>
+              )}
+            </div>
+          </Card>
+        </div>
+
+        {/* Droite */}
+        <div className="space-y-4">
+          <Card title="Timeline">
+            <ol className="relative border-l border-neutral-800 pl-4 space-y-3 pt-1">
+              {timeline.map((step, i) => (
+                <li key={i} className="relative">
+                  <span className={`absolute -left-[21px] mt-0.5 flex h-3.5 w-3.5 items-center justify-center rounded-full border border-neutral-900 ${step.done ? step.color : "bg-neutral-800"}`} />
+                  <p className={`text-[11px] font-semibold ${step.done ? "text-neutral-100" : "text-neutral-600"}`}>{step.label}</p>
+                  {step.date && (
+                    <p className="text-[10px] text-neutral-500">
+                      {step.date.toLocaleDateString("fr-FR", { weekday: "short", day: "numeric", month: "short", year: "numeric" })}
+                    </p>
+                  )}
+                </li>
+              ))}
+            </ol>
+          </Card>
+
+          <Card title="Emails">
+            <ul className="space-y-2 pt-1">
+              {expectedEmails.map((e, i) => (
+                <li key={i} className="flex items-start gap-2">
+                  <span className={`mt-0.5 text-sm leading-none ${e.sent ? "text-primary" : "text-neutral-700"}`}>
+                    {e.sent ? "✓" : "○"}
+                  </span>
+                  <div>
+                    <p className={`text-[11px] font-semibold ${e.sent ? "text-neutral-200" : "text-neutral-600"}`}>{e.label}</p>
+                    <p className="text-[10px] text-neutral-500">{e.desc}</p>
+                  </div>
+                </li>
+              ))}
+            </ul>
+          </Card>
+
+          {reservation.review && (
+            <Card title="Avis client">
+              <div className="flex gap-0.5 pt-1">
+                {Array.from({ length: 5 }).map((_, i) => (
+                  <span key={i} className={i < reservation.review!.rating ? "text-yellow-400" : "text-neutral-700"}>★</span>
+                ))}
+                <span className="ml-1 text-[10px] text-neutral-500">({reservation.review.rating}/5)</span>
+              </div>
+              {reservation.review.comment && (
+                <p className="mt-2 text-[11px] italic text-neutral-300">&ldquo;{reservation.review.comment}&rdquo;</p>
+              )}
+              <p className={`mt-1 text-[10px] ${reservation.review.status === "APPROVED" ? "text-primary" : "text-yellow-400"}`}>
+                {reservation.review.status}
+              </p>
+            </Card>
+          )}
+        </div>
       </div>
     </div>
   );
 }
 
+// ── Server Actions ────────────────────────────────────────────────────────
+
+async function markAsPaid(formData: FormData) {
+  "use server";
+  const id = Number(formData.get("id"));
+  await prisma.reservation.update({ where: { id }, data: { paymentStatus: "FULLY_PAID", status: "CONFIRMED" } });
+  revalidatePath(`/admin/reservations/${id}`);
+}
+
+async function confirmAction(formData: FormData) {
+  "use server";
+  const id = Number(formData.get("id"));
+  await prisma.reservation.update({ where: { id }, data: { status: "CONFIRMED" } });
+  revalidatePath(`/admin/reservations/${id}`);
+}
+
+async function cancelAction(formData: FormData) {
+  "use server";
+  const id = Number(formData.get("id"));
+  await prisma.reservation.update({
+    where: { id },
+    data: { status: "CANCELLED", cancellationReason: "Annulée depuis le backoffice admin", cancelledAt: new Date() },
+  });
+  revalidatePath(`/admin/reservations/${id}`);
+}
+
+async function sendBalanceReminder(formData: FormData) {
+  "use server";
+  const id = Number(formData.get("id"));
+  const reservation = await prisma.reservation.findUnique({ where: { id } });
+  if (!reservation) return;
+
+  const balanceDue = new Date(reservation.checkIn);
+  balanceDue.setDate(balanceDue.getDate() - 30);
+
+  await sendBalanceReminderEmail({
+    locale: reservation.locale === "EN" ? "en" : "fr",
+    to: reservation.guestEmail,
+    confirmationCode: reservation.confirmationCode,
+    balanceAmount: Number(reservation.balanceAmount ?? 0),
+    balanceDueDate: balanceDue.toLocaleDateString("fr-FR"),
+    paymentUrl: `${process.env.NEXT_PUBLIC_APP_URL}/reservation/solde/${reservation.confirmationCode}`,
+  });
+  revalidatePath(`/admin/reservations/${id}`);
+}
+
+async function sendReviewRequest(formData: FormData) {
+  "use server";
+  const id = Number(formData.get("id"));
+  const reservation = await prisma.reservation.findUnique({ where: { id } });
+  if (!reservation) return;
+
+  const { sendReviewRequestEmail } = await import("@/lib/emails");
+  await sendReviewRequestEmail({
+    locale: reservation.locale === "EN" ? "en" : "fr",
+    to: reservation.guestEmail,
+    guestName: reservation.guestName,
+    reviewUrl: `${process.env.NEXT_PUBLIC_APP_URL}/avis/${reservation.confirmationCode}`,
+  });
+  revalidatePath(`/admin/reservations/${id}`);
+}
+
+async function processRefund(formData: FormData) {
+  "use server";
+  const id = Number(formData.get("id"));
+  const reservation = await prisma.reservation.findUnique({ where: { id } });
+  if (!reservation?.stripePaymentIntentId) return;
+
+  try {
+    const Stripe = (await import("stripe")).default;
+    const stripe = new Stripe(process.env.STRIPE_SK ?? "", { apiVersion: "2026-02-25.clover" as const });
+    await stripe.refunds.create({ payment_intent: reservation.stripePaymentIntentId });
+    await prisma.reservation.update({
+      where: { id },
+      data: { paymentStatus: "REFUNDED", status: "CANCELLED", cancellationReason: "Remboursement via backoffice", cancelledAt: new Date() },
+    });
+  } catch (err) {
+    console.error("Stripe refund error", err);
+  }
+  revalidatePath(`/admin/reservations/${id}`);
+}
+
+// ── Composants ───────────────────────────────────────────────────────────
+
+function Card({ title, children }: { title: string; children: React.ReactNode }) {
+  return (
+    <div className="rounded-2xl border border-neutral-800 bg-[#0c0c0c] p-4">
+      <p className="mb-3 text-xs font-semibold text-neutral-100">{title}</p>
+      <div className="space-y-1.5 text-[11px]">{children}</div>
+    </div>
+  );
+}
+
+function Row({ label, value, bold, highlight, mono }: { label: string; value: string; bold?: boolean; highlight?: boolean; mono?: boolean }) {
+  return (
+    <div className="flex items-start justify-between gap-2 border-b border-neutral-800/60 pb-1.5 last:border-0 last:pb-0">
+      <span className="shrink-0 text-neutral-500">{label}</span>
+      <span className={`text-right ${bold ? "font-semibold text-neutral-50" : ""} ${highlight ? "text-secondary" : "text-neutral-200"} ${mono ? "font-mono text-[10px] break-all" : ""}`}>
+        {value}
+      </span>
+    </div>
+  );
+}

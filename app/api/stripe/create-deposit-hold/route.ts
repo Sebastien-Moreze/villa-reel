@@ -18,7 +18,7 @@ export async function POST(request: Request) {
   }
 
   const stripe = new Stripe(secret, {
-    apiVersion: "2024-06-20",
+    apiVersion: "2026-02-25.clover",
   });
 
   const amount = body.amount;

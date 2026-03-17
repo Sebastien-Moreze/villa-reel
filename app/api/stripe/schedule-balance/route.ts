@@ -12,7 +12,7 @@ export async function POST() {
   }
 
   const stripe = new Stripe(secret, {
-    apiVersion: "2024-06-20",
+    apiVersion: "2026-02-25.clover",
   });
 
   const today = new Date();
@@ -41,11 +41,11 @@ export async function POST() {
   });
 
   for (const reservation of reservations) {
-    const balanceAmount = reservation.balanceAmount ?? 0;
+    const balanceAmount = Number(reservation.balanceAmount ?? 0);
     if (balanceAmount <= 0) continue;
 
     try {
-      await stripe.paymentIntents.create({
+      const intent = await stripe.paymentIntents.create({
         amount: Math.round(Number(balanceAmount) * 100),
         currency: "eur",
         automatic_payment_methods: { enabled: true },
@@ -54,6 +54,11 @@ export async function POST() {
           villaId: String(reservation.villaId),
           type: "balance",
         },
+      });
+
+      await prisma.reservation.update({
+        where: { id: reservation.id },
+        data: { stripePaymentIntentId: intent.id },
       });
     } catch (error) {
       console.error("Failed to create balance payment intent", error);

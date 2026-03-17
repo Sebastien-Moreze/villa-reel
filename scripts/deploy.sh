@@ -52,9 +52,15 @@ docker run -d \
   -e NODE_ENV="${NODE_ENV:-production}" \
   -e DATABASE_URL="${DATABASE_URL:-}" \
   -e NEXTAUTH_SECRET="${NEXTAUTH_SECRET:-}" \
+  -e NEXTAUTH_URL="${NEXTAUTH_URL:-}" \
   -e STRIPE_SK="${STRIPE_SK:-}" \
+  -e STRIPE_PK="${STRIPE_PK:-}" \
   -e STRIPE_WEBHOOK_SECRET="${STRIPE_WEBHOOK_SECRET:-}" \
   -e RESEND_API_KEY="${RESEND_API_KEY:-}" \
+  -e CONTACT_EMAIL="${CONTACT_EMAIL:-}" \
+  -e HCAPTCHA_SECRET="${HCAPTCHA_SECRET:-}" \
+  -e NEXT_PUBLIC_HCAPTCHA_SITE_KEY="${NEXT_PUBLIC_HCAPTCHA_SITE_KEY:-}" \
+  -e NEXT_PUBLIC_APP_URL="${NEXT_PUBLIC_APP_URL:-}" \
   "$IMAGE"
 
 log "Running health check on ${HEALTHCHECK_URL}"
@@ -89,9 +95,15 @@ if [ "$success" -ne 1 ]; then
       -e NODE_ENV="${NODE_ENV:-production}" \
       -e DATABASE_URL="${DATABASE_URL:-}" \
       -e NEXTAUTH_SECRET="${NEXTAUTH_SECRET:-}" \
+      -e NEXTAUTH_URL="${NEXTAUTH_URL:-}" \
       -e STRIPE_SK="${STRIPE_SK:-}" \
+      -e STRIPE_PK="${STRIPE_PK:-}" \
       -e STRIPE_WEBHOOK_SECRET="${STRIPE_WEBHOOK_SECRET:-}" \
       -e RESEND_API_KEY="${RESEND_API_KEY:-}" \
+      -e CONTACT_EMAIL="${CONTACT_EMAIL:-}" \
+      -e HCAPTCHA_SECRET="${HCAPTCHA_SECRET:-}" \
+      -e NEXT_PUBLIC_HCAPTCHA_SITE_KEY="${NEXT_PUBLIC_HCAPTCHA_SITE_KEY:-}" \
+      -e NEXT_PUBLIC_APP_URL="${NEXT_PUBLIC_APP_URL:-}" \
       "$PREVIOUS_IMAGE_ID"
     log "Rollback completed, previous version is running."
   else
