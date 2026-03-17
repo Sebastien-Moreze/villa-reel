@@ -1,7 +1,8 @@
 'use client';
 
 import Link from "next/link";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
+import { useRouter } from "next/navigation";
 
 type HeroSectionProps = {
   locale: string;
@@ -9,6 +10,10 @@ type HeroSectionProps = {
 
 export function HeroSection({ locale }: HeroSectionProps) {
   const [offset, setOffset] = useState(0);
+  const router = useRouter();
+  const checkInRef = useRef<HTMLInputElement>(null);
+  const checkOutRef = useRef<HTMLInputElement>(null);
+  const guestsRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     const onScroll = () => {
@@ -20,6 +25,15 @@ export function HeroSection({ locale }: HeroSectionProps) {
   }, []);
 
   const buildHref = (path: string) => `/${locale}${path}`;
+
+  function handleSearch(e: React.FormEvent) {
+    e.preventDefault();
+    const params = new URLSearchParams();
+    if (checkInRef.current?.value)  params.set("checkIn",  checkInRef.current.value);
+    if (checkOutRef.current?.value) params.set("checkOut", checkOutRef.current.value);
+    if (guestsRef.current?.value)   params.set("guests",   guestsRef.current.value);
+    router.push(`/${locale}/reservation?${params.toString()}`);
+  }
 
   return (
     <section className="relative min-h-[80vh] overflow-hidden">
@@ -75,14 +89,17 @@ export function HeroSection({ locale }: HeroSectionProps) {
           <div className="w-full max-w-3xl rounded-2xl bg-white/95 p-4 shadow-2xl shadow-primary/20 backdrop-blur">
             <form
               className="grid gap-3 text-sm text-neutral-800 sm:grid-cols-[1.2fr,1.2fr,1fr,auto]"
-              onSubmit={(e) => e.preventDefault()}
+              onSubmit={handleSearch}
             >
               <div className="flex flex-col">
                 <label className="text-xs font-semibold text-neutral-500">
                   Arrivée
                 </label>
                 <input
+                  ref={checkInRef}
                   type="date"
+                  name="checkIn"
+                  min={new Date().toISOString().split("T")[0]}
                   className="mt-1 rounded-lg border border-neutral-200 px-3 py-2 text-sm outline-none focus:border-primary focus:ring-1 focus:ring-primary"
                 />
               </div>
@@ -91,7 +108,10 @@ export function HeroSection({ locale }: HeroSectionProps) {
                   Départ
                 </label>
                 <input
+                  ref={checkOutRef}
                   type="date"
+                  name="checkOut"
+                  min={new Date().toISOString().split("T")[0]}
                   className="mt-1 rounded-lg border border-neutral-200 px-3 py-2 text-sm outline-none focus:border-primary focus:ring-1 focus:ring-primary"
                 />
               </div>
@@ -100,7 +120,9 @@ export function HeroSection({ locale }: HeroSectionProps) {
                   Voyageurs
                 </label>
                 <input
+                  ref={guestsRef}
                   type="number"
+                  name="guests"
                   min={1}
                   className="mt-1 rounded-lg border border-neutral-200 px-3 py-2 text-sm outline-none focus:border-primary focus:ring-1 focus:ring-primary"
                   placeholder="2 adultes"

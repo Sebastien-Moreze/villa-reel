@@ -1,5 +1,7 @@
 'use client';
 
+import Link from "next/link";
+
 type Props = {
   confirmationCode: string;
   summary: {
@@ -83,12 +85,12 @@ export function ReservationStep5({ confirmationCode, summary }: Props) {
         >
           Télécharger la confirmation
         </button>
-        <a
+        <Link
           href="/"
           className="inline-flex items-center justify-center rounded-full bg-primary px-4 py-2 text-[11px] font-semibold text-white shadow-md hover:opacity-90"
         >
           Retour à l&apos;accueil
-        </a>
+        </Link>
       </div>
     </div>
   );

@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { differenceInCalendarDays, parseISO } from "date-fns";
 
 type Props = {
@@ -27,7 +27,6 @@ type BlockedRange = { startDate: string; endDate: string };
 
 export function ReservationStep1({ villaId, onChange }: Props) {
   const [bookingInfo, setBookingInfo] = useState<BookingInfo | null>(null);
-  const [blocked, setBlocked] = useState<BlockedRange[]>([]);
   const [checkIn, setCheckIn] = useState<string | null>(null);
   const [checkOut, setCheckOut] = useState<string | null>(null);
   const [guests, setGuests] = useState(2);
@@ -45,7 +44,7 @@ export function ReservationStep1({ villaId, onChange }: Props) {
         }
         if (availRes.ok) {
           const data = (await availRes.json()) as { blocked: BlockedRange[] };
-          setBlocked(data.blocked ?? []);
+          void data;
         }
       } catch {
         // ignore
@@ -53,6 +52,25 @@ export function ReservationStep1({ villaId, onChange }: Props) {
     };
     fetchData();
   }, [villaId]);
+
+  const computedError = useMemo(() => {
+    if (!bookingInfo || !checkIn || !checkOut) return null;
+
+    const start = parseISO(checkIn);
+    const end = parseISO(checkOut);
+    const nights = Math.max(differenceInCalendarDays(end, start), 0);
+
+    if (nights <= 0) {
+      return "La date de départ doit être postérieure à la date d'arrivée.";
+    }
+    if (nights < bookingInfo.minStay) {
+      return `Séjour minimum de ${bookingInfo.minStay} nuits.`;
+    }
+    if (bookingInfo.maxStay && nights > bookingInfo.maxStay) {
+      return `Séjour maximum de ${bookingInfo.maxStay} nuits.`;
+    }
+    return null;
+  }, [bookingInfo, checkIn, checkOut]);
 
   useEffect(() => {
     if (!bookingInfo || !checkIn || !checkOut) {
@@ -70,30 +88,21 @@ export function ReservationStep1({ villaId, onChange }: Props) {
     const end = parseISO(checkOut);
     const nights = Math.max(differenceInCalendarDays(end, start), 0);
 
-    if (nights <= 0) {
-      setError("La date de départ doit être postérieure à la date d'arrivée.");
-      onChange({ checkIn, checkOut, guests, nights: 0, total: 0 });
-      return;
-    }
-
-    if (nights < bookingInfo.minStay) {
-      setError(`Séjour minimum de ${bookingInfo.minStay} nuits.`);
-    } else if (bookingInfo.maxStay && nights > bookingInfo.maxStay) {
-      setError(`Séjour maximum de ${bookingInfo.maxStay} nuits.`);
-    } else {
-      setError(null);
-    }
+    void error;
 
     const total =
       nights * bookingInfo.pricePerNight +
       bookingInfo.cleaningFee +
       bookingInfo.deposit;
 
-    onChange({ checkIn, checkOut, guests, nights, total });
-  }, [bookingInfo, checkIn, checkOut, guests, onChange]);
-
-  const isBlocked = (dateStr: string) =>
-    blocked.some((r) => dateStr >= r.startDate && dateStr <= r.endDate);
+    onChange({
+      checkIn,
+      checkOut,
+      guests,
+      nights: computedError ? 0 : nights,
+      total: computedError ? 0 : total,
+    });
+  }, [bookingInfo, checkIn, checkOut, guests, onChange, computedError]);
 
   return (
     <div className="space-y-4 text-xs text-neutral-800">
@@ -157,8 +166,10 @@ export function ReservationStep1({ villaId, onChange }: Props) {
         </div>
       )}
 
-      {error && (
-        <p className="text-[11px] font-semibold text-red-600">{error}</p>
+      {(computedError ?? error) && (
+        <p className="text-[11px] font-semibold text-red-600">
+          {computedError ?? error}
+        </p>
       )}
 
       <p className="text-[10px] text-neutral-500">

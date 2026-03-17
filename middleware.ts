@@ -13,20 +13,19 @@ const ADMIN_PREFIX = "/admin";
 export async function middleware(req: NextRequest) {
   const { pathname } = req.nextUrl;
 
-  // Internationalisation pour toutes les routes publiques
-  const res = intlMiddleware(req);
-
-  // Redirection racine -> /fr
-  if (pathname === "/") {
-    return NextResponse.redirect(new URL(`/${defaultLocale}`, req.url));
+  // ── Routes API : bypass total (NextAuth, webhooks, etc.) ─────────────────
+  if (pathname.startsWith("/api/")) {
+    return NextResponse.next();
   }
 
-  // Admin sans locale (chemin distinct)
-  if (pathname.startsWith(`${ADMIN_PREFIX}/login`)) {
-    return res;
-  }
-
+  // ── Routes admin : bypass total du middleware i18n ────────────────────────
   if (pathname.startsWith(ADMIN_PREFIX)) {
+    // Page de login : accessible sans token
+    if (pathname.startsWith(`${ADMIN_PREFIX}/login`)) {
+      return NextResponse.next();
+    }
+
+    // Toutes les autres pages admin : vérification du token
     const token = await getToken({
       req,
       secret: process.env.NEXTAUTH_SECRET,
@@ -37,14 +36,17 @@ export async function middleware(req: NextRequest) {
       loginUrl.searchParams.set("callbackUrl", req.nextUrl.pathname);
       return NextResponse.redirect(loginUrl);
     }
+
+    return NextResponse.next();
   }
 
-  // Redirection /villa-reel -> /fr/villa-reel
-  if (pathname === "/villa-reel") {
-    return NextResponse.redirect(new URL(`/${defaultLocale}/villa-reel`, req.url));
+  // ── Redirection racine -> /fr ─────────────────────────────────────────────
+  if (pathname === "/") {
+    return NextResponse.redirect(new URL(`/${defaultLocale}`, req.url));
   }
 
-  return res;
+  // ── Internationalisation pour toutes les routes publiques ─────────────────
+  return intlMiddleware(req);
 }
 
 export const config = {

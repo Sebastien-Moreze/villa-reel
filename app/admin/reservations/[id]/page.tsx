@@ -2,6 +2,7 @@ import { prisma } from "@/lib/prisma";
 import { requireAuth, isAdmin } from "@/lib/auth";
 import { revalidatePath } from "next/cache";
 import { sendBalanceReminderEmail } from "@/lib/emails";
+import Link from "next/link";
 
 type PageProps = {
   params: { id: string };
@@ -69,9 +70,12 @@ export default async function ReservationDetailPage({ params }: PageProps) {
       {/* Header */}
       <div className="flex flex-wrap items-start justify-between gap-3">
         <div>
-          <a href="/admin/reservations" className="text-[11px] text-neutral-500 hover:text-neutral-300">
+          <Link
+            href="/admin/reservations"
+            className="text-[11px] text-neutral-500 hover:text-neutral-300"
+          >
             ← Réservations
-          </a>
+          </Link>
           <h1 className="mt-1 text-lg font-semibold text-neutral-50">{reservation.confirmationCode}</h1>
           <p className="text-[11px] text-neutral-400">{reservation.guestName} · {reservation.villa.nameFr}</p>
         </div>

@@ -18,11 +18,19 @@ COPY . .
 # ARG disponibles au build (ne pas mettre de secrets réels en dur)
 ARG DATABASE_URL
 ARG NEXTAUTH_SECRET
+ARG NEXTAUTH_URL
 ARG STRIPE_SK
+ARG STRIPE_PK
 ARG STRIPE_WEBHOOK_SECRET
 ARG RESEND_API_KEY
+ARG CONTACT_EMAIL
+ARG NEXT_PUBLIC_APP_URL
+ARG NEXT_PUBLIC_HCAPTCHA_SITE_KEY
 
 ENV NODE_ENV=production
+
+# Génération du client Prisma (obligatoire avant le build Next.js)
+RUN npx prisma generate
 
 RUN npm run build
 

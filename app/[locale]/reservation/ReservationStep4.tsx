@@ -1,6 +1,5 @@
 'use client';
 
-import { useEffect, useState } from "react";
 import { loadStripe } from "@stripe/stripe-js";
 import {
   Elements,
@@ -136,15 +135,7 @@ function PaymentForm({ depositAmount, onPaid }: Props) {
 }
 
 export function ReservationStep4({ depositAmount, onPaid }: Props) {
-  const [ready, setReady] = useState(false);
-
-  useEffect(() => {
-    if (stripePromise) {
-      setReady(true);
-    }
-  }, []);
-
-  if (!stripePromise || !ready) {
+  if (!stripePromise) {
     return (
       <p className="text-xs text-neutral-600">
         Initialisation du module de paiement sécurisé...

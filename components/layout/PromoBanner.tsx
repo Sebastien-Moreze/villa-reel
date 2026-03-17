@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from "react";
+import { useMemo, useState } from "react";
 
 type PromoBannerProps = {
   /** Le texte de la promo à afficher. Si vide, le bandeau n'apparaît pas. */
@@ -12,20 +12,17 @@ type PromoBannerProps = {
 const STORAGE_KEY_BASE = "villa-reel-promo-dismissed:";
 
 export function PromoBanner({ message, promoId }: PromoBannerProps) {
-  const [visible, setVisible] = useState(false);
+  const [dismissed, setDismissed] = useState(false);
 
-  useEffect(() => {
-    if (!message) return;
-
+  const shouldShow = useMemo(() => {
+    if (!message) return false;
+    if (dismissed) return false;
+    if (typeof window === "undefined") return false;
     const key = STORAGE_KEY_BASE + (promoId ?? "default");
-    const dismissed = typeof window !== "undefined" && localStorage.getItem(key);
+    return localStorage.getItem(key) == null;
+  }, [message, promoId, dismissed]);
 
-    if (!dismissed) {
-      setVisible(true);
-    }
-  }, [message, promoId]);
-
-  if (!message || !visible) {
+  if (!shouldShow) {
     return null;
   }
 
@@ -36,7 +33,7 @@ export function PromoBanner({ message, promoId }: PromoBannerProps) {
     } catch {
       // Ignorer les erreurs de stockage (mode privé, quota, etc.)
     }
-    setVisible(false);
+    setDismissed(true);
   };
 
   return (

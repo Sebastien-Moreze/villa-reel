@@ -1,7 +1,7 @@
 'use client';
 
 import Link from "next/link";
-import { usePathname, useRouter } from "next/navigation";
+import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 import { LanguageSwitcher } from "@/components/layout/LanguageSwitcher";
 
@@ -21,7 +21,6 @@ type Props = {
 
 export function Navbar({ locale }: Props) {
   const pathname = usePathname();
-  const router = useRouter();
   const [scrolled, setScrolled] = useState(false);
   const [open, setOpen] = useState(false);
 
@@ -34,10 +33,6 @@ export function Navbar({ locale }: Props) {
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
 
-  useEffect(() => {
-    setOpen(false);
-  }, [pathname]);
-
   const buildHref = (path: string) => {
     const base = `/${locale}`;
     if (!path) return base;
@@ -47,13 +42,6 @@ export function Navbar({ locale }: Props) {
   const isActive = (path: string) => {
     const target = buildHref(path);
     return pathname === target;
-  };
-
-  const switchLocale = (nextLocale: string) => {
-    const segments = pathname.split("/");
-    segments[1] = nextLocale;
-    const nextPath = segments.join("/") || "/";
-    router.push(nextPath);
   };
 
   return (
