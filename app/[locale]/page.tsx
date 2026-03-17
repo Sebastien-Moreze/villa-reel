@@ -7,6 +7,8 @@ import { ReviewsBanner } from "@/components/home/ReviewsBanner";
 import { PromoSection } from "@/components/home/PromoSection";
 import { locales } from "@/i18n";
 
+export const dynamic = "force-dynamic";
+
 type PageProps = {
   params: Promise<{ locale: string }>;
 };

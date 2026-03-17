@@ -13,6 +13,8 @@ import {
   CpuIcon,
 } from "lucide-react";
 
+export const dynamic = "force-dynamic";
+
 type PageProps = {
   params: { locale: string };
 };
