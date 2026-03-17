@@ -3,11 +3,9 @@ import Stripe from "stripe";
 import { prisma } from "@/lib/prisma";
 import { Resend } from "resend";
 
-export const config = {
-  api: {
-    bodyParser: false,
-  },
-};
+export const runtime = "nodejs";
+
+export const dynamic = "force-dynamic";
 
 export async function POST(request: Request) {
   const secret = process.env.STRIPE_SK;

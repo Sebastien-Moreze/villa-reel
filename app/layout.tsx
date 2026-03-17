@@ -21,13 +21,11 @@ export const metadata: Metadata = {
 
 export default function RootLayout({
   children,
-  params,
 }: Readonly<{
   children: React.ReactNode;
-  params: { locale: string };
 }>) {
   return (
-    <html lang={params.locale ?? "fr"}>
+    <html lang="fr">
       <body
         className={`${playfair.variable} ${montserrat.variable} antialiased bg-background text-neutral-900 font-sans`}
       >
