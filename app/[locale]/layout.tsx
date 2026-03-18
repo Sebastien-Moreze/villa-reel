@@ -3,6 +3,7 @@ import { ReactNode } from "react";
 import { NextIntlClientProvider } from "next-intl";
 import { Navbar } from "@/components/layout/Navbar";
 import { Footer } from "@/components/layout/Footer";
+import { BackToTop } from "@/components/layout/BackToTop";
 import { ToastProvider } from "@/components/providers/ToastProvider";
 
 export const metadata: Metadata = {
@@ -27,6 +28,7 @@ export default async function LocaleLayout({ children, params }: Props) {
           <Navbar locale={locale} />
           <main className="flex-1 pt-20">{children}</main>
           <Footer />
+          <BackToTop />
         </div>
       </ToastProvider>
     </NextIntlClientProvider>
