@@ -10,7 +10,7 @@ export async function GET() {
 
   try {
     // Simple ping DB
-    const _result = await prisma.$queryRaw`SELECT 1`;
+    await prisma.$queryRaw`SELECT 1`;
     dbStatus = "connected";
   } catch {
     dbStatus = "disconnected";

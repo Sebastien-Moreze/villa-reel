@@ -2,7 +2,7 @@ type PageProps = {
   params: { locale: string };
 };
 
-export default function CollaborateursPage({ params: _params }: PageProps) {
+export default function CollaborateursPage(_props: PageProps) {
   return (
     <div className="pb-16">
       {/* Hero */}
