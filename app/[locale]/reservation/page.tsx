@@ -1,23 +1,25 @@
 'use client';
 
 import { useState } from "react";
+import { useTranslations } from "next-intl";
 import { ReservationStep1 } from "./ReservationStep1";
 import { ReservationStep2 } from "./ReservationStep2";
 import { ReservationStep3 } from "./ReservationStep3";
 import { ReservationStep4 } from "./ReservationStep4";
 import { ReservationStep5 } from "./ReservationStep5";
 
-const STEPS = [
-  "Dates",
-  "Récapitulatif",
-  "Voyageur",
-  "Paiement",
-  "Confirmation",
-];
-
 export default function ReservationPage() {
+  const t = useTranslations();
   const villaId = 1;
   const [step, setStep] = useState(0);
+
+  const STEPS = [
+    t("reservation.step1"),
+    t("reservation.step2"),
+    t("reservation.step3"),
+    t("reservation.step4"),
+    t("reservation.step5"),
+  ];
 
   const [checkIn, setCheckIn] = useState<string | null>(null);
   const [checkOut, setCheckOut] = useState<string | null>(null);
@@ -44,11 +46,10 @@ export default function ReservationPage() {
             Villa R.E.E.L
           </p>
           <h1 className="font-display mt-2 text-2xl font-semibold tracking-tight md:text-3xl">
-            Réserver votre séjour
+            {t("reservation.title")}
           </h1>
           <p className="mt-2 max-w-xl text-xs text-white/90">
-            Un tunnel de réservation en 5 étapes pour planifier sereinement
-            votre expérience à la Villa R.E.E.L.
+            {t("reservation.description")}
           </p>
 
           {/* Stepper */}
@@ -134,7 +135,7 @@ export default function ReservationPage() {
                     });
                     if (!res.ok) {
                       const err = (await res.json()) as { error?: string };
-                      setBookingError(err.error ?? "Erreur lors de la réservation.");
+                      setBookingError(err.error ?? t("reservation.errorGeneric"));
                       return;
                     }
                     const result = (await res.json()) as {
@@ -147,7 +148,7 @@ export default function ReservationPage() {
                     setDepositAmount(result.depositAmount);
                     setStep(3);
                   } catch {
-                    setBookingError("Erreur réseau. Veuillez réessayer.");
+                    setBookingError(t("reservation.errorNetwork"));
                   }
                 }}
               />
@@ -164,7 +165,7 @@ export default function ReservationPage() {
             )}
             {step === 3 && !reservationId && (
               <p className="text-xs text-red-600">
-                Erreur : aucune réservation en cours. Veuillez recommencer.
+                {t("reservation.errorNoReservation")}
               </p>
             )}
             {step === 4 && confirmationCode && (
@@ -195,7 +196,7 @@ export default function ReservationPage() {
                 onClick={() => setStep((s) => Math.max(0, s - 1))}
                 className="rounded-full border border-neutral-300 bg-white px-4 py-1.5 text-[11px] font-semibold text-neutral-700 disabled:opacity-40"
               >
-                Retour
+                {t("reservation.back")}
               </button>
               {step < 3 && (
                 <button
@@ -203,7 +204,7 @@ export default function ReservationPage() {
                   onClick={() => setStep((s) => Math.min(STEPS.length - 1, s + 1))}
                   className="rounded-full bg-primary px-4 py-1.5 text-[11px] font-semibold text-white shadow-md hover:opacity-90"
                 >
-                  Étape suivante
+                  {t("reservation.next")}
                 </button>
               )}
             </div>

@@ -1,7 +1,16 @@
+'use client';
+
 import Link from "next/link";
+import { useTranslations } from "next-intl";
+import { useParams } from "next/navigation";
 
 export function Footer() {
+  const t = useTranslations();
+  const params = useParams();
+  const locale = (params?.locale as string) ?? "fr";
   const year = new Date().getFullYear();
+
+  const buildHref = (path: string) => `/${locale}${path}`;
 
   return (
     <footer className="mt-16 bg-[#1A1A1A] text-sm text-neutral-300">
@@ -10,35 +19,22 @@ export function Footer() {
           <div className="space-y-4">
             <div>
               <div className="inline-flex items-baseline gap-2">
-                <span className="text-xs font-semibold tracking-[0.3em] text-secondary">
-                  VILLA
-                </span>
-                <span className="text-xs font-semibold tracking-[0.35em] text-secondary">
-                  R.E.E.L
-                </span>
+                <span className="text-xs font-semibold tracking-[0.3em] text-secondary">VILLA</span>
+                <span className="text-xs font-semibold tracking-[0.35em] text-secondary">R.E.E.L</span>
               </div>
               <p className="mt-3 max-w-xs text-xs text-neutral-400">
-                1281 route de Moussy,
-                <br />
+                1281 route de Moussy,<br />
                 74930 Reigner-Esery, France
               </p>
             </div>
 
             <div className="flex gap-3">
-              <a
-                href="https://instagram.com"
-                target="_blank"
-                rel="noreferrer"
-                className="inline-flex h-9 w-9 items-center justify-center rounded-full border border-neutral-600 text-xs font-medium text-neutral-200 transition hover:border-primary hover:text-secondary"
-              >
+              <a href="https://instagram.com" target="_blank" rel="noreferrer"
+                className="inline-flex h-9 w-9 items-center justify-center rounded-full border border-neutral-600 text-xs font-medium text-neutral-200 transition hover:border-primary hover:text-secondary">
                 IG
               </a>
-              <a
-                href="https://facebook.com"
-                target="_blank"
-                rel="noreferrer"
-                className="inline-flex h-9 w-9 items-center justify-center rounded-full border border-neutral-600 text-xs font-medium text-neutral-200 transition hover:border-primary hover:text-secondary"
-              >
+              <a href="https://facebook.com" target="_blank" rel="noreferrer"
+                className="inline-flex h-9 w-9 items-center justify-center rounded-full border border-neutral-600 text-xs font-medium text-neutral-200 transition hover:border-primary hover:text-secondary">
                 FB
               </a>
             </div>
@@ -47,96 +43,47 @@ export function Footer() {
           <div className="grid gap-8 sm:grid-cols-2 md:grid-cols-4">
             <div>
               <h3 className="text-xs font-semibold uppercase tracking-wide text-neutral-100">
-                Navigation
+                {t("footer.nav")}
               </h3>
               <ul className="mt-3 space-y-2 text-xs text-neutral-400">
-                <li>
-                  <Link href="/" className="hover:text-secondary">
-                    Accueil
-                  </Link>
-                </li>
-                <li>
-                  <Link href="/villa" className="hover:text-secondary">
-                    La Villa
-                  </Link>
-                </li>
-                <li>
-                  <Link href="/galerie" className="hover:text-secondary">
-                    Galerie
-                  </Link>
-                </li>
-                <li>
-                  <Link href="/entreprises" className="hover:text-secondary">
-                    Entreprises
-                  </Link>
-                </li>
-                <li>
-                  <Link href="/evenements" className="hover:text-secondary">
-                    Événements
-                  </Link>
-                </li>
+                <li><Link href={buildHref("")} className="hover:text-secondary">{t("footer.home")}</Link></li>
+                <li><Link href={buildHref("/villa")} className="hover:text-secondary">{t("footer.villa")}</Link></li>
+                <li><Link href={buildHref("/galerie")} className="hover:text-secondary">{t("footer.gallery")}</Link></li>
+                <li><Link href={buildHref("/entreprises")} className="hover:text-secondary">{t("footer.business")}</Link></li>
+                <li><Link href={buildHref("/evenements")} className="hover:text-secondary">{t("footer.events")}</Link></li>
               </ul>
             </div>
 
             <div>
               <h3 className="text-xs font-semibold uppercase tracking-wide text-neutral-100">
-                Services
+                {t("footer.services")}
               </h3>
               <ul className="mt-3 space-y-2 text-xs text-neutral-400">
-                <li>Location saisonnière</li>
-                <li>Événements privés</li>
-                <li>Séminaires & entreprises</li>
-                <li>Collaborations créatives</li>
+                <li><Link href={buildHref("/reservation")} className="hover:text-secondary">{t("footer.booking")}</Link></li>
+                <li><Link href={buildHref("/evenements")} className="hover:text-secondary">{t("footer.events")}</Link></li>
+                <li><Link href={buildHref("/entreprises")} className="hover:text-secondary">{t("footer.business")}</Link></li>
+                <li><Link href={buildHref("/collaborateurs")} className="hover:text-secondary">{t("footer.partners")}</Link></li>
               </ul>
             </div>
 
             <div>
               <h3 className="text-xs font-semibold uppercase tracking-wide text-neutral-100">
-                Informations
+                {t("footer.legal")}
               </h3>
               <ul className="mt-3 space-y-2 text-xs text-neutral-400">
-                <li>
-                  <Link href="/mentions-legales" className="hover:text-secondary">
-                    Mentions légales
-                  </Link>
-                </li>
-                <li>
-                  <Link href="/cgv" className="hover:text-secondary">
-                    Conditions générales de vente
-                  </Link>
-                </li>
-                <li>
-                  <Link
-                    href="/confidentialite"
-                    className="hover:text-secondary"
-                  >
-                    Politique de confidentialité
-                  </Link>
-                </li>
+                <li><Link href="/mentions-legales" className="hover:text-secondary">Mentions légales</Link></li>
+                <li><Link href="/cgv" className="hover:text-secondary">CGV</Link></li>
+                <li><Link href="/confidentialite" className="hover:text-secondary">Confidentialité</Link></li>
               </ul>
             </div>
 
             <div>
               <h3 className="text-xs font-semibold uppercase tracking-wide text-neutral-100">
-                Contact
+                {t("footer.contact")}
               </h3>
               <ul className="mt-3 space-y-2 text-xs text-neutral-400">
-                <li>
-                  <a
-                    href="mailto:contact@villareel.fr"
-                    className="hover:text-secondary"
-                  >
-                    contact@villareel.fr
-                  </a>
-                </li>
-                <li>
-                  <a
-                    href="tel:+33600000000"
-                    className="hover:text-secondary"
-                  >
-                    +33 (0)6 00 00 00 00
-                  </a>
-                </li>
+                <li><a href="mailto:contact@villareel.fr" className="hover:text-secondary">contact@villareel.fr</a></li>
+                <li><a href="tel:+33600000000" className="hover:text-secondary">+33 (0)6 00 00 00 00</a></li>
               </ul>
             </div>
           </div>
@@ -144,14 +91,10 @@ export function Footer() {
 
         <div className="border-t border-neutral-800">
           <div className="mx-auto flex max-w-6xl flex-col items-center justify-between gap-3 px-4 py-4 text-[11px] text-neutral-500 md:flex-row md:px-6">
-            <p>Copyright © {year} Villa R.E.E.L. Tous droits réservés.</p>
-            <p className="text-neutral-500">
-              Site créé pour sublimer vos séjours, événements et collaborations.
-            </p>
+            <p>Copyright © {year} {t("footer.copyright")}</p>
           </div>
         </div>
       </div>
     </footer>
   );
 }
-

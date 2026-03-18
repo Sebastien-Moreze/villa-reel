@@ -3,12 +3,14 @@
 import Link from "next/link";
 import { useEffect, useState, useRef } from "react";
 import { useRouter } from "next/navigation";
+import { useTranslations } from "next-intl";
 
 type HeroSectionProps = {
   locale: string;
 };
 
 export function HeroSection({ locale }: HeroSectionProps) {
+  const t = useTranslations();
   const [offset, setOffset] = useState(0);
   const router = useRouter();
   const checkInRef = useRef<HTMLInputElement>(null);
@@ -16,9 +18,7 @@ export function HeroSection({ locale }: HeroSectionProps) {
   const guestsRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
-    const onScroll = () => {
-      setOffset(window.scrollY * 0.15);
-    };
+    const onScroll = () => { setOffset(window.scrollY * 0.15); };
     onScroll();
     window.addEventListener("scroll", onScroll);
     return () => window.removeEventListener("scroll", onScroll);
@@ -37,35 +37,29 @@ export function HeroSection({ locale }: HeroSectionProps) {
 
   return (
     <section className="relative min-h-[80vh] overflow-hidden">
-      {/* Background image with parallax effect (placeholder paths to replace) */}
       <div
         className="absolute inset-0 bg-cover bg-center"
         style={{
-          backgroundImage:
-            "url('/images/hero/hero-banner.jpg')",
+          backgroundImage: "url('/images/hero/hero-banner.jpg')",
           transform: `translateY(${offset * 0.5}px)`,
           transition: "transform 0.1s linear",
         }}
       />
-
-      {/* Tropical gradient overlay */}
       <div className="absolute inset-0 bg-gradient-to-b from-primary/80 via-primary/70 to-secondary/80" />
 
       <div className="relative z-10 mx-auto flex min-h-[80vh] max-w-6xl flex-col justify-center px-4 py-24 text-white md:px-6">
         <div className="max-w-2xl space-y-4">
           <p className="text-xs uppercase tracking-[0.35em] text-white/80">
-            VILLA R.E.E.L
+            {t("hero.eyebrow")}
           </p>
           <h1 className="font-display text-4xl font-bold tracking-tight text-white sm:text-5xl md:text-6xl">
-            VILLA R.E.E.L
+            {t("hero.title")}
           </h1>
           <p className="font-display text-lg italic text-white/95 md:text-xl">
-            Entre Alpes et Tropiques
+            {t("hero.subtitle")}
           </p>
           <p className="max-w-xl text-sm text-white/90 md:text-base">
-            Une villa d&apos;exception entre montagne et jardin tropical, pensée
-            pour vos séjours, événements professionnels et collaborations
-            créatives.
+            {t("hero.description")}
           </p>
 
           <div className="mt-6 flex flex-wrap gap-3">
@@ -73,13 +67,13 @@ export function HeroSection({ locale }: HeroSectionProps) {
               href={buildHref("/reservation")}
               className="inline-flex items-center justify-center rounded-full bg-cta px-6 py-3 text-sm font-semibold text-white shadow-lg shadow-cta/30 transition hover:opacity-90"
             >
-              Réserver maintenant
+              {t("hero.ctaPrimary")}
             </Link>
             <Link
               href={buildHref("/villa")}
               className="inline-flex items-center justify-center rounded-full border border-white/50 bg-white/5 px-6 py-3 text-sm font-semibold text-white backdrop-blur transition hover:bg-white/10"
             >
-              Découvrir la villa
+              {t("hero.ctaSecondary")}
             </Link>
           </div>
         </div>
@@ -92,9 +86,7 @@ export function HeroSection({ locale }: HeroSectionProps) {
               onSubmit={handleSearch}
             >
               <div className="flex flex-col">
-                <label className="text-xs font-semibold text-neutral-500">
-                  Arrivée
-                </label>
+                <label className="text-xs font-semibold text-neutral-500">{t("hero.checkIn")}</label>
                 <input
                   ref={checkInRef}
                   type="date"
@@ -104,9 +96,7 @@ export function HeroSection({ locale }: HeroSectionProps) {
                 />
               </div>
               <div className="flex flex-col">
-                <label className="text-xs font-semibold text-neutral-500">
-                  Départ
-                </label>
+                <label className="text-xs font-semibold text-neutral-500">{t("hero.checkOut")}</label>
                 <input
                   ref={checkOutRef}
                   type="date"
@@ -116,23 +106,21 @@ export function HeroSection({ locale }: HeroSectionProps) {
                 />
               </div>
               <div className="flex flex-col">
-                <label className="text-xs font-semibold text-neutral-500">
-                  Voyageurs
-                </label>
+                <label className="text-xs font-semibold text-neutral-500">{t("hero.guests")}</label>
                 <input
                   ref={guestsRef}
                   type="number"
                   name="guests"
                   min={1}
                   className="mt-1 rounded-lg border border-neutral-200 px-3 py-2 text-sm outline-none focus:border-primary focus:ring-1 focus:ring-primary"
-                  placeholder="2 adultes"
+                  placeholder={t("hero.guestsPlaceholder")}
                 />
               </div>
               <button
                 type="submit"
                 className="mt-4 inline-flex items-center justify-center rounded-xl bg-primary px-5 py-3 text-xs font-semibold text-white shadow-md transition hover:opacity-90 sm:mt-5"
               >
-                Vérifier la disponibilité
+                {t("hero.checkAvailability")}
               </button>
             </form>
           </div>
@@ -141,4 +129,3 @@ export function HeroSection({ locale }: HeroSectionProps) {
     </section>
   );
 }
-

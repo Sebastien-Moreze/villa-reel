@@ -1,5 +1,6 @@
 import { prisma } from "@/lib/prisma";
 import { locales } from "@/i18n";
+import { getTranslations } from "next-intl/server";
 import { AvailabilityCalendar } from "@/components/villa/AvailabilityCalendar";
 import { ReviewsBanner } from "@/components/home/ReviewsBanner";
 import {
@@ -16,7 +17,7 @@ import {
 export const dynamic = "force-dynamic";
 
 type PageProps = {
-  params: { locale: string };
+  params: Promise<{ locale: string }>;
 };
 
 export function generateStaticParams() {
@@ -25,7 +26,8 @@ export function generateStaticParams() {
 
 export default async function VillaPage({ params }: PageProps) {
   const villaId = 1;
-  const { locale } = params;
+  const { locale } = await params;
+  const t = await getTranslations({ locale });
 
   const villa = await prisma.villa.findUnique({
     where: { id: villaId },
@@ -41,7 +43,7 @@ export default async function VillaPage({ params }: PageProps) {
   if (!villa) {
     return (
       <div className="mx-auto max-w-4xl px-4 py-20 text-center text-sm text-neutral-700">
-        Villa introuvable.
+        {t("villa.notFound")}
       </div>
     );
   }
@@ -63,7 +65,7 @@ export default async function VillaPage({ params }: PageProps) {
           <div className="max-w-xl text-white">
             <div className="mb-2 inline-flex items-center gap-2 rounded-full bg-black/35 px-3 py-1 text-[11px] font-medium">
               <span className="text-yellow-300">★★★★★</span>
-              <span>Villa d&apos;exception</span>
+              <span>{t("villa.badge")}</span>
             </div>
             <h1 className="text-3xl font-semibold uppercase tracking-tight md:text-4xl">
               {locale === "en" ? villa.nameEn : villa.nameFr}
@@ -84,49 +86,43 @@ export default async function VillaPage({ params }: PageProps) {
               id="description-title"
               className="text-lg font-semibold text-neutral-900"
             >
-              {locale === "en" ? "Description" : "Description de la villa"}
+              {t("villa.descriptionTitle")}
             </h2>
             <article className="mt-3 space-y-3 text-sm leading-relaxed text-neutral-700">
               <p>{description}</p>
-              <p>
-                Entre montagnes et jardin luxuriant, la Villa R.E.E.L offre
-                plusieurs espaces de vie, une piscine chauffée, un jardin
-                tropical et des vues dégagées sur la chaîne alpine. Un lieu
-                pensé pour les familles, les retraites d&apos;équipe et les
-                événements intimistes.
-              </p>
+              <p>{t("villa.descriptionBody")}</p>
             </article>
           </section>
 
           {/* Key facts */}
-          <section aria-label="Caractéristiques principales">
+          <section aria-label={t("villa.amenitiesTitle")}>
             <div className="grid gap-4 text-xs text-neutral-800 sm:grid-cols-4">
               <div className="flex items-center gap-2 rounded-xl bg-white p-3 shadow-sm">
                 <BedDouble className="h-4 w-4 text-primary" />
                 <div>
                   <div className="font-semibold">{villa.bedrooms}</div>
-                  <div className="text-[11px] text-neutral-500">Chambres</div>
+                  <div className="text-[11px] text-neutral-500">{t("villa.bedrooms")}</div>
                 </div>
               </div>
               <div className="flex items-center gap-2 rounded-xl bg-white p-3 shadow-sm">
                 <Bath className="h-4 w-4 text-primary" />
                 <div>
                   <div className="font-semibold">{villa.bathrooms}</div>
-                  <div className="text-[11px] text-neutral-500">Salles d&apos;eau</div>
+                  <div className="text-[11px] text-neutral-500">{t("villa.bathrooms")}</div>
                 </div>
               </div>
               <div className="flex items-center gap-2 rounded-xl bg-white p-3 shadow-sm">
                 <Users className="h-4 w-4 text-primary" />
                 <div>
                   <div className="font-semibold">{villa.maxGuests}</div>
-                  <div className="text-[11px] text-neutral-500">Voyageurs max</div>
+                  <div className="text-[11px] text-neutral-500">{t("villa.maxGuests")}</div>
                 </div>
               </div>
               <div className="flex items-center gap-2 rounded-xl bg-white p-3 shadow-sm">
                 <Ruler className="h-4 w-4 text-primary" />
                 <div>
                   <div className="font-semibold">{villa.surface} m²</div>
-                  <div className="text-[11px] text-neutral-500">Surface</div>
+                  <div className="text-[11px] text-neutral-500">{t("villa.surface")}</div>
                 </div>
               </div>
             </div>
@@ -138,13 +134,13 @@ export default async function VillaPage({ params }: PageProps) {
               id="amenities-title"
               className="text-lg font-semibold text-neutral-900"
             >
-              Équipements & atmosphère
+              {t("villa.amenitiesTitle")}
             </h2>
             <div className="mt-4 grid gap-3 text-xs text-neutral-700 sm:grid-cols-2">
-              <AmenityItem icon={<Waves className="h-4 w-4" />} label="Piscine chauffée" />
-              <AmenityItem icon={<Mountain className="h-4 w-4" />} label="Vue Mont-Blanc" />
-              <AmenityItem icon={<Trees className="h-4 w-4" />} label="Jardin tropical" />
-              <AmenityItem icon={<CpuIcon className="h-4 w-4" />} label="Billard & espace lounge" />
+              <AmenityItem icon={<Waves className="h-4 w-4" />} label={t("villa.amenity.pool")} />
+              <AmenityItem icon={<Mountain className="h-4 w-4" />} label={t("villa.amenity.view")} />
+              <AmenityItem icon={<Trees className="h-4 w-4" />} label={t("villa.amenity.garden")} />
+              <AmenityItem icon={<CpuIcon className="h-4 w-4" />} label={t("villa.amenity.billiard")} />
             </div>
           </section>
 
@@ -155,11 +151,10 @@ export default async function VillaPage({ params }: PageProps) {
                 id="calendar-title"
                 className="text-lg font-semibold text-neutral-900"
               >
-                Disponibilités
+                {t("villa.availabilityTitle")}
               </h2>
               <p className="mt-1 text-xs text-neutral-600">
-                Visualisez en un coup d&apos;œil les périodes disponibles pour
-                planifier votre séjour.
+                {t("villa.availabilityDesc")}
               </p>
             </div>
             <AvailabilityCalendar villaId={villaId} />
@@ -171,11 +166,10 @@ export default async function VillaPage({ params }: PageProps) {
               id="map-title"
               className="text-lg font-semibold text-neutral-900"
             >
-              Localisation
+              {t("villa.locationTitle")}
             </h2>
             <p className="text-xs text-neutral-600">
-              La localisation précise est communiquée après confirmation de la
-              réservation. La carte ci-dessous indique la commune environnante.
+              {t("villa.locationDesc")}
             </p>
             <div className="overflow-hidden rounded-2xl border border-neutral-200 bg-neutral-100">
               <iframe
@@ -190,7 +184,7 @@ export default async function VillaPage({ params }: PageProps) {
 
           {/* Reviews for this villa */}
           {reviews.length > 0 && (
-            <section aria-label="Avis des clients" className="mt-6">
+            <section aria-label="Reviews" className="mt-6">
               <ReviewsBanner
                 reviews={reviews.map((r) => ({
                   id: r.id,
@@ -210,7 +204,7 @@ export default async function VillaPage({ params }: PageProps) {
               <span className="text-lg font-semibold text-neutral-900">
                 {villa.pricePerNight.toString()} €
               </span>
-              <span className="text-xs text-neutral-500">/ nuit</span>
+              <span className="text-xs text-neutral-500">{t("villa.perNight")}</span>
             </div>
 
             <BookingCalculator
@@ -218,6 +212,15 @@ export default async function VillaPage({ params }: PageProps) {
               pricePerNight={Number(villa.pricePerNight)}
               cleaningFee={Number(villa.cleaningFee)}
               deposit={Number(villa.deposit)}
+              labels={{
+                checkIn: t("villa.bookingCheckIn"),
+                checkOut: t("villa.bookingCheckOut"),
+                cleaning: t("villa.bookingCleaning"),
+                depositLabel: t("villa.bookingDeposit"),
+                total: t("villa.bookingTotal"),
+                cta: t("villa.bookingCta"),
+                note: t("villa.bookingNote"),
+              }}
             />
           </div>
         </aside>
@@ -242,11 +245,22 @@ function AmenityItem({ icon, label }: AmenityItemProps) {
   );
 }
 
+type BookingLabels = {
+  checkIn: string;
+  checkOut: string;
+  cleaning: string;
+  depositLabel: string;
+  total: string;
+  cta: string;
+  note: string;
+};
+
 type BookingCalculatorProps = {
   villaId: number;
   pricePerNight: number;
   cleaningFee: number;
   deposit: number;
+  labels: BookingLabels;
 };
 
 function BookingCalculator({
@@ -254,6 +268,7 @@ function BookingCalculator({
   pricePerNight,
   cleaningFee,
   deposit,
+  labels,
 }: BookingCalculatorProps) {
   const searchParams = new URLSearchParams();
   searchParams.set("villaId", String(villaId));
@@ -265,7 +280,7 @@ function BookingCalculator({
       <div className="grid grid-cols-2 gap-2">
         <div className="flex flex-col gap-1">
           <label className="text-[11px] font-semibold text-neutral-500">
-            Arrivée
+            {labels.checkIn}
           </label>
           <input
             type="date"
@@ -274,7 +289,7 @@ function BookingCalculator({
         </div>
         <div className="flex flex-col gap-1">
           <label className="text-[11px] font-semibold text-neutral-500">
-            Départ
+            {labels.checkOut}
           </label>
           <input
             type="date"
@@ -289,16 +304,16 @@ function BookingCalculator({
           <span>{pricePerNight} €</span>
         </div>
         <div className="mt-1 flex items-center justify-between">
-          <span>Ménage</span>
+          <span>{labels.cleaning}</span>
           <span>{cleaningFee} €</span>
         </div>
         <div className="mt-1 flex items-center justify-between">
-          <span>Caution</span>
+          <span>{labels.depositLabel}</span>
           <span>{deposit} €</span>
         </div>
         <div className="mt-2 border-t border-neutral-200 pt-2 font-semibold text-neutral-900">
           <div className="flex items-center justify-between">
-            <span>Total estimé</span>
+            <span>{labels.total}</span>
             <span>{pricePerNight + cleaningFee + deposit} €</span>
           </div>
         </div>
@@ -308,14 +323,12 @@ function BookingCalculator({
         href={reservationUrl}
         className="inline-flex w-full items-center justify-center rounded-full bg-cta px-4 py-2.5 text-xs font-semibold text-white shadow-md transition hover:shadow-lg"
       >
-        Réserver
+        {labels.cta}
       </a>
 
       <p className="text-[10px] text-neutral-500">
-        Le montant exact sera calculé en fonction de vos dates, du nombre de
-        nuits et des éventuelles promotions en cours.
+        {labels.note}
       </p>
     </div>
   );
 }
-

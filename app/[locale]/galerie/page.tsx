@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { locales } from "@/i18n";
 import { GalerieGrid } from "@/components/galerie/GalerieGrid";
+import { getTranslations } from "next-intl/server";
 
 type PageProps = {
   params: Promise<{ locale: string }>;
@@ -10,40 +11,31 @@ export function generateStaticParams() {
   return locales.map((locale) => ({ locale }));
 }
 
-export async function generateMetadata(
-  { params }: PageProps,
-): Promise<Metadata> {
+export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const { locale } = await params;
-  if (locale === "en") {
-    return {
-      title: "Villa R.E.E.L – Gallery",
-      description:
-        "Discover the villa in images: interiors, outdoors, pool, bedrooms and living spaces.",
-    };
-  }
+  const t = await getTranslations({ locale });
   return {
-    title: "Villa R.E.E.L – Galerie",
-    description:
-      "Découvrez la villa en images : intérieurs, extérieurs, piscine, chambres et espaces de vie.",
+    title: `Villa R.E.E.L – ${t("galerie.title")}`,
+    description: t("galerie.subtitle"),
   };
 }
 
 export default async function GaleriePage({ params }: PageProps) {
   await params;
+  const t = await getTranslations();
 
   return (
     <div className="pb-16">
       <section className="bg-gradient-to-b from-primary via-primary/95 to-secondary py-16 text-white">
         <div className="mx-auto max-w-6xl px-4 md:px-6">
           <p className="text-xs uppercase tracking-[0.3em] text-white/80">
-            Villa R.E.E.L
+            {t("galerie.eyebrow")}
           </p>
           <h1 className="font-display mt-2 text-3xl font-semibold tracking-tight md:text-4xl">
-            Galerie
+            {t("galerie.title")}
           </h1>
           <p className="mt-3 max-w-xl text-sm text-white/90">
-            Découvrez la villa en images : intérieurs, extérieurs, piscine,
-            chambres et espaces de vie.
+            {t("galerie.subtitle")}
           </p>
         </div>
       </section>
