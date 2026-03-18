@@ -9,6 +9,10 @@ COPY package.json package-lock.json ./
 # On ignore les scripts ici (ex: postinstall prisma generate) car le schéma Prisma
 # n'est pas encore copié dans cette étape.
 RUN npm ci --ignore-scripts
+# Compiler bcrypt depuis les sources pour la plateforme cible (Alpine/Linux).
+# npm ci --ignore-scripts saute la compilation native : on la force ici
+# avec les outils déjà installés (python3, make, g++).
+RUN npm rebuild bcrypt --build-from-source
 
 ### builder
 FROM node:24-alpine AS builder
