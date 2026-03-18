@@ -15,11 +15,7 @@ const STEPS = [
   "Confirmation",
 ];
 
-type PageProps = {
-  params: { locale: string };
-};
-
-export default function ReservationPage(_props: PageProps) {
+export default function ReservationPage() {
   const villaId = 1;
   const [step, setStep] = useState(0);
 
@@ -30,7 +26,6 @@ export default function ReservationPage(_props: PageProps) {
   const [baseTotal, setBaseTotal] = useState(0);
 
   const [promoCode, setPromoCode] = useState<string | null>(null);
-  const [_discount, setDiscount] = useState(0);
   const [total, setTotal] = useState(0);
   const [depositAmount, setDepositAmount] = useState(0);
 
@@ -109,9 +104,8 @@ export default function ReservationPage(_props: PageProps) {
                 checkOut={checkOut}
                 nights={nights}
                 baseTotal={baseTotal}
-                onChange={({ promoCode, discount, total, depositAmount }) => {
+                onChange={({ promoCode, total, depositAmount }) => {
                   setPromoCode(promoCode);
-                  setDiscount(discount);
                   setTotal(total);
                   setDepositAmount(depositAmount);
                 }}

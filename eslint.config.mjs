@@ -13,6 +13,18 @@ const eslintConfig = defineConfig([
     "build/**",
     "next-env.d.ts",
   ]),
+  // Allow _-prefixed variables/args to be unused (convention for intentionally unused)
+  {
+    rules: {
+      "@typescript-eslint/no-unused-vars": ["error", {
+        varsIgnorePattern: "^_",
+        argsIgnorePattern: "^_",
+        destructuredArrayIgnorePattern: "^_",
+        caughtErrorsIgnorePattern: "^_",
+      }],
+      "no-unused-vars": "off", // defer to @typescript-eslint/no-unused-vars
+    },
+  },
 ]);
 
 export default eslintConfig;
