@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
 import { ReactNode } from "react";
 import { NextIntlClientProvider } from "next-intl";
-import { getMessages } from "next-intl/server";
 import { Navbar } from "@/components/layout/Navbar";
 import { Footer } from "@/components/layout/Footer";
 import { ToastProvider } from "@/components/providers/ToastProvider";
@@ -18,7 +17,7 @@ type Props = {
 };
 export default async function LocaleLayout({ children, params }: Props) {
   const { locale } = await params;
-  const messages = await getMessages();
+  const messages = (await import(`@/messages/${locale === "en" ? "en" : "fr"}.json`)).default;
 
 
   return (

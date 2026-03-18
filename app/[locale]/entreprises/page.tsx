@@ -6,7 +6,7 @@ type PageProps = {
 
 export default async function EntreprisesPage({ params }: PageProps) {
   const { locale } = await params;
-  const t = await getTranslations();
+  const t = await getTranslations({ locale });
 
   const formules = [
     "seminaires", "teambuilding", "incentive",

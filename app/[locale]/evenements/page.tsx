@@ -6,7 +6,7 @@ type PageProps = {
 
 export default async function EvenementsPage({ params }: PageProps) {
   const { locale } = await params;
-  const t = await getTranslations();
+  const t = await getTranslations({ locale });
 
   return (
     <div className="pb-16">

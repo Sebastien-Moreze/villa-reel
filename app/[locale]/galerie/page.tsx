@@ -21,8 +21,8 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 }
 
 export default async function GaleriePage({ params }: PageProps) {
-  await params;
-  const t = await getTranslations();
+  const { locale } = await params;
+  const t = await getTranslations({ locale });
 
   return (
     <div className="pb-16">

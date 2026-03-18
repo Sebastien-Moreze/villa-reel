@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { subMonths, addMonths, startOfMonth, endOfMonth } from "date-fns";
+import { useTranslations, useLocale } from "next-intl";
 
 type AvailabilityCalendarProps = {
   villaId: number;
@@ -13,6 +14,8 @@ type BlockedRange = {
 };
 
 export function AvailabilityCalendar({ villaId }: AvailabilityCalendarProps) {
+  const t = useTranslations();
+  const locale = useLocale();
   const [blocked, setBlocked] = useState<BlockedRange[]>([]);
   const [currentMonth, setCurrentMonth] = useState(new Date());
   const [loading, setLoading] = useState(false);
@@ -49,6 +52,11 @@ export function AvailabilityCalendar({ villaId }: AvailabilityCalendarProps) {
     return day;
   });
 
+  // Day labels based on locale
+  const dayLabels = locale === "en"
+    ? ["M", "T", "W", "T", "F", "S", "S"]
+    : ["L", "M", "M", "J", "V", "S", "D"];
+
   return (
     <div className="rounded-2xl border border-neutral-200 bg-white p-4 text-xs text-neutral-800 shadow-sm">
       <div className="mb-3 flex items-center justify-between">
@@ -60,7 +68,7 @@ export function AvailabilityCalendar({ villaId }: AvailabilityCalendarProps) {
           ←
         </button>
         <div className="text-sm font-semibold">
-          {currentMonth.toLocaleDateString("fr-FR", {
+          {currentMonth.toLocaleDateString(locale === "en" ? "en-GB" : "fr-FR", {
             month: "long",
             year: "numeric",
           })}
@@ -76,13 +84,13 @@ export function AvailabilityCalendar({ villaId }: AvailabilityCalendarProps) {
 
       {loading && (
         <p className="mb-2 text-[11px] text-neutral-500">
-          Chargement des disponibilités...
+          {t("calendar.loading")}
         </p>
       )}
 
       <div className="grid grid-cols-7 gap-1 text-[10px]">
-        {["L", "M", "M", "J", "V", "S", "D"].map((d) => (
-          <div key={d} className="py-1 text-center font-semibold text-neutral-500">
+        {dayLabels.map((d, i) => (
+          <div key={i} className="py-1 text-center font-semibold text-neutral-500">
             {d}
           </div>
         ))}
@@ -105,10 +113,10 @@ export function AvailabilityCalendar({ villaId }: AvailabilityCalendarProps) {
 
       <div className="mt-3 flex items-center justify-between text-[10px] text-neutral-500">
         <div className="flex items-center gap-1">
-          <span className="h-3 w-3 rounded-sm bg-primary/40" /> Disponible
+          <span className="h-3 w-3 rounded-sm bg-primary/40" /> {t("calendar.available")}
         </div>
         <div className="flex items-center gap-1">
-          <span className="h-3 w-3 rounded-sm bg-red-200" /> Indisponible
+          <span className="h-3 w-3 rounded-sm bg-red-200" /> {t("calendar.unavailable")}
         </div>
       </div>
     </div>

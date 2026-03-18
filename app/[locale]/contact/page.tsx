@@ -7,7 +7,7 @@ type PageProps = {
 
 export default async function ContactPage({ params }: PageProps) {
   const { locale } = await params;
-  const t = await getTranslations();
+  const t = await getTranslations({ locale });
 
   return (
     <div className="pb-16">

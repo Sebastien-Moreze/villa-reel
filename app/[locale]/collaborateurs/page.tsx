@@ -1,7 +1,12 @@
 import { getTranslations } from "next-intl/server";
 
-export default async function CollaborateursPage() {
-  const t = await getTranslations();
+type PageProps = {
+  params: Promise<{ locale: string }>;
+};
+
+export default async function CollaborateursPage({ params }: PageProps) {
+  const { locale } = await params;
+  const t = await getTranslations({ locale });
 
   return (
     <div className="pb-16">

@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { differenceInCalendarDays, parseISO } from "date-fns";
+import { useTranslations } from "next-intl";
 
 type Props = {
   villaId: number;
@@ -26,6 +27,7 @@ type BookingInfo = {
 type BlockedRange = { startDate: string; endDate: string };
 
 export function ReservationStep1({ villaId, onChange }: Props) {
+  const t = useTranslations();
   const [bookingInfo, setBookingInfo] = useState<BookingInfo | null>(null);
   const [checkIn, setCheckIn] = useState<string | null>(null);
   const [checkOut, setCheckOut] = useState<string | null>(null);
@@ -60,16 +62,16 @@ export function ReservationStep1({ villaId, onChange }: Props) {
     const nights = Math.max(differenceInCalendarDays(end, start), 0);
 
     if (nights <= 0) {
-      return "La date de départ doit être postérieure à la date d'arrivée.";
+      return t("reservation.errors.invalidRange");
     }
     if (nights < bookingInfo.minStay) {
-      return `Séjour minimum de ${bookingInfo.minStay} nuits.`;
+      return t("reservation.errors.minStay", { min: bookingInfo.minStay });
     }
     if (bookingInfo.maxStay && nights > bookingInfo.maxStay) {
-      return `Séjour maximum de ${bookingInfo.maxStay} nuits.`;
+      return t("reservation.errors.maxStay", { max: bookingInfo.maxStay });
     }
     return null;
-  }, [bookingInfo, checkIn, checkOut]);
+  }, [bookingInfo, checkIn, checkOut, t]);
 
   useEffect(() => {
     if (!bookingInfo || !checkIn || !checkOut) {
@@ -104,12 +106,12 @@ export function ReservationStep1({ villaId, onChange }: Props) {
   return (
     <div className="space-y-4 text-xs text-neutral-800">
       <p className="text-sm font-semibold text-neutral-900">
-        Sélectionnez vos dates de séjour
+        {t("reservation.step1Title")}
       </p>
       <div className="grid gap-3 md:grid-cols-2">
         <div className="flex flex-col gap-1">
           <label className="text-[11px] font-semibold text-neutral-600">
-            Arrivée
+            {t("reservation.checkInLabel")}
           </label>
           <input
             type="date"
@@ -120,7 +122,7 @@ export function ReservationStep1({ villaId, onChange }: Props) {
         </div>
         <div className="flex flex-col gap-1">
           <label className="text-[11px] font-semibold text-neutral-600">
-            Départ
+            {t("reservation.checkOutLabel")}
           </label>
           <input
             type="date"
@@ -133,7 +135,7 @@ export function ReservationStep1({ villaId, onChange }: Props) {
 
       <div className="flex flex-col gap-1">
         <label className="text-[11px] font-semibold text-neutral-600">
-          Nombre de voyageurs
+          {t("reservation.guestsLabel")}
         </label>
         <input
           type="number"
@@ -145,7 +147,7 @@ export function ReservationStep1({ villaId, onChange }: Props) {
         />
         {bookingInfo && (
           <p className="text-[10px] text-neutral-500">
-            Jusqu&apos;à {bookingInfo.maxGuests} personnes.
+            {t("reservation.maxGuestsNote", { n: bookingInfo.maxGuests })}
           </p>
         )}
       </div>
@@ -153,12 +155,11 @@ export function ReservationStep1({ villaId, onChange }: Props) {
       {bookingInfo && (
         <div className="rounded-xl bg-neutral-50 p-3 text-[11px] text-neutral-700">
           <p>
-            Tarif indicatif :{" "}
-            <span className="font-semibold">
-              {bookingInfo.pricePerNight} € / nuit
-            </span>{" "}
-            + ménage ({bookingInfo.cleaningFee} €) + caution (
-            {bookingInfo.deposit} €).
+            {t("reservation.priceSummary", {
+              price: bookingInfo.pricePerNight,
+              cleaning: bookingInfo.cleaningFee,
+              deposit: bookingInfo.deposit,
+            })}
           </p>
         </div>
       )}
@@ -170,8 +171,7 @@ export function ReservationStep1({ villaId, onChange }: Props) {
       )}
 
       <p className="text-[10px] text-neutral-500">
-        Les jours déjà réservés ou bloqués apparaissent comme indisponibles dans
-        le calendrier.
+        {t("reservation.calendarNote")}
       </p>
     </div>
   );

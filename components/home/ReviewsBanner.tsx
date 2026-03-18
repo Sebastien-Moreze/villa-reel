@@ -1,5 +1,7 @@
 'use client';
 
+import { useTranslations } from "next-intl";
+
 type ReviewCard = {
   id: number;
   guestName: string;
@@ -12,7 +14,8 @@ type Props = {
 };
 
 export function ReviewsBanner({ reviews }: Props) {
-  const score = 4.9; // valeur mise en avant, à ajuster plus tard si besoin
+  const t = useTranslations();
+  const score = 4.9;
 
   return (
     <section className="bg-gradient-to-r from-primary via-secondary to-primary py-14 text-white">
@@ -20,14 +23,14 @@ export function ReviewsBanner({ reviews }: Props) {
         <div className="flex flex-col items-start justify-between gap-6 md:flex-row md:items-center">
           <div>
             <p className="text-xs font-semibold uppercase tracking-[0.25em] text-white/80">
-              Avis clients
+              {t("reviews.eyebrow")}
             </p>
             <div className="mt-2 flex items-baseline gap-2">
               <span className="font-display text-3xl font-semibold">{score.toFixed(1)}</span>
               <span className="text-lg">★★★★★</span>
             </div>
             <p className="mt-1 text-xs text-white/90">
-              Séjours mémorables entre Alpes et Tropiques.
+              {t("reviews.subtitle")}
             </p>
           </div>
 
@@ -35,7 +38,7 @@ export function ReviewsBanner({ reviews }: Props) {
             type="button"
             className="rounded-full border border-white/40 bg-white/5 px-4 py-2 text-xs font-semibold text-white backdrop-blur transition hover:bg-white/15"
           >
-            Laisser un avis
+            {t("reviews.leaveReview")}
           </button>
         </div>
 
@@ -48,15 +51,14 @@ export function ReviewsBanner({ reviews }: Props) {
               >
                 <div className="mb-2 flex items-center justify-between">
                   <div className="font-semibold">
-                    {review.guestName || "Invité"}
+                    {review.guestName || t("reviews.guest")}
                   </div>
                   <div className="text-[11px] text-white/90">
                     {review.rating.toFixed(1)} ★
                   </div>
                 </div>
                 <p className="text-[11px] leading-relaxed text-white/80 line-clamp-4">
-                  {review.comment ??
-                    "Un séjour remarquable à la Villa R.E.E.L, entre confort et nature préservée."}
+                  {review.comment ?? t("reviews.defaultComment")}
                 </p>
               </article>
             ))}

@@ -71,9 +71,9 @@ export function Footer() {
                 {t("footer.legal")}
               </h3>
               <ul className="mt-3 space-y-2 text-xs text-neutral-400">
-                <li><Link href="/mentions-legales" className="hover:text-secondary">Mentions légales</Link></li>
-                <li><Link href="/cgv" className="hover:text-secondary">CGV</Link></li>
-                <li><Link href="/confidentialite" className="hover:text-secondary">Confidentialité</Link></li>
+                <li><Link href="/mentions-legales" className="hover:text-secondary">{t("footer.legalNotice")}</Link></li>
+                <li><Link href="/cgv" className="hover:text-secondary">{t("footer.terms")}</Link></li>
+                <li><Link href="/confidentialite" className="hover:text-secondary">{t("footer.privacy")}</Link></li>
               </ul>
             </div>
 

@@ -3,11 +3,13 @@
 import Image from "next/image";
 import Link from "next/link";
 import { useState } from "react";
+import { useTranslations } from "next-intl";
 import { GALLERY_PHOTOS, HOME_GALLERY_COUNT } from "@/lib/gallery";
 
 const PHOTOS = GALLERY_PHOTOS.slice(0, HOME_GALLERY_COUNT);
 
 export function GallerySection({ locale }: { locale: string }) {
+  const t = useTranslations();
   const [activeId, setActiveId] = useState<number | null>(null);
   const activePhoto = PHOTOS.find((p) => p.id === activeId) ?? null;
 
@@ -17,17 +19,17 @@ export function GallerySection({ locale }: { locale: string }) {
         <div className="flex flex-col items-start justify-between gap-4 md:flex-row md:items-end">
           <div>
             <h2 className="font-display text-sm font-semibold uppercase tracking-[0.2em] text-primary">
-              Atmosphère
+              {t("gallery.eyebrow")}
             </h2>
             <p className="font-display mt-2 text-2xl font-semibold text-neutral-900 md:text-3xl">
-              Un aperçu de la villa
+              {t("gallery.title")}
             </p>
           </div>
           <Link
             href={`/${locale}/galerie`}
             className="rounded-full border border-neutral-300 bg-white px-4 py-2 text-xs font-semibold text-neutral-800 shadow-sm transition hover:border-primary hover:text-primary"
           >
-            Voir toutes les photos
+            {t("gallery.viewAll")}
           </Link>
         </div>
 
@@ -42,7 +44,7 @@ export function GallerySection({ locale }: { locale: string }) {
       {activePhoto && (
         <button
           type="button"
-          aria-label="Fermer la photo"
+          aria-label={t("gallery.closePhoto")}
           className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-4"
           onClick={() => setActiveId(null)}
         >
@@ -59,7 +61,7 @@ export function GallerySection({ locale }: { locale: string }) {
             />
             <button
               type="button"
-              aria-label="Fermer"
+              aria-label={t("gallery.close")}
               className="absolute right-3 top-3 inline-flex h-8 w-8 items-center justify-center rounded-full bg-black/60 text-xs font-semibold text-white"
               onClick={() => setActiveId(null)}
             >

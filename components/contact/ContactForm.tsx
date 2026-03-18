@@ -2,6 +2,7 @@
 
 import { useRef, useState, useTransition } from "react";
 import Script from "next/script";
+import { useTranslations } from "next-intl";
 import { submitContact } from "@/app/[locale]/contact/actions";
 
 declare global {
@@ -28,6 +29,7 @@ type ContactFormProps = {
 };
 
 export function ContactForm({ locale }: ContactFormProps) {
+  const t = useTranslations();
   const formRef = useRef<HTMLFormElement>(null);
   const captchaContainerRef = useRef<HTMLDivElement>(null);
   const widgetIdRef = useRef<string | null>(null);
@@ -64,10 +66,10 @@ export function ContactForm({ locale }: ContactFormProps) {
         });
       },
       "expired-callback": () => {
-        setError("La vérification anti-spam a expiré. Veuillez réessayer.");
+        setError(t("contact.form.captchaExpired"));
       },
       "error-callback": () => {
-        setError("Erreur lors de la vérification anti-spam. Veuillez réessayer.");
+        setError(t("contact.form.captchaError"));
       },
     });
   }
@@ -112,10 +114,10 @@ export function ContactForm({ locale }: ContactFormProps) {
           </svg>
         </div>
         <p className="text-sm font-semibold text-neutral-800">
-          Message envoyé avec succès
+          {t("contact.form.successTitle")}
         </p>
         <p className="mt-2 text-xs text-neutral-500">
-          Nous vous répondrons dans les plus brefs délais.
+          {t("contact.form.successDesc")}
         </p>
       </div>
     );
@@ -138,7 +140,7 @@ export function ContactForm({ locale }: ContactFormProps) {
         <div className="grid gap-3 md:grid-cols-2">
           <div className="flex flex-col gap-1">
             <label htmlFor="firstName" className="text-[11px] font-semibold text-neutral-600">
-              Prénom
+              {t("contact.form.firstName")}
             </label>
             <input
               id="firstName"
@@ -150,7 +152,7 @@ export function ContactForm({ locale }: ContactFormProps) {
           </div>
           <div className="flex flex-col gap-1">
             <label htmlFor="lastName" className="text-[11px] font-semibold text-neutral-600">
-              Nom
+              {t("contact.form.lastName")}
             </label>
             <input
               id="lastName"
@@ -165,7 +167,7 @@ export function ContactForm({ locale }: ContactFormProps) {
         <div className="grid gap-3 md:grid-cols-2">
           <div className="flex flex-col gap-1">
             <label htmlFor="phone" className="text-[11px] font-semibold text-neutral-600">
-              Téléphone
+              {t("contact.form.phone")}
             </label>
             <input
               id="phone"
@@ -190,7 +192,7 @@ export function ContactForm({ locale }: ContactFormProps) {
 
         <div className="flex flex-col gap-1">
           <label htmlFor="address" className="text-[11px] font-semibold text-neutral-600">
-            Adresse
+            {t("contact.form.address")}
           </label>
           <input
             id="address"
@@ -202,7 +204,7 @@ export function ContactForm({ locale }: ContactFormProps) {
 
         <div className="flex flex-col gap-1">
           <label htmlFor="subject" className="text-[11px] font-semibold text-neutral-600">
-            Objet
+            {t("contact.form.subject")}
           </label>
           <select
             id="subject"
@@ -210,18 +212,18 @@ export function ContactForm({ locale }: ContactFormProps) {
             required
             className="rounded-lg border border-neutral-200 px-3 py-2 text-xs outline-none focus:border-primary focus:ring-1 focus:ring-primary"
           >
-            <option value="">Sélectionnez un objet</option>
-            <option value="sejour">Séjour / location</option>
-            <option value="entreprise">Séminaire / entreprise</option>
-            <option value="evenement">Événement privé</option>
-            <option value="collaboration">Collaboration / tournage</option>
-            <option value="autre">Autre demande</option>
+            <option value="">{t("contact.form.subjectPlaceholder")}</option>
+            <option value="sejour">{t("contact.form.subjectStay")}</option>
+            <option value="entreprise">{t("contact.form.subjectBusiness")}</option>
+            <option value="evenement">{t("contact.form.subjectEvent")}</option>
+            <option value="collaboration">{t("contact.form.subjectCollab")}</option>
+            <option value="autre">{t("contact.form.subjectOther")}</option>
           </select>
         </div>
 
         <div className="flex flex-col gap-1">
           <label htmlFor="message" className="text-[11px] font-semibold text-neutral-600">
-            Message
+            {t("contact.form.message")}
           </label>
           <textarea
             id="message"
@@ -229,7 +231,7 @@ export function ContactForm({ locale }: ContactFormProps) {
             rows={5}
             required
             className="rounded-lg border border-neutral-200 px-3 py-2 text-xs outline-none focus:border-primary focus:ring-1 focus:ring-primary"
-            placeholder="Précisez vos dates souhaitées, le nombre de personnes et la nature de votre projet."
+            placeholder={t("contact.form.messagePlaceholder")}
           />
         </div>
 
@@ -249,9 +251,7 @@ export function ContactForm({ locale }: ContactFormProps) {
             className="mt-0.5 h-3 w-3 rounded border-neutral-300 text-primary"
           />
           <label htmlFor="consent" className="text-[10px] text-neutral-600">
-            J&apos;accepte que mes données soient utilisées pour être
-            recontacté(e) dans le cadre de ma demande, conformément à la
-            politique de confidentialité du site.
+            {t("contact.form.consent")}
           </label>
         </div>
 
@@ -266,7 +266,7 @@ export function ContactForm({ locale }: ContactFormProps) {
           disabled={isPending}
           className="mt-2 inline-flex items-center justify-center rounded-full bg-gradient-to-r from-primary to-secondary px-5 py-2.5 text-xs font-semibold text-white shadow-md transition hover:opacity-90 disabled:opacity-60"
         >
-          {isPending ? "Envoi en cours…" : "Envoyer ma demande"}
+          {isPending ? t("contact.form.submitting") : t("contact.form.submit")}
         </button>
       </form>
     </>

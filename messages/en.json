@@ -1,195 +1,336 @@
 {
-  "nav.home": "Home",
-  "nav.villa": "The Villa",
-  "nav.gallery": "Gallery",
-  "nav.business": "Business",
-  "nav.events": "Events",
-  "nav.partners": "Partners",
-  "nav.contact": "Contact",
-  "nav.book": "Book now",
+  "nav": {
+    "home": "Home",
+    "villa": "The Villa",
+    "gallery": "Gallery",
+    "business": "Business",
+    "events": "Events",
+    "partners": "Partners",
+    "contact": "Contact",
+    "book": "Book now"
+  },
 
-  "hero.eyebrow": "VILLA R.E.E.L",
-  "hero.title": "VILLA R.E.E.L",
-  "hero.subtitle": "Between Alps and Tropics",
-  "hero.description": "An exceptional villa between mountains and tropical garden, designed for your stays, corporate events and creative collaborations.",
-  "hero.ctaPrimary": "Book now",
-  "hero.ctaSecondary": "Discover the villa",
-  "hero.checkIn": "Check-in",
-  "hero.checkOut": "Check-out",
-  "hero.guests": "Guests",
-  "hero.guestsPlaceholder": "2 adults",
-  "hero.checkAvailability": "Check availability",
+  "hero": {
+    "eyebrow": "VILLA R.E.E.L",
+    "title": "VILLA R.E.E.L",
+    "subtitle": "Between Alps and Tropics",
+    "description": "An exceptional villa between mountains and tropical garden, designed for your stays, corporate events and creative collaborations.",
+    "ctaPrimary": "Book now",
+    "ctaSecondary": "Discover the villa",
+    "checkIn": "Check-in",
+    "checkOut": "Check-out",
+    "guests": "Guests",
+    "guestsPlaceholder": "2 adults",
+    "checkAvailability": "Check availability"
+  },
 
-  "features.eyebrow": "Villa R.E.E.L Experience",
-  "features.title": "Between alpine elegance and tropical atmosphere",
-  "features.pool.title": "Heated pool",
-  "features.pool.desc": "A turquoise pool to relax from the very first morning.",
-  "features.view.title": "Mont-Blanc view",
-  "features.view.desc": "Unique panorama of the alpine range from the terrace.",
-  "features.garden.title": "Tropical garden",
-  "features.garden.desc": "Palm trees, banana trees and ambient lighting for your evenings.",
-  "features.billiard.title": "Billiard room",
-  "features.billiard.desc": "A convivial space for your evenings with friends or colleagues.",
+  "features": {
+    "eyebrow": "Villa R.E.E.L Experience",
+    "title": "Between alpine elegance and tropical atmosphere",
+    "pool": {
+      "title": "Heated pool",
+      "desc": "A turquoise pool to relax from the very first morning."
+    },
+    "view": {
+      "title": "Mont-Blanc view",
+      "desc": "Unique panorama of the alpine range from the terrace."
+    },
+    "garden": {
+      "title": "Tropical garden",
+      "desc": "Palm trees, banana trees and ambient lighting for your evenings."
+    },
+    "billiard": {
+      "title": "Billiard room",
+      "desc": "A convivial space for your evenings with friends or colleagues."
+    }
+  },
 
-  "villa.badge": "Exceptional villa",
-  "villa.descriptionTitle": "Villa description",
-  "villa.descriptionBody": "Between mountains and lush garden, Villa R.E.E.L offers multiple living spaces, a heated pool, a tropical garden and unobstructed views of the alpine range. A place designed for families, team retreats and intimate events.",
-  "villa.bedrooms": "Bedrooms",
-  "villa.bathrooms": "Bathrooms",
-  "villa.maxGuests": "Max guests",
-  "villa.surface": "Area",
-  "villa.amenitiesTitle": "Amenities & atmosphere",
-  "villa.amenity.pool": "Heated pool",
-  "villa.amenity.view": "Mont-Blanc view",
-  "villa.amenity.garden": "Tropical garden",
-  "villa.amenity.billiard": "Billiard & lounge area",
-  "villa.availabilityTitle": "Availability",
-  "villa.availabilityDesc": "See at a glance the available periods to plan your stay.",
-  "villa.locationTitle": "Location",
-  "villa.locationDesc": "The precise location is shared after booking confirmation. The map below shows the surrounding area.",
-  "villa.notFound": "Villa not found.",
-  "villa.perNight": "/ night",
-  "villa.bookingCheckIn": "Check-in",
-  "villa.bookingCheckOut": "Check-out",
-  "villa.bookingCleaning": "Cleaning fee",
-  "villa.bookingDeposit": "Deposit",
-  "villa.bookingTotal": "Estimated total",
-  "villa.bookingCta": "Book",
-  "villa.bookingNote": "The exact amount will be calculated based on your dates, number of nights and any current promotions.",
+  "villa": {
+    "badge": "Exceptional villa",
+    "descriptionTitle": "Villa description",
+    "descriptionBody": "Between mountains and lush garden, Villa R.E.E.L offers multiple living spaces, a heated pool, a tropical garden and unobstructed views of the alpine range. A place designed for families, team retreats and intimate events.",
+    "bedrooms": "Bedrooms",
+    "bathrooms": "Bathrooms",
+    "maxGuests": "Max guests",
+    "surface": "Area",
+    "amenitiesTitle": "Amenities & atmosphere",
+    "amenity": {
+      "pool": "Heated pool",
+      "view": "Mont-Blanc view",
+      "garden": "Tropical garden",
+      "billiard": "Billiard & lounge area"
+    },
+    "availabilityTitle": "Availability",
+    "availabilityDesc": "See at a glance the available periods to plan your stay.",
+    "locationTitle": "Location",
+    "locationDesc": "The precise location is shared after booking confirmation. The map below shows the surrounding area.",
+    "notFound": "Villa not found.",
+    "perNight": "/ night",
+    "bookingCheckIn": "Check-in",
+    "bookingCheckOut": "Check-out",
+    "bookingCleaning": "Cleaning fee",
+    "bookingDeposit": "Deposit",
+    "bookingTotal": "Estimated total",
+    "bookingCta": "Book",
+    "bookingNote": "The exact amount will be calculated based on your dates, number of nights and any current promotions."
+  },
 
-  "contact.eyebrow": "Villa R.E.E.L",
-  "contact.title": "Contact & inquiries",
-  "contact.subtitle": "A question, a stay project, an event or a seminar? Share your wishes with us and we will get back to you quickly.",
-  "contact.infoTitle": "Contact information",
-  "contact.email": "Email:",
-  "contact.phone": "Phone:",
-  "contact.bookTitle": "Book your stay",
-  "contact.bookDesc": "Check availability and send a booking request directly through our dedicated form.",
-  "contact.bookCta": "Discover the villa",
+  "contact": {
+    "eyebrow": "Villa R.E.E.L",
+    "title": "Contact & inquiries",
+    "subtitle": "A question, a stay project, an event or a seminar? Share your wishes with us and we will get back to you quickly.",
+    "infoTitle": "Contact information",
+    "email": "Email:",
+    "phone": "Phone:",
+    "bookTitle": "Book your stay",
+    "bookDesc": "Check availability and send a booking request directly through our dedicated form.",
+    "bookCta": "Discover the villa",
+    "form": {
+      "firstName": "First name",
+      "lastName": "Last name",
+      "phone": "Phone",
+      "email": "Email",
+      "address": "Address",
+      "subject": "Subject",
+      "subjectPlaceholder": "Select a subject",
+      "subjectStay": "Stay / rental",
+      "subjectBusiness": "Seminar / corporate",
+      "subjectEvent": "Private event",
+      "subjectCollab": "Collaboration / filming",
+      "subjectOther": "Other request",
+      "message": "Message",
+      "messagePlaceholder": "Please specify your desired dates, number of guests and the nature of your project.",
+      "consent": "I agree that my data may be used to be contacted in the context of my request, in accordance with the site's privacy policy.",
+      "submit": "Send my request",
+      "submitting": "Sending...",
+      "successTitle": "Message sent successfully",
+      "successDesc": "We will get back to you as soon as possible.",
+      "captchaExpired": "The anti-spam verification expired. Please try again.",
+      "captchaError": "Anti-spam verification error. Please try again."
+    }
+  },
 
-  "entreprises.eyebrow": "Villa R.E.E.L",
-  "entreprises.title": "Corporate & Seminars",
-  "entreprises.subtitle": "Give your teams an inspiring setting between Alps and tropical garden for seminars, workshops, product launches and team-building activities.",
-  "entreprises.stat.capacity.label": "Capacity",
-  "entreprises.stat.capacity.value": "Up to 20 people",
-  "entreprises.stat.surface.label": "Total area",
-  "entreprises.stat.surface.value": "250 m²",
-  "entreprises.stat.rooms.label": "Bedrooms",
-  "entreprises.stat.rooms.value": "4 double rooms",
-  "entreprises.stat.pool.label": "Pool",
-  "entreprises.stat.pool.value": "Heated pool",
-  "entreprises.formulesEyebrow": "Corporate packages",
-  "entreprises.formulesTitle": "Imagine your professional highlights at Villa R.E.E.L",
-  "entreprises.formule.seminaires": "Seminars",
-  "entreprises.formule.teambuilding": "Team Building",
-  "entreprises.formule.incentive": "Incentive",
-  "entreprises.formule.formations": "Training",
-  "entreprises.formule.soirees": "Corporate evenings",
-  "entreprises.formule.lancements": "Product launches",
-  "entreprises.formule.desc": "A warm setting for work sessions, creative workshops or inspiring presentations, with flexible indoor and outdoor spaces.",
-  "entreprises.whyEyebrow": "Why choose the Villa",
-  "entreprises.why1.title": "A haven outside the office",
-  "entreprises.why1.desc": "Far from anonymous meeting rooms, a character house that fosters informal exchange, creativity and team spirit.",
-  "entreprises.why2.title": "Indoor & outdoor spaces",
-  "entreprises.why2.desc": "Living room, terrace, tropical garden and pool alternately become work, sharing or relaxation settings.",
-  "entreprises.why3.title": "Tailor-made partners",
-  "entreprises.why3.desc": "Catering, wine tasting, photography and event management services can be added according to your needs.",
-  "entreprises.ctaTitle": "Plan your next seminar at Villa R.E.E.L",
-  "entreprises.ctaDesc": "Share your project, dates and needs, and we will get back to you with a tailor-made proposal.",
-  "entreprises.ctaBtn": "Request a quote",
+  "entreprises": {
+    "eyebrow": "Villa R.E.E.L",
+    "title": "Corporate & Seminars",
+    "subtitle": "Give your teams an inspiring setting between Alps and tropical garden for seminars, workshops, product launches and team-building activities.",
+    "stat": {
+      "capacity": {
+        "label": "Capacity",
+        "value": "Up to 20 people"
+      },
+      "surface": {
+        "label": "Total area",
+        "value": "250 m²"
+      },
+      "rooms": {
+        "label": "Bedrooms",
+        "value": "4 double rooms"
+      },
+      "pool": {
+        "label": "Pool",
+        "value": "Heated pool"
+      }
+    },
+    "formulesEyebrow": "Corporate packages",
+    "formulesTitle": "Imagine your professional highlights at Villa R.E.E.L",
+    "formule": {
+      "seminaires": "Seminars",
+      "teambuilding": "Team Building",
+      "incentive": "Incentive",
+      "formations": "Training",
+      "soirees": "Corporate evenings",
+      "lancements": "Product launches",
+      "desc": "A warm setting for work sessions, creative workshops or inspiring presentations, with flexible indoor and outdoor spaces."
+    },
+    "whyEyebrow": "Why choose the Villa",
+    "why1": {
+      "title": "A haven outside the office",
+      "desc": "Far from anonymous meeting rooms, a character house that fosters informal exchange, creativity and team spirit."
+    },
+    "why2": {
+      "title": "Indoor & outdoor spaces",
+      "desc": "Living room, terrace, tropical garden and pool alternately become work, sharing or relaxation settings."
+    },
+    "why3": {
+      "title": "Tailor-made partners",
+      "desc": "Catering, wine tasting, photography and event management services can be added according to your needs."
+    },
+    "ctaTitle": "Plan your next seminar at Villa R.E.E.L",
+    "ctaDesc": "Share your project, dates and needs, and we will get back to you with a tailor-made proposal.",
+    "ctaBtn": "Request a quote"
+  },
 
-  "evenements.eyebrow": "Villa R.E.E.L",
-  "evenements.title": "Events & celebrations",
-  "evenements.subtitle": "Engagements, intimate weddings, birthdays, bachelor/bachelorette parties... Villa R.E.E.L becomes the backdrop for your most precious moments.",
-  "evenements.event1.title": "Engagements",
-  "evenements.event1.desc": "An intimate setting to celebrate your engagement surrounded by loved ones, between a warm living room and a green terrace.",
-  "evenements.event2.title": "Weddings",
-  "evenements.event2.desc": "A character house for a confidential wedding, where every space can be staged for your special day.",
-  "evenements.event3.title": "Birthdays",
-  "evenements.event3.desc": "An unforgettable birthday in a warm villa, with pool, tropical garden and carefully crafted lighting.",
-  "evenements.event4.title": "Bachelor/Bachelorette",
-  "evenements.event4.desc": "A chic and relaxed setting for a weekend with friends, between relaxation, games and evenings by the pool.",
-  "evenements.servicesEyebrow": "Services & partners",
-  "evenements.servicesSubtitle": "Compose your event with our trusted partners, according to your wishes and budget.",
-  "evenements.service1.title": "Private chef",
-  "evenements.service1.desc": "Custom menus, food & wine pairings, brunches, cocktail dinners...",
-  "evenements.service2.title": "Wine tasting with ViniLux",
-  "evenements.service2.desc": "Wine selections, tasting workshops and food pairings around your meals.",
-  "evenements.service3.title": "Decoration & scenography",
-  "evenements.service3.desc": "Floral atmosphere, lighting design, table decoration and overall scenography.",
-  "evenements.service4.title": "Photography & video",
-  "evenements.service4.desc": "Professional capture of your event for lasting memories.",
-  "evenements.service5.title": "Music & ambiance",
-  "evenements.service5.desc": "DJs, live musicians, playlists and sound system tailored to your wishes.",
-  "evenements.service6.title": "Event coordination",
-  "evenements.service6.desc": "Support to orchestrate service providers and the flow of your day.",
-  "evenements.ctaTitle": "Ready to imagine your event at Villa R.E.E.L?",
-  "evenements.ctaDesc": "Share your project, wishes and ideal date. We will get back to you to build a tailor-made proposal.",
-  "evenements.ctaBtn": "Discuss your event",
+  "evenements": {
+    "eyebrow": "Villa R.E.E.L",
+    "title": "Events & celebrations",
+    "subtitle": "Engagements, intimate weddings, birthdays, bachelor/bachelorette parties... Villa R.E.E.L becomes the backdrop for your most precious moments.",
+    "event1": {
+      "title": "Engagements",
+      "desc": "An intimate setting to celebrate your engagement surrounded by loved ones, between a warm living room and a green terrace."
+    },
+    "event2": {
+      "title": "Weddings",
+      "desc": "A character house for a confidential wedding, where every space can be staged for your special day."
+    },
+    "event3": {
+      "title": "Birthdays",
+      "desc": "An unforgettable birthday in a warm villa, with pool, tropical garden and carefully crafted lighting."
+    },
+    "event4": {
+      "title": "Bachelor/Bachelorette",
+      "desc": "A chic and relaxed setting for a weekend with friends, between relaxation, games and evenings by the pool."
+    },
+    "servicesEyebrow": "Services & partners",
+    "servicesSubtitle": "Compose your event with our trusted partners, according to your wishes and budget.",
+    "service1": {
+      "title": "Private chef",
+      "desc": "Custom menus, food & wine pairings, brunches, cocktail dinners..."
+    },
+    "service2": {
+      "title": "Wine tasting with ViniLux",
+      "desc": "Wine selections, tasting workshops and food pairings around your meals."
+    },
+    "service3": {
+      "title": "Decoration & scenography",
+      "desc": "Floral atmosphere, lighting design, table decoration and overall scenography."
+    },
+    "service4": {
+      "title": "Photography & video",
+      "desc": "Professional capture of your event for lasting memories."
+    },
+    "service5": {
+      "title": "Music & ambiance",
+      "desc": "DJs, live musicians, playlists and sound system tailored to your wishes."
+    },
+    "service6": {
+      "title": "Event coordination",
+      "desc": "Support to orchestrate service providers and the flow of your day."
+    },
+    "ctaTitle": "Ready to imagine your event at Villa R.E.E.L?",
+    "ctaDesc": "Share your project, wishes and ideal date. We will get back to you to build a tailor-made proposal.",
+    "ctaBtn": "Discuss your event"
+  },
 
-  "galerie.eyebrow": "Villa R.E.E.L",
-  "galerie.title": "Gallery",
-  "galerie.subtitle": "Discover the villa in pictures: interiors, outdoors, pool, bedrooms and living spaces.",
+  "galerie": {
+    "eyebrow": "Villa R.E.E.L",
+    "title": "Gallery",
+    "subtitle": "Discover the villa in pictures: interiors, outdoors, pool, bedrooms and living spaces."
+  },
 
-  "collaborateurs.eyebrow": "Villa R.E.E.L",
-  "collaborateurs.title": "Our Partners",
-  "collaborateurs.subtitle": "Trusted partners to enrich your stay: wine tasting, gastronomy, bespoke experiences.",
-  "collaborateurs.vinilux.name": "ViniLux",
-  "collaborateurs.vinilux.desc": "Wine merchant and oenological partner, ViniLux offers wine selections, tasting workshops and food pairings for your evenings, seminars or private events at the villa.",
-  "collaborateurs.vinilux.cta": "Discover ViniLux",
-  "collaborateurs.chef.name": "Félicien Christe",
-  "collaborateurs.chef.desc": "Private chef, Félicien Christe creates personalised menus, intimate dinners, brunches and cocktail dinners for your stays and events at Villa R.E.E.L.",
-  "collaborateurs.chef.note": "On request, he can work for your private stays, corporate events or special celebrations.",
-  "collaborateurs.disclaimer": "These services are optional and independent of the villa rental price. They are subject to separate quotes and invoicing from each service provider.",
+  "gallery": {
+    "eyebrow": "Atmosphere",
+    "title": "A glimpse of the villa",
+    "viewAll": "View all photos",
+    "closePhoto": "Close photo",
+    "close": "Close"
+  },
 
-  "footer.nav": "Navigation",
-  "footer.services": "Services",
-  "footer.legal": "Legal",
-  "footer.home": "Home",
-  "footer.villa": "The Villa",
-  "footer.gallery": "Gallery",
-  "footer.business": "Business",
-  "footer.events": "Events",
-  "footer.partners": "Partners",
-  "footer.contact": "Contact",
-  "footer.booking": "Booking",
-  "footer.copyright": "Villa R.E.E.L. All rights reserved.",
+  "collaborateurs": {
+    "eyebrow": "Villa R.E.E.L",
+    "title": "Our Partners",
+    "subtitle": "Trusted partners to enrich your stay: wine tasting, gastronomy, bespoke experiences.",
+    "vinilux": {
+      "name": "ViniLux",
+      "desc": "Wine merchant and oenological partner, ViniLux offers wine selections, tasting workshops and food pairings for your evenings, seminars or private events at the villa.",
+      "cta": "Discover ViniLux"
+    },
+    "chef": {
+      "name": "Félicien Christe",
+      "desc": "Private chef, Félicien Christe creates personalised menus, intimate dinners, brunches and cocktail dinners for your stays and events at Villa R.E.E.L.",
+      "note": "On request, he can work for your private stays, corporate events or special celebrations."
+    },
+    "disclaimer": "These services are optional and independent of the villa rental price. They are subject to separate quotes and invoicing from each service provider."
+  },
 
-  "forms.checkIn": "Check-in",
-  "forms.checkOut": "Check-out",
-  "forms.guests": "Guests",
-  "forms.submit": "Send",
+  "reviews": {
+    "eyebrow": "Guest reviews",
+    "subtitle": "Memorable stays between Alps and Tropics.",
+    "leaveReview": "Leave a review",
+    "defaultComment": "A remarkable stay at Villa R.E.E.L, between comfort and preserved nature.",
+    "guest": "Guest"
+  },
 
-  "reservation.step1": "Dates",
-  "reservation.step2": "Summary",
-  "reservation.step3": "Guest",
-  "reservation.step4": "Payment",
-  "reservation.step5": "Confirmation",
-  "reservation.title": "Book your stay",
-  "reservation.description": "A 5-step booking flow to calmly plan your experience at Villa R.E.E.L.",
-  "reservation.errors.invalidRange": "Check-out date must be after check-in date.",
-  "reservation.errors.minStay": "Minimum stay of {min} nights.",
-  "reservation.errors.maxStay": "Maximum stay of {max} nights.",
-  "reservation.errorGeneric": "Booking error. Please try again.",
-  "reservation.back": "Back",
-  "reservation.next": "Next step",
-  "reservation.errorNoReservation": "Error: no active booking. Please start over.",
-  "reservation.errorNetwork": "Network error. Please try again.",
+  "footer": {
+    "nav": "Navigation",
+    "services": "Services",
+    "legal": "Legal",
+    "home": "Home",
+    "villa": "The Villa",
+    "gallery": "Gallery",
+    "business": "Business",
+    "events": "Events",
+    "partners": "Partners",
+    "contact": "Contact",
+    "booking": "Booking",
+    "copyright": "Villa R.E.E.L. All rights reserved.",
+    "legalNotice": "Legal Notice",
+    "terms": "Terms & Conditions",
+    "privacy": "Privacy Policy"
+  },
 
-  "emails.subject.reservationConfirmed": "Your Villa R.E.E.L reservation is confirmed!",
-  "emails.subject.balanceReminder": "Reminder: remaining balance for your stay",
-  "emails.subject.arrivalReminder": "Your stay starts in 7 days!",
-  "emails.subject.reviewRequest": "How was your stay?",
-  "emails.subject.contactConfirmation": "We have received your message",
-  "emails.subject.contactNotification": "New contact message – Villa R.E.E.L",
+  "forms": {
+    "checkIn": "Check-in",
+    "checkOut": "Check-out",
+    "guests": "Guests",
+    "submit": "Send"
+  },
 
-  "admin.title": "Admin interface",
-  "admin.nav.dashboard": "Dashboard",
-  "admin.nav.reservations": "Reservations",
-  "admin.nav.calendar": "Calendar",
-  "admin.nav.reviews": "Reviews",
-  "admin.nav.promotions": "Promotions",
-  "admin.nav.messages": "Messages",
-  "admin.nav.content": "Content",
-  "admin.nav.settings": "Settings"
+  "reservation": {
+    "step1": "Dates",
+    "step2": "Summary",
+    "step3": "Guest",
+    "step4": "Payment",
+    "step5": "Confirmation",
+    "title": "Book your stay",
+    "description": "A 5-step booking flow to calmly plan your experience at Villa R.E.E.L.",
+    "back": "Back",
+    "next": "Next step",
+    "errorGeneric": "Booking error. Please try again.",
+    "errorNoReservation": "Error: no active booking. Please start over.",
+    "errorNetwork": "Network error. Please try again.",
+    "step1Title": "Select your stay dates",
+    "checkInLabel": "Check-in",
+    "checkOutLabel": "Check-out",
+    "guestsLabel": "Number of guests",
+    "maxGuestsNote": "Up to {n} guests.",
+    "priceSummary": "Estimated price: {price} € / night — cleaning ({cleaning} €) — deposit ({deposit} €).",
+    "calendarNote": "Already booked or blocked days appear as unavailable in the calendar.",
+    "errors": {
+      "invalidRange": "Check-out date must be after check-in date.",
+      "minStay": "Minimum stay of {min} nights.",
+      "maxStay": "Maximum stay of {max} nights."
+    }
+  },
+
+  "calendar": {
+    "loading": "Loading availability...",
+    "available": "Available",
+    "unavailable": "Unavailable"
+  },
+
+  "emails": {
+    "subject": {
+      "reservationConfirmed": "Your Villa R.E.E.L reservation is confirmed!",
+      "balanceReminder": "Reminder: remaining balance for your stay",
+      "arrivalReminder": "Your stay starts in 7 days!",
+      "reviewRequest": "How was your stay?",
+      "contactConfirmation": "We have received your message",
+      "contactNotification": "New contact message – Villa R.E.E.L"
+    }
+  },
+
+  "admin": {
+    "title": "Admin interface",
+    "nav": {
+      "dashboard": "Dashboard",
+      "reservations": "Reservations",
+      "calendar": "Calendar",
+      "reviews": "Reviews",
+      "promotions": "Promotions",
+      "messages": "Messages",
+      "content": "Content",
+      "settings": "Settings"
+    }
+  }
 }
