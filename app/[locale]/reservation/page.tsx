@@ -35,7 +35,9 @@ export default function ReservationPage({ params: _params }: PageProps) {
   const [depositAmount, setDepositAmount] = useState(0);
 
   const [maxGuests, _setMaxGuests] = useState(20);
+  const [reservationId, setReservationId] = useState<number | null>(null);
   const [confirmationCode, setConfirmationCode] = useState<string | null>(null);
+  const [bookingError, setBookingError] = useState<string | null>(null);
 
   const progress = ((step + 1) / STEPS.length) * 100;
 
@@ -118,19 +120,58 @@ export default function ReservationPage({ params: _params }: PageProps) {
             {step === 2 && (
               <ReservationStep3
                 maxGuests={maxGuests}
-                onValid={() => {
-                  setStep(3);
+                onValid={async (guestData) => {
+                  setBookingError(null);
+                  try {
+                    const res = await fetch("/api/reservations/create", {
+                      method: "POST",
+                      headers: { "Content-Type": "application/json" },
+                      body: JSON.stringify({
+                        villaId,
+                        checkIn,
+                        checkOut,
+                        nbGuests: guestData.guests,
+                        guestName: `${guestData.firstName} ${guestData.lastName}`.trim(),
+                        guestEmail: guestData.email,
+                        guestPhone: guestData.phone,
+                        promoCode: promoCode ?? undefined,
+                        locale: "fr",
+                      }),
+                    });
+                    if (!res.ok) {
+                      const err = (await res.json()) as { error?: string };
+                      setBookingError(err.error ?? "Erreur lors de la réservation.");
+                      return;
+                    }
+                    const result = (await res.json()) as {
+                      reservationId: number;
+                      confirmationCode: string;
+                      depositAmount: number;
+                    };
+                    setReservationId(result.reservationId);
+                    // Mettre à jour l'acompte avec la valeur calculée côté serveur
+                    setDepositAmount(result.depositAmount);
+                    setStep(3);
+                  } catch {
+                    setBookingError("Erreur réseau. Veuillez réessayer.");
+                  }
                 }}
               />
             )}
-            {step === 3 && (
+            {step === 3 && reservationId && (
               <ReservationStep4
+                reservationId={reservationId}
                 depositAmount={depositAmount}
                 onPaid={(code) => {
                   setConfirmationCode(code);
                   setStep(4);
                 }}
               />
+            )}
+            {step === 3 && !reservationId && (
+              <p className="text-xs text-red-600">
+                Erreur : aucune réservation en cours. Veuillez recommencer.
+              </p>
             )}
             {step === 4 && confirmationCode && (
               <ReservationStep5
@@ -143,6 +184,13 @@ export default function ReservationPage({ params: _params }: PageProps) {
                   total,
                 }}
               />
+            )}
+
+            {/* Erreur de réservation */}
+            {bookingError && (
+              <p className="mt-3 text-[11px] font-semibold text-red-600">
+                {bookingError}
+              </p>
             )}
 
             {/* Navigation */}

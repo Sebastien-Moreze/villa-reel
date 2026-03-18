@@ -10,6 +10,7 @@ import {
 } from "@stripe/react-stripe-js";
 
 type Props = {
+  reservationId: number;
   depositAmount: number;
   onPaid: (confirmationCode: string) => void;
 };
@@ -19,7 +20,7 @@ const stripePromise =
     ? loadStripe(process.env.NEXT_PUBLIC_STRIPE_PK ?? "")
     : null;
 
-function PaymentForm({ depositAmount, onPaid }: Props) {
+function PaymentForm({ reservationId, depositAmount, onPaid }: Props) {
   const stripe = useStripe();
   const elements = useElements();
   const [loading, setLoading] = useState(false);
@@ -35,7 +36,9 @@ function PaymentForm({ depositAmount, onPaid }: Props) {
       const res = await fetch("/api/stripe/create-deposit-intent", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ amount: depositAmount * 100, currency: "eur" }),
+        // Le montant est résolu côté serveur depuis la DB via reservationId.
+        // Ne jamais envoyer l'amount depuis le client.
+        body: JSON.stringify({ reservationId, currency: "eur" }),
       });
       if (!res.ok) {
         setError("Impossible de créer le paiement. Veuillez réessayer.");
@@ -135,7 +138,7 @@ function PaymentForm({ depositAmount, onPaid }: Props) {
   );
 }
 
-export function ReservationStep4({ depositAmount, onPaid }: Props) {
+export function ReservationStep4({ reservationId, depositAmount, onPaid }: Props) {
   if (!stripePromise) {
     return (
       <p className="text-xs text-neutral-600">
@@ -146,7 +149,7 @@ export function ReservationStep4({ depositAmount, onPaid }: Props) {
 
   return (
     <Elements stripe={stripePromise}>
-      <PaymentForm depositAmount={depositAmount} onPaid={onPaid} />
+      <PaymentForm reservationId={reservationId} depositAmount={depositAmount} onPaid={onPaid} />
     </Elements>
   );
 }

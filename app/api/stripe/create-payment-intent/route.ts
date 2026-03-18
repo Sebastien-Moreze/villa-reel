@@ -1,13 +1,13 @@
 import { NextResponse } from "next/server";
 import Stripe from "stripe";
+import { prisma } from "@/lib/prisma";
 
 export async function POST(request: Request) {
   const body = (await request.json()) as {
     reservationId?: number;
     villaId?: number;
-    amount?: number; // in cents
-    currency?: string;
     type?: "deposit" | "balance";
+    currency?: string;
   };
 
   const secret = process.env.STRIPE_SK;
@@ -22,22 +22,61 @@ export async function POST(request: Request) {
     apiVersion: "2026-02-25.clover",
   });
 
-  const amount = body.amount;
-  if (!amount || amount <= 0 || !body.reservationId || !body.villaId) {
+  const { reservationId, villaId, type = "deposit" } = body;
+
+  if (!reservationId || !villaId) {
     return NextResponse.json({ error: "Invalid payload" }, { status: 400 });
   }
 
+  // ── Validation côté serveur ───────────────────────────────────────────────
+  // Le montant n'est JAMAIS fourni par le client — il est toujours lu en DB.
+  // Cela empêche toute manipulation de prix côté navigateur.
+  const reservation = await prisma.reservation.findUnique({
+    where: { id: Number(reservationId) },
+    select: {
+      id: true,
+      villaId: true,
+      depositAmount: true,
+      balanceAmount: true,
+      status: true,
+      paymentStatus: true,
+    },
+  });
+
+  if (!reservation) {
+    return NextResponse.json({ error: "Reservation not found" }, { status: 404 });
+  }
+
+  // Vérifier que la villa correspond
+  if (reservation.villaId !== Number(villaId)) {
+    return NextResponse.json({ error: "Invalid request" }, { status: 400 });
+  }
+
+  // Vérifier l'état de la réservation
+  if (reservation.status === "CANCELLED") {
+    return NextResponse.json({ error: "Reservation is cancelled" }, { status: 400 });
+  }
+
+  // Calculer le montant depuis la DB (en centimes)
+  const serverAmount =
+    type === "balance"
+      ? Math.round(Number(reservation.balanceAmount) * 100)
+      : Math.round(Number(reservation.depositAmount) * 100);
+
+  if (!serverAmount || serverAmount <= 0) {
+    return NextResponse.json({ error: "Invalid amount" }, { status: 400 });
+  }
+
   const currency = body.currency ?? "eur";
-  const type = body.type ?? "deposit";
 
   try {
     const intent = await stripe.paymentIntents.create({
-      amount,
+      amount: serverAmount,
       currency,
       automatic_payment_methods: { enabled: true },
       metadata: {
-        reservationId: String(body.reservationId),
-        villaId: String(body.villaId),
+        reservationId: String(reservationId),
+        villaId: String(villaId),
         type,
       },
     });
@@ -51,4 +90,3 @@ export async function POST(request: Request) {
     );
   }
 }
-

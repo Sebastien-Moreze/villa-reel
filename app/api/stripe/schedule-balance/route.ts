@@ -1,8 +1,18 @@
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import Stripe from "stripe";
 import { prisma } from "@/lib/prisma";
 
-export async function POST() {
+export async function POST(request: NextRequest) {
+  // ── Authentification CRON_SECRET ─────────────────────────────────────────
+  // Cet endpoint est appelé par le scheduler (cron). Il doit être protégé
+  // pour éviter qu'un tiers ne déclenche des PaymentIntents arbitraires.
+  const cronSecret = process.env.CRON_SECRET;
+  const authHeader = request.headers.get("x-cron-secret");
+
+  if (!cronSecret || authHeader !== cronSecret) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
+
   const secret = process.env.STRIPE_SK;
   if (!secret) {
     return NextResponse.json(

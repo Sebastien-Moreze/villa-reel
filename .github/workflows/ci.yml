@@ -128,10 +128,16 @@ jobs:
           docker build \
             --file Dockerfile \
             --tag villa-reel-ci:${{ github.sha }} \
-            --build-arg DATABASE_URL=postgres://user:password@localhost:5432/villa_reel \
-            --build-arg NEXTAUTH_SECRET=dummy_nextauth_secret \
-            --build-arg STRIPE_SK=dummy_stripe_sk \
-            --build-arg STRIPE_WEBHOOK_SECRET=dummy_stripe_wh_secret \
-            --build-arg RESEND_API_KEY=dummy_resend_api_key \
+            --build-arg DATABASE_URL=postgresql://user:password@localhost:5432/villa_reel \
+            --build-arg NEXTAUTH_SECRET=ci-dummy-nextauth-secret-32chars \
+            --build-arg NEXTAUTH_URL=http://localhost:3000 \
+            --build-arg STRIPE_SK=sk_test_dummy \
+            --build-arg NEXT_PUBLIC_STRIPE_PK=pk_test_dummy \
+            --build-arg STRIPE_WEBHOOK_SECRET=whsec_dummy \
+            --build-arg RESEND_API_KEY=re_dummy \
+            --build-arg CONTACT_EMAIL=ci@example.com \
+            --build-arg NEXT_PUBLIC_APP_URL=http://localhost:3000 \
+            --build-arg NEXT_PUBLIC_HCAPTCHA_SITE_KEY=10000000-ffff-ffff-ffff-000000000001 \
+            --build-arg CRON_SECRET=ci_dummy_cron_secret \
             .
 

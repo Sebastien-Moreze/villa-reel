@@ -17,19 +17,33 @@ WORKDIR /app
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
 
-# ARG disponibles au build (ne pas mettre de secrets réels en dur)
+# ── Déclaration des ARGs passés par --build-arg ──────────────────────────────
 ARG DATABASE_URL
 ARG NEXTAUTH_SECRET
 ARG NEXTAUTH_URL
 ARG STRIPE_SK
-ARG STRIPE_PK
+ARG NEXT_PUBLIC_STRIPE_PK
 ARG STRIPE_WEBHOOK_SECRET
 ARG RESEND_API_KEY
 ARG CONTACT_EMAIL
 ARG NEXT_PUBLIC_APP_URL
 ARG NEXT_PUBLIC_HCAPTCHA_SITE_KEY
+ARG CRON_SECRET
 
+# ── CRITICAL : exporter les ARGs en ENV pour que next build puisse les lire ───
+# Sans ces lignes, npm run build n'a accès à aucune variable d'environnement.
 ENV NODE_ENV=production
+ENV DATABASE_URL=$DATABASE_URL
+ENV NEXTAUTH_SECRET=$NEXTAUTH_SECRET
+ENV NEXTAUTH_URL=$NEXTAUTH_URL
+ENV STRIPE_SK=$STRIPE_SK
+ENV NEXT_PUBLIC_STRIPE_PK=$NEXT_PUBLIC_STRIPE_PK
+ENV STRIPE_WEBHOOK_SECRET=$STRIPE_WEBHOOK_SECRET
+ENV RESEND_API_KEY=$RESEND_API_KEY
+ENV CONTACT_EMAIL=$CONTACT_EMAIL
+ENV NEXT_PUBLIC_APP_URL=$NEXT_PUBLIC_APP_URL
+ENV NEXT_PUBLIC_HCAPTCHA_SITE_KEY=$NEXT_PUBLIC_HCAPTCHA_SITE_KEY
+ENV CRON_SECRET=$CRON_SECRET
 
 # Génération du client Prisma (obligatoire avant le build Next.js)
 RUN npx prisma generate

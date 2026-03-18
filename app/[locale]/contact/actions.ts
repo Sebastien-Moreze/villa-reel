@@ -3,6 +3,7 @@
 import { z } from "zod";
 import { Resend } from "resend";
 import { prisma } from "@/lib/prisma";
+import { escapeHtml, escapeHtmlMultiline } from "@/lib/html";
 
 const contactSchema = z.object({
   firstName: z.string().min(1),
@@ -55,20 +56,21 @@ async function sendEmails(input: z.infer<typeof contactSchema>) {
   const ownerHtml = `
     <p>Nouveau message de contact sur le site Villa R.E.E.L :</p>
     <ul>
-      <li><strong>Nom :</strong> ${input.firstName} ${input.lastName}</li>
-      <li><strong>Email :</strong> ${input.email}</li>
-      <li><strong>Téléphone :</strong> ${input.phone ?? "-"}</li>
-      <li><strong>Adresse :</strong> ${input.address ?? "-"}</li>
-      <li><strong>Objet :</strong> ${input.subject}</li>
+      <li><strong>Nom :</strong> ${escapeHtml(input.firstName)} ${escapeHtml(input.lastName)}</li>
+      <li><strong>Email :</strong> ${escapeHtml(input.email)}</li>
+      <li><strong>Téléphone :</strong> ${escapeHtml(input.phone ?? "-")}</li>
+      <li><strong>Adresse :</strong> ${escapeHtml(input.address ?? "-")}</li>
+      <li><strong>Objet :</strong> ${escapeHtml(input.subject)}</li>
     </ul>
     <p><strong>Message :</strong></p>
-    <p>${input.message.replace(/\n/g, "<br />")}</p>
+    <p>${escapeHtmlMultiline(input.message)}</p>
   `;
 
+  const safeName = escapeHtml(input.firstName);
   const guestHtml =
     input.locale === "en"
-      ? `<p>Hello ${input.firstName},</p><p>Thank you for contacting Villa R.E.E.L. We have received your message and will get back to you as soon as possible.</p><p>Best regards,<br/>Villa R.E.E.L</p>`
-      : `<p>Bonjour ${input.firstName},</p><p>Merci pour votre message. Nous l'avons bien reçu et reviendrons vers vous dans les plus brefs délais.</p><p>Cordialement,<br/>Villa R.E.E.L</p>`;
+      ? `<p>Hello ${safeName},</p><p>Thank you for contacting Villa R.E.E.L. We have received your message and will get back to you as soon as possible.</p><p>Best regards,<br/>Villa R.E.E.L</p>`
+      : `<p>Bonjour ${safeName},</p><p>Merci pour votre message. Nous l'avons bien reçu et reviendrons vers vous dans les plus brefs délais.</p><p>Cordialement,<br/>Villa R.E.E.L</p>`;
 
   await Promise.all([
     resend.emails.send({

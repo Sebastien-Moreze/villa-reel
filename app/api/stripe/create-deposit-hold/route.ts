@@ -1,11 +1,11 @@
 import { NextResponse } from "next/server";
 import Stripe from "stripe";
+import { prisma } from "@/lib/prisma";
 
 export async function POST(request: Request) {
   const body = (await request.json()) as {
     reservationId?: number;
     villaId?: number;
-    amount?: number; // in cents
     currency?: string;
   };
 
@@ -21,22 +21,53 @@ export async function POST(request: Request) {
     apiVersion: "2026-02-25.clover",
   });
 
-  const amount = body.amount;
-  if (!amount || amount <= 0 || !body.reservationId || !body.villaId) {
+  const { reservationId, villaId } = body;
+
+  if (!reservationId || !villaId) {
     return NextResponse.json({ error: "Invalid payload" }, { status: 400 });
+  }
+
+  // ── Validation côté serveur ───────────────────────────────────────────────
+  // Le montant n'est JAMAIS fourni par le client — toujours lu depuis la DB.
+  const reservation = await prisma.reservation.findUnique({
+    where: { id: Number(reservationId) },
+    select: {
+      id: true,
+      villaId: true,
+      depositAmount: true,
+      status: true,
+    },
+  });
+
+  if (!reservation) {
+    return NextResponse.json({ error: "Reservation not found" }, { status: 404 });
+  }
+
+  if (reservation.villaId !== Number(villaId)) {
+    return NextResponse.json({ error: "Invalid request" }, { status: 400 });
+  }
+
+  if (reservation.status === "CANCELLED") {
+    return NextResponse.json({ error: "Reservation is cancelled" }, { status: 400 });
+  }
+
+  const serverAmount = Math.round(Number(reservation.depositAmount) * 100);
+
+  if (!serverAmount || serverAmount <= 0) {
+    return NextResponse.json({ error: "Invalid amount" }, { status: 400 });
   }
 
   const currency = body.currency ?? "eur";
 
   try {
     const intent = await stripe.paymentIntents.create({
-      amount,
+      amount: serverAmount,
       currency,
       capture_method: "manual",
       automatic_payment_methods: { enabled: true },
       metadata: {
-        reservationId: String(body.reservationId),
-        villaId: String(body.villaId),
+        reservationId: String(reservationId),
+        villaId: String(villaId),
         type: "deposit-hold",
       },
     });
@@ -50,4 +81,3 @@ export async function POST(request: Request) {
     );
   }
 }
-

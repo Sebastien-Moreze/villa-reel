@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import Stripe from "stripe";
 import { prisma } from "@/lib/prisma";
 import { Resend } from "resend";
+import { escapeHtml } from "@/lib/html";
 
 export const runtime = "nodejs";
 
@@ -132,11 +133,11 @@ async function sendPaymentFailureEmail(reservationId: number, type: string) {
     : `${process.env.NEXT_PUBLIC_APP_URL}/reservation/acompte/${reservation.confirmationCode}`;
 
   const html = `
-    <p>Bonjour ${reservation.guestName},</p>
+    <p>Bonjour ${escapeHtml(reservation.guestName)},</p>
     <p>Nous avons rencontré un problème lors du traitement de votre paiement
     (${isBalance ? "solde" : "acompte"}) pour votre réservation à la Villa R.E.E.L.</p>
-    <p>Code de confirmation : <strong>${reservation.confirmationCode}</strong></p>
-    <p>Veuillez réessayer via ce lien sécurisé : <a href="${retryUrl}">${retryUrl}</a></p>
+    <p>Code de confirmation : <strong>${escapeHtml(reservation.confirmationCode)}</strong></p>
+    <p>Veuillez réessayer via ce lien sécurisé : <a href="${escapeHtml(retryUrl)}">${escapeHtml(retryUrl)}</a></p>
     <p>Si le problème persiste, n'hésitez pas à nous contacter directement.</p>
     <p>Cordialement,<br/>Villa R.E.E.L</p>
   `;
@@ -168,11 +169,11 @@ async function sendPaymentEmail(reservationId: number, type: string) {
       : "Solde de votre séjour réglé – Villa R.E.E.L";
 
   const html = `
-    <p>Bonjour ${reservation.guestName},</p>
+    <p>Bonjour ${escapeHtml(reservation.guestName)},</p>
     <p>Nous vous confirmons la bonne réception ${
       type === "deposit" ? "de votre acompte" : "du solde de votre séjour"
     } pour votre réservation à la Villa R.E.E.L.</p>
-    <p>Code de confirmation : <strong>${reservation.confirmationCode}</strong></p>
+    <p>Code de confirmation : <strong>${escapeHtml(reservation.confirmationCode)}</strong></p>
     <p>À très bientôt,</p>
     <p>Villa R.E.E.L</p>
   `;
