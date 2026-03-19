@@ -47,7 +47,7 @@ export default async function CGVPage({ params }: PageProps) {
             Les présentes CGV ont pour objet de définir les conditions dans lesquelles la Villa R.E.E.L, propriété de la société R.E.E.L., est mise en location saisonnière à usage privatif. La villa est située au 1281 Route de Moussy, 74930 Reignier-Esery, France.
           </p>
           <p className="mt-2">
-            La villa est proposée pour des séjours privés, des événements d'entreprise et des collaborations. Sa capacité maximale d'accueil est de 8 personnes.
+            La villa est proposée pour des séjours privés, des événements d&apos;entreprise et des collaborations. Sa capacité maximale d&apos;accueil est de 8 personnes.
           </p>
           <p className="mt-2">
             La Villa R.E.E.L est un <strong>meublé de tourisme classé</strong>. Le classement est attribué conformément aux dispositions du Code du tourisme (article L. 324-1 et suivants).
@@ -58,14 +58,14 @@ export default async function CGVPage({ params }: PageProps) {
         <section>
           <h2 className="text-base font-semibold text-neutral-900 mb-3">Article 3 – Réservation et formation du contrat</h2>
           <p>
-            La réservation est effectuée via le site internet <strong>villareel.com</strong> ou directement par email auprès du Bailleur. Elle n'est définitive qu'après :
+            La réservation est effectuée via le site internet <strong>villareel.com</strong> ou directement par email auprès du Bailleur. Elle n&apos;est définitive qu&apos;après :
           </p>
           <ul className="mt-2 ml-4 space-y-1 list-disc">
             <li>réception du formulaire de réservation dûment complété ;</li>
             <li>confirmation écrite (email) adressée par le Bailleur.</li>
           </ul>
           <p className="mt-2">
-            La durée minimale de séjour est de <strong>2 nuits</strong>. Des séjours d'une nuit peuvent être accordés sur demande, selon les disponibilités et à la discrétion du Bailleur. Les arrivées sont possibles <strong>tous les jours de la semaine</strong>.
+            La durée minimale de séjour est de <strong>2 nuits</strong>. Des séjours d&apos;une nuit peuvent être accordés sur demande, selon les disponibilités et à la discrétion du Bailleur. Les arrivées sont possibles <strong>tous les jours de la semaine</strong>.
           </p>
           <p className="mt-2">
             Le Locataire déclare avoir pris connaissance et accepté les présentes CGV avant toute réservation.
@@ -78,28 +78,28 @@ export default async function CGVPage({ params }: PageProps) {
 
           <h3 className="text-sm font-semibold text-neutral-800 mt-4 mb-2">4.1 Prix</h3>
           <p>
-            Les tarifs sont indiqués en euros (€), toutes taxes comprises, sur le site villareel.com. Ils comprennent la location du bien, les charges courantes (eau, électricité, chauffage) et le ménage de fin de séjour. <strong>Aucuns frais de ménage ne sont facturés séparément.</strong> Les prestations additionnelles (chef privé, dégustation de vins, etc.) font l'objet d'une facturation séparée.
+            Les tarifs sont indiqués en euros (€), toutes taxes comprises, sur le site villareel.com. Ils comprennent la location du bien, les charges courantes (eau, électricité, chauffage) et le ménage de fin de séjour. <strong>Aucuns frais de ménage ne sont facturés séparément.</strong> Les prestations additionnelles (chef privé, dégustation de vins, etc.) font l&apos;objet d&apos;une facturation séparée.
           </p>
 
           <h3 className="text-sm font-semibold text-neutral-800 mt-4 mb-2">4.2 Modalités de paiement</h3>
           <p>
-            Aucun acompte n'est exigé à la réservation. La <strong>totalité du montant du séjour est due au plus tard 30 jours avant la date d'arrivée</strong>. À défaut de règlement dans ce délai, le Bailleur se réserve le droit d'annuler la réservation.
+            Aucun acompte n&apos;est exigé à la réservation. La <strong>totalité du montant du séjour est due au plus tard 30 jours avant la date d&apos;arrivée</strong>. À défaut de règlement dans ce délai, le Bailleur se réserve le droit d&apos;annuler la réservation.
           </p>
           <p className="mt-2">
-            Pour toute réservation effectuée moins de 30 jours avant la date d'arrivée, la totalité du montant est exigible immédiatement.
+            Pour toute réservation effectuée moins de 30 jours avant la date d&apos;arrivée, la totalité du montant est exigible immédiatement.
           </p>
 
           <h3 className="text-sm font-semibold text-neutral-800 mt-4 mb-2">4.3 Dépôt de garantie</h3>
           <p>
-            Un dépôt de garantie de <strong>500 €</strong> est requis avant l'entrée dans les lieux. Il est restitué dans un délai de <strong>7 jours ouvrés</strong> après la date de départ du Locataire, déduction faite, le cas échéant, du coût des dommages constatés lors de l'état des lieux de sortie.
+            Un dépôt de garantie de <strong>500 €</strong> est requis avant l&apos;entrée dans les lieux. Il est restitué dans un délai de <strong>7 jours ouvrés</strong> après la date de départ du Locataire, déduction faite, le cas échéant, du coût des dommages constatés lors de l&apos;état des lieux de sortie.
           </p>
         </section>
 
         {/* Article 5 */}
         <section>
-          <h2 className="text-base font-semibold text-neutral-900 mb-3">Article 5 – Conditions d'annulation</h2>
+          <h2 className="text-base font-semibold text-neutral-900 mb-3">Article 5 – Conditions d&apos;annulation</h2>
 
-          <p className="mb-3">La politique d'annulation de la Villa R.E.E.L est souple afin de vous offrir une réservation sereine :</p>
+          <p className="mb-3">La politique d&apos;annulation de la Villa R.E.E.L est souple afin de vous offrir une réservation sereine :</p>
 
           <div className="rounded-xl overflow-hidden border border-neutral-200 mt-2">
             <table className="w-full text-xs">
@@ -123,10 +123,10 @@ export default async function CGVPage({ params }: PageProps) {
           </div>
 
           <p className="mt-3">
-            Toute demande d'annulation doit être adressée par écrit (email) à <a href="mailto:r.jedonne@gmail.com" className="text-primary underline">r.jedonne@gmail.com</a>. La date de réception de l'email fait foi.
+            Toute demande d&apos;annulation doit être adressée par écrit (email) à <a href="mailto:r.jedonne@gmail.com" className="text-primary underline">r.jedonne@gmail.com</a>. La date de réception de l&apos;email fait foi.
           </p>
           <p className="mt-2">
-            Le dépôt de garantie est restitué intégralement en cas d'annulation, quelle que soit la date.
+            Le dépôt de garantie est restitué intégralement en cas d&apos;annulation, quelle que soit la date.
           </p>
         </section>
 
@@ -134,25 +134,25 @@ export default async function CGVPage({ params }: PageProps) {
         <section>
           <h2 className="text-base font-semibold text-neutral-900 mb-3">Article 6 – Arrivée et départ</h2>
           <p>
-            La mise à disposition de la villa s'effectue à partir de <strong>16h00</strong> le jour d'arrivée. Le Locataire s'engage à libérer les lieux au plus tard à <strong>11h00</strong> le jour du départ, sauf accord écrit préalable du Bailleur. Tout dépassement non autorisé pourra faire l'objet d'une facturation supplémentaire.
+            La mise à disposition de la villa s&apos;effectue à partir de <strong>16h00</strong> le jour d&apos;arrivée. Le Locataire s&apos;engage à libérer les lieux au plus tard à <strong>11h00</strong> le jour du départ, sauf accord écrit préalable du Bailleur. Tout dépassement non autorisé pourra faire l&apos;objet d&apos;une facturation supplémentaire.
           </p>
         </section>
 
         {/* Article 7 */}
         <section>
           <h2 className="text-base font-semibold text-neutral-900 mb-3">Article 7 – Obligations du locataire</h2>
-          <p>Le Locataire s'engage à :</p>
+          <p>Le Locataire s&apos;engage à :</p>
           <ul className="mt-2 ml-4 space-y-1 list-disc">
             <li>occuper les lieux en bon père de famille et en respecter le règlement intérieur ;</li>
             <li>ne pas sous-louer ou céder le contrat à un tiers sans accord préalable écrit ;</li>
-            <li>ne pas dépasser la capacité maximale d'accueil de 20 personnes ;</li>
+            <li>ne pas dépasser la capacité maximale d&apos;accueil de 20 personnes ;</li>
             <li>ne pas organiser de manifestations à caractère commercial sans autorisation préalable ;</li>
             <li>respecter le voisinage et éviter toute nuisance sonore entre 22h00 et 8h00 ;</li>
-            <li>restituer les lieux dans l'état où il les a trouvés à son arrivée ;</li>
+            <li>restituer les lieux dans l&apos;état où il les a trouvés à son arrivée ;</li>
             <li>signaler immédiatement tout dommage ou dysfonctionnement au Bailleur.</li>
           </ul>
           <p className="mt-3 text-sm text-neutral-600">
-            Le Locataire s'engage également à respecter en tous points le{" "}
+            Le Locataire s&apos;engage également à respecter en tous points le{" "}
             <a href="/fr/reglement-interieur" className="text-primary underline hover:text-primary/80">
               Règlement intérieur de la Villa R.E.E.L
             </a>
@@ -164,7 +164,7 @@ export default async function CGVPage({ params }: PageProps) {
         <section>
           <h2 className="text-base font-semibold text-neutral-900 mb-3">Article 8 – Responsabilité</h2>
           <p>
-            Le Bailleur décline toute responsabilité en cas de vol, perte ou dommage touchant les effets personnels du Locataire ou de ses invités pendant la durée du séjour. Le Locataire est responsable de tous dommages causés à la villa, à ses équipements et à son mobilier pendant la durée de l'occupation.
+            Le Bailleur décline toute responsabilité en cas de vol, perte ou dommage touchant les effets personnels du Locataire ou de ses invités pendant la durée du séjour. Le Locataire est responsable de tous dommages causés à la villa, à ses équipements et à son mobilier pendant la durée de l&apos;occupation.
           </p>
           <p className="mt-2">
             Le Locataire est invité à contracter une assurance villégiature couvrant sa responsabilité civile pour la durée du séjour.
@@ -175,7 +175,7 @@ export default async function CGVPage({ params }: PageProps) {
         <section>
           <h2 className="text-base font-semibold text-neutral-900 mb-3">Article 9 – Force majeure</h2>
           <p>
-            Aucune des parties ne pourra être tenue pour responsable d'un manquement à ses obligations contractuelles résultant d'un événement de force majeure au sens de l'article 1218 du Code civil. En cas de force majeure, les parties s'efforceront de trouver une solution amiable (report du séjour, bon de remplacement).
+            Aucune des parties ne pourra être tenue pour responsable d&apos;un manquement à ses obligations contractuelles résultant d&apos;un événement de force majeure au sens de l&apos;article 1218 du Code civil. En cas de force majeure, les parties s&apos;efforceront de trouver une solution amiable (report du séjour, bon de remplacement).
           </p>
         </section>
 
@@ -183,7 +183,7 @@ export default async function CGVPage({ params }: PageProps) {
         <section>
           <h2 className="text-base font-semibold text-neutral-900 mb-3">Article 10 – Droit applicable et litiges</h2>
           <p>
-            Les présentes CGV sont soumises au droit français. En cas de litige, les parties s'engagent à rechercher une solution amiable avant tout recours judiciaire. À défaut d'accord, le litige sera soumis aux tribunaux compétents du ressort de la Cour d'appel d'Annecy (Haute-Savoie).
+            Les présentes CGV sont soumises au droit français. En cas de litige, les parties s&apos;engagent à rechercher une solution amiable avant tout recours judiciaire. À défaut d&apos;accord, le litige sera soumis aux tribunaux compétents du ressort de la Cour d&apos;appel d&apos;Annecy (Haute-Savoie).
           </p>
           <p className="mt-2">
             Conformément aux dispositions du Code de la consommation, le Locataire consommateur a la possibilité de recourir gratuitement à un médiateur de la consommation.
