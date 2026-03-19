@@ -2,89 +2,115 @@ import { NextResponse } from "next/server";
 import Stripe from "stripe";
 import { prisma } from "@/lib/prisma";
 import { rateLimit, getClientIp } from "@/lib/rate-limit";
+import { logger } from "@/lib/logger";
+import { apiError } from "@/lib/http-error";
 
 export async function POST(request: Request) {
   // ── Rate limiting : 5 tentatives par IP par minute ───────────────────────
   const ip = getClientIp(request);
   if (!rateLimit(`deposit-intent:${ip}`, 5, 60_000)) {
-    return NextResponse.json(
-      { error: "Too many requests. Please try again later." },
-      { status: 429 },
-    );
+    return apiError.tooManyRequests();
   }
 
-  const body = (await request.json()) as {
-    reservationId?: number;
-    currency?: string;
-  };
+  let json: unknown;
+  try { json = await request.json(); } catch { return apiError.badRequest("Invalid JSON"); }
+
+  const body = json as { reservationId?: unknown };
+  const reservationId = Number(body?.reservationId);
+  if (!Number.isInteger(reservationId) || reservationId <= 0) {
+    return apiError.badRequest("reservationId invalide");
+  }
 
   const secret = process.env.STRIPE_SK;
   if (!secret) {
-    return NextResponse.json(
-      { error: "Stripe not configured" },
-      { status: 500 },
-    );
-  }
-
-  const { reservationId } = body;
-  if (!reservationId) {
-    return NextResponse.json({ error: "reservationId is required" }, { status: 400 });
+    return apiError.serverError("Stripe not configured");
   }
 
   // ── Le montant est toujours lu en DB, jamais fourni par le client ─────────
   const reservation = await prisma.reservation.findUnique({
-    where: { id: Number(reservationId) },
+    where: { id: reservationId },
     select: {
       id: true,
-      depositAmount: true,
+      villaId: true,
+      totalAmount: true,
+      balanceAmount: true,
+      checkOut: true,
       status: true,
       paymentStatus: true,
-      villaId: true,
     },
   });
 
-  if (!reservation) {
-    return NextResponse.json({ error: "Reservation not found" }, { status: 404 });
-  }
+  if (!reservation) return apiError.notFound("Reservation not found");
+  if (reservation.status === "CANCELLED") return apiError.badRequest("Reservation is cancelled");
+  if (reservation.paymentStatus === "FULLY_PAID") return apiError.badRequest("Reservation already fully paid");
 
-  if (reservation.status === "CANCELLED") {
-    return NextResponse.json({ error: "Reservation is cancelled" }, { status: 400 });
-  }
+  // Montant total du séjour (pas d'acompte — paiement intégral)
+  const totalCents = Math.round(Number(reservation.balanceAmount ?? reservation.totalAmount) * 100);
+  if (!totalCents || totalCents <= 0) return apiError.badRequest("Invalid payment amount");
 
-  if (reservation.paymentStatus === "DEPOSIT_PAID" || reservation.paymentStatus === "FULLY_PAID") {
-    return NextResponse.json({ error: "Deposit already paid" }, { status: 400 });
-  }
-
-  const serverAmount = Math.round(Number(reservation.depositAmount) * 100);
-  if (!serverAmount || serverAmount <= 0) {
-    return NextResponse.json({ error: "Invalid deposit amount" }, { status: 400 });
-  }
-
-  const stripe = new Stripe(secret, {
-    apiVersion: "2026-02-25.clover",
+  // Montant caution (lu depuis la villa — jamais depuis le client)
+  const villa = await prisma.villa.findUnique({
+    where: { id: reservation.villaId },
+    select: { deposit: true },
   });
+  const cautionCents = Math.round(Number(villa?.deposit ?? 0) * 100);
 
-  const currency = body.currency ?? "eur";
+  const stripe = new Stripe(secret, { apiVersion: "2026-02-25.clover" });
 
   try {
-    const intent = await stripe.paymentIntents.create({
-      amount: serverAmount,
-      currency,
+    // ── 1. PaymentIntent principal — capture immédiate ────────────────────
+    const mainIntent = await stripe.paymentIntents.create({
+      amount: totalCents,
+      currency: "eur",
       automatic_payment_methods: { enabled: true },
       metadata: {
         reservationId: String(reservation.id),
         villaId: String(reservation.villaId),
-        type: "deposit",
-        purpose: "villa-reel-deposit",
+        type: "stay-payment",
       },
     });
 
-    return NextResponse.json({ clientSecret: intent.client_secret });
+    // ── 2. PaymentIntent caution — autorisation sans capture ─────────────
+    let cautionIntent: Stripe.PaymentIntent | null = null;
+    if (cautionCents > 0) {
+      cautionIntent = await stripe.paymentIntents.create({
+        amount: cautionCents,
+        currency: "eur",
+        capture_method: "manual",           // ← autorisation uniquement, pas de débit
+        automatic_payment_methods: { enabled: true },
+        metadata: {
+          reservationId: String(reservation.id),
+          villaId: String(reservation.villaId),
+          type: "caution-hold",
+        },
+      });
+
+      // Deadline : checkout + 48 h
+      const cautionDeadline = new Date(reservation.checkOut.getTime() + 48 * 60 * 60 * 1000);
+
+      // Persistance de l'ID de l'intent caution en DB
+      await prisma.reservation.update({
+        where: { id: reservation.id },
+        data: {
+          cautionIntentId: cautionIntent.id,
+          cautionAmount: Number(villa!.deposit),
+          cautionStatus: "NONE",            // devient HELD après confirmation côté client
+          cautionDeadline,
+        },
+      });
+    }
+
+    return NextResponse.json({
+      clientSecret: mainIntent.client_secret,
+      cautionClientSecret: cautionIntent?.client_secret ?? null,
+      cautionAmount: cautionCents > 0 ? Number(villa!.deposit) : 0,
+    });
   } catch (error) {
-    console.error("Stripe error", error);
-    return NextResponse.json(
-      { error: "Failed to create payment intent" },
-      { status: 500 },
-    );
+    logger.error("Failed to create payment intents", {
+      route: "/api/stripe/create-deposit-intent",
+      reservationId,
+      error,
+    });
+    return apiError.serverError("Failed to create payment intent");
   }
 }

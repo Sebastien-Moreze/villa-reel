@@ -1,78 +1,90 @@
 import { NextResponse } from "next/server";
 import Stripe from "stripe";
+import { z } from "zod";
 import { prisma } from "@/lib/prisma";
+import { rateLimit, getClientIp } from "@/lib/rate-limit";
+import { logger } from "@/lib/logger";
+import { apiError } from "@/lib/http-error";
+
+/* ── Schéma Zod strict ────────────────────────────────────────────
+   La devise n'est PAS acceptée du client — elle est fixée à "eur"
+   côté serveur pour éviter toute manipulation de prix / devise.    */
+const schema = z.object({
+  reservationId: z.number().int().positive(),
+  villaId: z.number().int().positive(),
+  type: z.enum(["deposit", "balance"]).default("deposit"),
+});
 
 export async function POST(request: Request) {
-  const body = (await request.json()) as {
-    reservationId?: number;
-    villaId?: number;
-    type?: "deposit" | "balance";
-    currency?: string;
-  };
+  /* ── Rate limiting : 10 tentatives / IP / minute ──────────────── */
+  const ip = getClientIp(request);
+  if (!rateLimit(`stripe-pi:${ip}`, 10, 60_000)) {
+    return apiError.tooManyRequests();
+  }
 
+  /* ── Parse + validation Zod ───────────────────────────────────── */
+  let json: unknown;
+  try {
+    json = await request.json();
+  } catch {
+    return apiError.badRequest("Invalid JSON");
+  }
+
+  const parsed = schema.safeParse(json);
+  if (!parsed.success) {
+    return apiError.badRequest("Payload invalide");
+  }
+
+  const { reservationId, villaId, type } = parsed.data;
+
+  /* ── Clés Stripe ──────────────────────────────────────────────── */
   const secret = process.env.STRIPE_SK;
   if (!secret) {
-    return NextResponse.json(
-      { error: "Stripe secret key not configured" },
-      { status: 500 },
-    );
+    logger.error("STRIPE_SK not configured");
+    return apiError.serverError("Stripe non configuré");
   }
 
-  const stripe = new Stripe(secret, {
-    apiVersion: "2026-02-25.clover",
-  });
+  const stripe = new Stripe(secret, { apiVersion: "2026-02-25.clover" });
 
-  const { reservationId, villaId, type = "deposit" } = body;
-
-  if (!reservationId || !villaId) {
-    return NextResponse.json({ error: "Invalid payload" }, { status: 400 });
-  }
-
-  // ── Validation côté serveur ───────────────────────────────────────────────
-  // Le montant n'est JAMAIS fourni par le client — il est toujours lu en DB.
-  // Cela empêche toute manipulation de prix côté navigateur.
+  /* ── Lire le montant depuis la DB — JAMAIS depuis le client ────── */
   const reservation = await prisma.reservation.findUnique({
-    where: { id: Number(reservationId) },
+    where: { id: reservationId },
     select: {
       id: true,
       villaId: true,
       depositAmount: true,
       balanceAmount: true,
       status: true,
-      paymentStatus: true,
     },
   });
 
   if (!reservation) {
-    return NextResponse.json({ error: "Reservation not found" }, { status: 404 });
+    return apiError.notFound("Réservation introuvable");
   }
 
-  // Vérifier que la villa correspond
-  if (reservation.villaId !== Number(villaId)) {
-    return NextResponse.json({ error: "Invalid request" }, { status: 400 });
+  /* Vérifier l'appartenance à la villa */
+  if (reservation.villaId !== villaId) {
+    return apiError.forbidden();
   }
 
-  // Vérifier l'état de la réservation
   if (reservation.status === "CANCELLED") {
-    return NextResponse.json({ error: "Reservation is cancelled" }, { status: 400 });
+    return apiError.badRequest("Réservation annulée");
   }
 
-  // Calculer le montant depuis la DB (en centimes)
+  /* Montant calculé côté serveur (en centimes) */
   const serverAmount =
     type === "balance"
       ? Math.round(Number(reservation.balanceAmount) * 100)
       : Math.round(Number(reservation.depositAmount) * 100);
 
   if (!serverAmount || serverAmount <= 0) {
-    return NextResponse.json({ error: "Invalid amount" }, { status: 400 });
+    return apiError.badRequest("Montant invalide");
   }
-
-  const currency = body.currency ?? "eur";
 
   try {
     const intent = await stripe.paymentIntents.create({
       amount: serverAmount,
-      currency,
+      currency: "eur", /* Devise forcée côté serveur */
       automatic_payment_methods: { enabled: true },
       metadata: {
         reservationId: String(reservationId),
@@ -83,10 +95,11 @@ export async function POST(request: Request) {
 
     return NextResponse.json({ clientSecret: intent.client_secret });
   } catch (error) {
-    console.error("Stripe error", error);
-    return NextResponse.json(
-      { error: "Failed to create payment intent" },
-      { status: 500 },
-    );
+    logger.error("Failed to create payment intent", {
+      route: "/api/stripe/create-payment-intent",
+      reservationId,
+      error,
+    });
+    return apiError.serverError("Erreur Stripe");
   }
 }

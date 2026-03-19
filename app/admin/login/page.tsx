@@ -4,10 +4,27 @@ import { useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { signIn } from "next-auth/react";
 
+/* ── Guard contre les open redirects ─────────────────────────────
+   Seules les URLs internes (commençant par /) sont autorisées.
+   Toute URL externe est ignorée → fallback /admin/dashboard.       */
+function sanitizeCallbackUrl(raw: string | null): string {
+  if (!raw) return "/admin/dashboard";
+  try {
+    const decoded = decodeURIComponent(raw);
+    /* N'autoriser que les chemins internes */
+    if (decoded.startsWith("/") && !decoded.startsWith("//")) {
+      return decoded;
+    }
+  } catch {
+    /* decodeURIComponent peut throw si malformé */
+  }
+  return "/admin/dashboard";
+}
+
 export default function AdminLoginPage() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const callbackUrl = searchParams.get("callbackUrl") ?? "/admin/dashboard";
+  const callbackUrl = sanitizeCallbackUrl(searchParams.get("callbackUrl"));
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -19,7 +36,7 @@ export default function AdminLoginPage() {
     setLoading(true);
     setError(null);
     const res = await signIn("credentials", {
-      email,
+      email: email.trim().toLowerCase(),
       password,
       redirect: false,
     });
@@ -67,6 +84,7 @@ export default function AdminLoginPage() {
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               required
+              maxLength={255}
               className="rounded-lg border border-primary/40 bg-neutral-950 px-3 py-2 text-xs text-neutral-50 outline-none focus:border-primary focus:ring-1 focus:ring-primary"
             />
           </div>
@@ -85,6 +103,7 @@ export default function AdminLoginPage() {
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               required
+              maxLength={128}
               className="rounded-lg border border-primary/40 bg-neutral-950 px-3 py-2 text-xs text-neutral-50 outline-none focus:border-primary focus:ring-1 focus:ring-primary"
             />
           </div>
@@ -113,4 +132,3 @@ export default function AdminLoginPage() {
     </div>
   );
 }
-

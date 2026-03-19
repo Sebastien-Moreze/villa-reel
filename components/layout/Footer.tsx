@@ -71,9 +71,10 @@ export function Footer() {
                 {t("footer.legal")}
               </h3>
               <ul className="mt-3 space-y-2 text-xs text-neutral-400">
-                <li><Link href="/mentions-legales" className="hover:text-secondary">{t("footer.legalNotice")}</Link></li>
-                <li><Link href="/cgv" className="hover:text-secondary">{t("footer.terms")}</Link></li>
-                <li><Link href="/confidentialite" className="hover:text-secondary">{t("footer.privacy")}</Link></li>
+                <li><Link href={buildHref("/mentions-legales")} className="hover:text-secondary">{t("footer.legalNotice")}</Link></li>
+                <li><Link href={buildHref("/cgv")} className="hover:text-secondary">{t("footer.terms")}</Link></li>
+                <li><Link href={buildHref("/confidentialite")} className="hover:text-secondary">{t("footer.privacy")}</Link></li>
+                <li><Link href={buildHref("/reglement-interieur")} className="hover:text-secondary">{t("footer.houseRules")}</Link></li>
               </ul>
             </div>
 
@@ -82,7 +83,7 @@ export function Footer() {
                 {t("footer.contact")}
               </h3>
               <ul className="mt-3 space-y-2 text-xs text-neutral-400">
-                <li><a href="mailto:contact@villareel.fr" className="hover:text-secondary">contact@villareel.fr</a></li>
+                <li><a href="mailto:contact@villareel.com" className="hover:text-secondary">contact@villareel.com</a></li>
                 <li><a href="tel:+33600000000" className="hover:text-secondary">+33 (0)6 00 00 00 00</a></li>
               </ul>
             </div>
@@ -92,6 +93,17 @@ export function Footer() {
         <div className="border-t border-neutral-800">
           <div className="mx-auto flex max-w-6xl flex-col items-center justify-between gap-3 px-4 py-4 text-[11px] text-neutral-500 md:flex-row md:px-6">
             <p>Copyright © {year} {t("footer.copyright")}</p>
+            <p>
+              Site réalisé par{" "}
+              <a
+                href="https://saanesu.com"
+                target="_blank"
+                rel="noreferrer"
+                className="text-neutral-400 hover:text-secondary transition-colors"
+              >
+                saanesu
+              </a>
+            </p>
           </div>
         </div>
       </div>

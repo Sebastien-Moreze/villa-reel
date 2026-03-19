@@ -4,11 +4,11 @@ import { ReservationStatus } from "@prisma/client";
 import { revalidatePath } from "next/cache";
 
 type PageProps = {
-  searchParams: {
+  searchParams: Promise<{
     page?: string;
     status?: ReservationStatus | "ALL";
     q?: string;
-  };
+  }>;
 };
 
 const PAGE_SIZE = 20;
@@ -26,11 +26,12 @@ export default async function AdminReservationsPage({
     );
   }
 
-  const page = Number(searchParams.page ?? "1") || 1;
-  const status = searchParams.status && searchParams.status !== "ALL"
-    ? searchParams.status
+  const params = await searchParams;
+  const page = Number(params.page ?? "1") || 1;
+  const status = params.status && params.status !== "ALL"
+    ? params.status
     : undefined;
-  const q = searchParams.q?.trim();
+  const q = params.q?.trim();
 
   const where = {
     ...(status && { status }),
@@ -72,7 +73,7 @@ export default async function AdminReservationsPage({
         />
         <select
           name="status"
-          defaultValue={searchParams.status ?? "ALL"}
+          defaultValue={params.status ?? "ALL"}
           className="rounded-full border border-neutral-700 bg-[#050505] px-3 py-1.5 text-xs text-neutral-100 outline-none focus:border-primary"
         >
           <option value="ALL">Tous les statuts</option>
@@ -88,7 +89,7 @@ export default async function AdminReservationsPage({
 
       <div className="mt-3">
         <a
-          href={`/api/admin/reservations/export?status=${searchParams.status ?? ""}&q=${q ?? ""}`}
+          href={`/api/admin/reservations/export?status=${params.status ?? ""}&q=${q ?? ""}`}
           className="inline-block rounded-full border border-neutral-700 px-3 py-1.5 text-[11px] text-neutral-200 hover:border-primary"
         >
           ↓ Exporter en CSV
@@ -192,7 +193,7 @@ export default async function AdminReservationsPage({
         <div className="flex gap-2">
           {page > 1 && (
             <a
-              href={`?page=${page - 1}&status=${searchParams.status ?? ""}&q=${q ?? ""}`}
+              href={`?page=${page - 1}&status=${params.status ?? ""}&q=${q ?? ""}`}
               className="rounded-full border border-neutral-700 px-3 py-1 text-[11px] text-neutral-200 hover:border-primary"
             >
               Précédent
@@ -200,7 +201,7 @@ export default async function AdminReservationsPage({
           )}
           {page < totalPages && (
             <a
-              href={`?page=${page + 1}&status=${searchParams.status ?? ""}&q=${q ?? ""}`}
+              href={`?page=${page + 1}&status=${params.status ?? ""}&q=${q ?? ""}`}
               className="rounded-full border border-neutral-700 px-3 py-1 text-[11px] text-neutral-200 hover:border-primary"
             >
               Suivant

@@ -2,6 +2,8 @@ import { NextRequest } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { requireAuth, isAdmin } from "@/lib/auth";
 import { ReservationStatus } from "@prisma/client";
+import { logger } from "@/lib/logger";
+import { apiError } from "@/lib/http-error";
 
 // Ne jamais essayer de pré-générer cette route au build
 export const dynamic = "force-dynamic";
@@ -11,7 +13,7 @@ export async function GET(request: NextRequest) {
     await requireAuth();
     const admin = await isAdmin();
     if (!admin) {
-      return new Response("Accès refusé", { status: 403 });
+      return apiError.forbidden();
     }
 
     const { searchParams } = new URL(request.url);
@@ -107,7 +109,10 @@ export async function GET(request: NextRequest) {
       },
     });
   } catch (error) {
-    console.error("Erreur export réservations admin", error);
-    return new Response("Export indisponible", { status: 500 });
+    logger.error("Admin reservation export failed", {
+      route: "/api/admin/reservations/export",
+      error,
+    });
+    return apiError.serverError("Export indisponible");
   }
 }

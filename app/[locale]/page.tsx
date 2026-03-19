@@ -52,43 +52,49 @@ export async function generateMetadata(
 async function getHomeData() {
   "use server";
 
-  const now = new Date();
+  try {
+    const now = new Date();
 
-  const [reviews, activePromo] = await Promise.all([
-    prisma.review.findMany({
-      where: { status: "APPROVED" },
-      orderBy: { createdAt: "desc" },
-      take: 3,
-    }),
-    prisma.promoCode.findFirst({
-      where: {
-        isActive: true,
-        OR: [
-          { startDate: null, endDate: null },
-          {
-            startDate: { lte: now },
-            endDate: { gte: now },
-          },
-        ],
-      },
-      orderBy: { createdAt: "desc" },
-    }),
-  ]);
+    const [reviews, activePromo] = await Promise.all([
+      prisma.review.findMany({
+        where: { status: "APPROVED" },
+        orderBy: { createdAt: "desc" },
+        take: 3,
+      }),
+      prisma.promoCode.findFirst({
+        where: {
+          isActive: true,
+          OR: [
+            { startDate: null, endDate: null },
+            {
+              startDate: { lte: now },
+              endDate: { gte: now },
+            },
+          ],
+        },
+        orderBy: { createdAt: "desc" },
+      }),
+    ]);
 
-  return {
-    reviews: reviews.map((r) => ({
-      id: r.id,
-      guestName: r.guestName,
-      rating: r.rating,
-      comment: r.comment,
-    })),
-    promo: activePromo
-      ? {
-          code: activePromo.code,
-          description: activePromo.description,
-        }
-      : null,
-  };
+    return {
+      reviews: reviews.map((r) => ({
+        id: r.id,
+        guestName: r.guestName,
+        rating: r.rating,
+        comment: r.comment,
+      })),
+      promo: activePromo
+        ? {
+            code: activePromo.code,
+            description: activePromo.description,
+          }
+        : null,
+    };
+  } catch {
+    /* Base de données inaccessible (ex. PostgreSQL non démarré en dev) —
+       on retourne des données vides pour ne pas bloquer le rendu. */
+    return { reviews: [], promo: null };
+  }
 }
 
 export default async function HomePage({ params }: PageProps) {

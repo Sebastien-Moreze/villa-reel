@@ -44,8 +44,7 @@ export function ReservationStep2({ villaId, checkIn, checkOut, nights, baseTotal
 
   useEffect(() => {
     const total = Math.max(baseTotal - discount, 0);
-    const depositAmount = Math.round(total * 0.3);
-    onChange({ promoCode: promoCode || null, discount, total, depositAmount });
+    onChange({ promoCode: promoCode || null, discount, total, depositAmount: 0 });
   }, [baseTotal, discount, promoCode, onChange]);
 
   const handleBlurPromo = async () => {
@@ -86,7 +85,6 @@ export function ReservationStep2({ villaId, checkIn, checkOut, nights, baseTotal
   };
 
   const total = Math.max(baseTotal - discount, 0);
-  const depositAmount = Math.round(total * 0.3);
 
   return (
     <div className="space-y-4 text-xs text-neutral-800">
@@ -104,14 +102,6 @@ export function ReservationStep2({ villaId, checkIn, checkOut, nights, baseTotal
             </span>
             <span>{bookingInfo.pricePerNight * nights} €</span>
           </div>
-          <div className="mt-1 flex items-center justify-between">
-            <span>Ménage</span>
-            <span>{bookingInfo.cleaningFee} €</span>
-          </div>
-          <div className="mt-1 flex items-center justify-between">
-            <span>Caution</span>
-            <span>{bookingInfo.deposit} €</span>
-          </div>
           {discount > 0 && (
             <div className="mt-1 flex items-center justify-between text-primary">
               <span>Remise promo</span>
@@ -124,9 +114,13 @@ export function ReservationStep2({ villaId, checkIn, checkOut, nights, baseTotal
               <span>{total} €</span>
             </div>
           </div>
-          <div className="mt-1 flex items-center justify-between text-primary">
-            <span>Acompte (30% à régler maintenant)</span>
-            <span className="font-semibold">{depositAmount} €</span>
+          <div className="mt-1 flex items-center justify-between text-neutral-500">
+            <span>Caution (remboursée après séjour)</span>
+            <span>{bookingInfo.deposit} €</span>
+          </div>
+          <div className="mt-1 flex items-center justify-between text-primary font-semibold">
+            <span>Paiement dû 30 jours avant l&apos;arrivée</span>
+            <span>{total} €</span>
           </div>
         </div>
       )}
@@ -153,10 +147,9 @@ export function ReservationStep2({ villaId, checkIn, checkOut, nights, baseTotal
       </div>
 
       <div className="rounded-xl bg-neutral-50 p-3 text-[10px] text-neutral-600">
-        <p className="font-semibold">Politique d&apos;annulation</p>
+        <p className="font-semibold">Politique d&apos;annulation souple</p>
         <p className="mt-1">
-          Acompte de 30% non remboursable à moins de 30 jours de l&apos;arrivée. Solde à régler 14 jours
-          avant l&apos;arrivée. Conditions détaillées précisées dans les CGV.
+          Remboursement intégral si annulation plus de 14 jours avant l&apos;arrivée. Aucun remboursement en dessous de 14 jours. Conditions détaillées dans les CGV.
         </p>
       </div>
     </div>

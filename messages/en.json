@@ -5,7 +5,7 @@
     "gallery": "Gallery",
     "business": "Business",
     "events": "Events",
-    "partners": "Partners",
+    "partners": "Partenaires",
     "contact": "Contact",
     "book": "Book now"
   },
@@ -16,7 +16,8 @@
     "subtitle": "Between Alps and Tropics",
     "description": "An exceptional villa between mountains and tropical garden, designed for your stays, corporate events and creative collaborations.",
     "ctaPrimary": "Book now",
-    "ctaSecondary": "Discover the villa",
+    "ctaSecondary": "Check availability",
+    "ctaTertiary": "Discover the villa",
     "checkIn": "Check-in",
     "checkOut": "Check-out",
     "guests": "Guests",
@@ -136,12 +137,17 @@
     "formulesTitle": "Imagine your professional highlights at Villa R.E.E.L",
     "formule": {
       "seminaires": "Seminars",
+      "seminairesDesc": "Whiteboards, projectors, high-speed internet and flexible spaces for productive work sessions, far from anonymous meeting rooms.",
       "teambuilding": "Team Building",
+      "teambuildingDesc": "Tropical garden, heated pool and open green spaces for team bonding activities that strengthen relationships and team dynamics.",
       "incentive": "Incentive",
+      "incentiveDesc": "Reward your top performers with an exceptional experience: exclusive villa, private chef and local discoveries in the heart of the Alps.",
       "formations": "Training",
+      "formationsDesc": "An inspiring setting away from urban noise for focused training days, creative workshops and individual coaching sessions.",
       "soirees": "Corporate evenings",
+      "soireesDesc": "From cocktail dinners to gala evenings, the villa transforms into the perfect stage for festive, convivial and memorable events.",
       "lancements": "Product launches",
-      "desc": "A warm setting for work sessions, creative workshops or inspiring presentations, with flexible indoor and outdoor spaces."
+      "lancementsDesc": "Present your new products in a premium setting that leaves a lasting impression and positions your brand in a world of excellence."
     },
     "whyEyebrow": "Why choose the Villa",
     "why1": {
@@ -229,18 +235,32 @@
   "collaborateurs": {
     "eyebrow": "Villa R.E.E.L",
     "title": "Our Partners",
-    "subtitle": "Trusted partners to enrich your stay: wine tasting, gastronomy, bespoke experiences.",
+    "subtitle": "Exceptional partners to elevate your stay: Michelin-star trained gastronomy, prestigious oenology, bespoke experiences.",
     "vinilux": {
       "name": "ViniLux",
-      "desc": "Wine merchant and oenological partner, ViniLux offers wine selections, tasting workshops and food pairings for your evenings, seminars or private events at the villa.",
-      "cta": "Discover ViniLux"
+      "tag": "Wine Merchant & Oenological Partner",
+      "desc": "ViniLux is your wine expert at Villa R.E.E.L. From fine wine selections to tasting workshops and food pairings, ViniLux crafts an oenological experience worthy of the villa's exceptional setting.",
+      "cta": "Discover ViniLux",
+      "services": "Fine wine selection · Tasting workshops · Food & wine pairings"
     },
     "chef": {
       "name": "Félicien Christe",
-      "desc": "Private chef, Félicien Christe creates personalised menus, intimate dinners, brunches and cocktail dinners for your stays and events at Villa R.E.E.L.",
-      "note": "On request, he can work for your private stays, corporate events or special celebrations."
+      "tag": "Michelin-Star Trained · Executive Chef",
+      "role": "Private Chef & Gastronomic Partner",
+      "bio1": "Originally from the Lyon area of France, Félicien Christe began his career in pastry at the age of 17, driven by an absolute passion for flavour and culinary creation. After training at a Michelin-starred restaurant in Chamonix, he travelled to Australia to perfect his English before joining the iconic London institution The Savoy.",
+      "bio2": "In 2015, he took the helm of the kitchens at the 5-star Guarda Golf Hotel & Residences in Crans-Montana, Switzerland, where his restaurant FIVE was awarded 14 points by Gault & Millau 2022. A master of creative, uncompromising cuisine, Félicien tailors every experience to the occasion.",
+      "award": "14 pts Gault & Millau 2022",
+      "awardLabel": "Restaurant FIVE — Guarda Golf Hotel & Residences, Crans-Montana",
+      "careerTitle": "Career",
+      "career1": "Pastry apprentice, Lyon region",
+      "career2": "Michelin-starred restaurant, Chamonix",
+      "career3": "The Savoy, London",
+      "career4": "Executive Chef, Guarda Golf Hotel & Residences, Crans-Montana (since 2015)",
+      "note": "Available by reservation for private dinners, corporate seminars, festive brunches or exclusive celebrations at Villa R.E.E.L.",
+      "ctaLinkedIn": "LinkedIn Profile",
+      "ctaRestaurant": "Restaurant FIVE"
     },
-    "disclaimer": "These services are optional and independent of the villa rental price. They are subject to separate quotes and invoicing from each service provider."
+    "disclaimer": "These services are optional and independent of the villa rental price. They are subject to separate quotes and invoicing directly from each service provider."
   },
 
   "reviews": {
@@ -260,13 +280,14 @@
     "gallery": "Gallery",
     "business": "Business",
     "events": "Events",
-    "partners": "Partners",
+    "partners": "Partenaires",
     "contact": "Contact",
     "booking": "Booking",
     "copyright": "Villa R.E.E.L. All rights reserved.",
     "legalNotice": "Legal Notice",
     "terms": "Terms & Conditions",
-    "privacy": "Privacy Policy"
+    "privacy": "Privacy Policy",
+    "houseRules": "House Rules"
   },
 
   "forms": {

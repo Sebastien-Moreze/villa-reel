@@ -4,9 +4,14 @@ import Image from "next/image";
 import Link from "next/link";
 import { useState } from "react";
 import { useTranslations } from "next-intl";
-import { GALLERY_PHOTOS, HOME_GALLERY_COUNT } from "@/lib/gallery";
+import { GALLERY_PHOTOS } from "@/lib/gallery";
 
-const PHOTOS = GALLERY_PHOTOS.slice(0, HOME_GALLERY_COUNT);
+// 3 photos sélectionnées pour mettre la villa en valeur sur l'accueil
+const PHOTOS = [
+  GALLERY_PHOTOS.find((p) => p.id === 1)!,  // Piscine & vue sur la maison
+  GALLERY_PHOTOS.find((p) => p.id === 2)!,  // Salon panoramique
+  GALLERY_PHOTOS.find((p) => p.id === 17)!, // Piscine au coucher du soleil
+];
 
 export function GallerySection({ locale }: { locale: string }) {
   const t = useTranslations();
@@ -33,10 +38,17 @@ export function GallerySection({ locale }: { locale: string }) {
           </Link>
         </div>
 
-        <div className="mt-8 grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4 md:gap-4">
-          {PHOTOS.map((photo) => (
-            <GalleryItem key={photo.id} photo={photo} onClick={setActiveId} />
-          ))}
+        {/* Layout éditorial : 1 grande photo + 2 empilées */}
+        <div className="mt-8 grid h-[420px] grid-cols-3 gap-3 md:h-[500px] md:gap-4">
+          {/* Grande photo à gauche */}
+          <div className="col-span-2">
+            <GalleryItem photo={PHOTOS[0]} onClick={setActiveId} className="h-full" />
+          </div>
+          {/* 2 photos empilées à droite */}
+          <div className="flex flex-col gap-3 md:gap-4">
+            <GalleryItem photo={PHOTOS[1]} onClick={setActiveId} className="flex-1" />
+            <GalleryItem photo={PHOTOS[2]} onClick={setActiveId} className="flex-1" />
+          </div>
         </div>
       </div>
 
@@ -77,24 +89,29 @@ export function GallerySection({ locale }: { locale: string }) {
 type GalleryItemProps = {
   photo: { id: number; src: string; alt: string };
   onClick: (id: number) => void;
+  className?: string;
 };
 
-function GalleryItem({ photo, onClick }: GalleryItemProps) {
+function GalleryItem({ photo, onClick, className = "" }: GalleryItemProps) {
   return (
     <button
       type="button"
       aria-label={photo.alt}
-      className="group relative aspect-[4/3] w-full overflow-hidden rounded-2xl bg-neutral-200"
+      className={`group relative w-full overflow-hidden rounded-2xl bg-neutral-200 ${className}`}
       onClick={() => onClick(photo.id)}
     >
       <Image
         src={photo.src}
         alt={photo.alt}
         fill
-        className="object-cover transition-transform group-hover:scale-105"
-        sizes="(max-width: 640px) 50vw, (max-width: 768px) 33vw, 25vw"
+        className="object-cover transition-transform duration-500 group-hover:scale-105"
+        sizes="(max-width: 768px) 66vw, 50vw"
       />
-      <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent opacity-70 transition group-hover:opacity-60" />
+      <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent opacity-60 transition group-hover:opacity-40" />
+      {/* Caption au survol */}
+      <span className="absolute bottom-3 left-3 right-3 text-left text-[11px] font-medium text-white/0 transition-all group-hover:text-white/90">
+        {photo.alt}
+      </span>
     </button>
   );
 }

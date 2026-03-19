@@ -1,6 +1,7 @@
 import React from "react";
 import { Resend } from "resend";
 import { render } from "@react-email/components";
+import { logger } from "@/lib/logger";
 import ReservationConfirmationEmail from "@/emails/ReservationConfirmation";
 import BalanceReminderEmail from "@/emails/BalanceReminder";
 import ArrivalReminderEmail from "@/emails/ArrivalReminder";
@@ -11,7 +12,7 @@ import ContactNotificationEmail from "@/emails/ContactNotification";
 type Locale = "fr" | "en";
 
 const resendApiKey = process.env.RESEND_API_KEY;
-const fromEmail = process.env.CONTACT_EMAIL ?? "no-reply@villareel.fr";
+const fromEmail = process.env.CONTACT_EMAIL ?? "no-reply@villareel.com";
 
 function getResend() {
   if (!resendApiKey) {
@@ -48,7 +49,10 @@ async function sendWithRetry(options: {
     }
   }
 
-  console.error("Failed to send email after retries", lastError);
+  logger.error("Failed to send email after retries", {
+    module: "lib/emails",
+    detail: lastError,
+  });
 }
 
 export async function sendReservationConfirmationEmail(args: {

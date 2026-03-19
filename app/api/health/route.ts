@@ -1,7 +1,6 @@
 import { NextResponse } from "next/server";
-import { PrismaClient } from "@prisma/client";
-
-const prisma = new PrismaClient();
+import { prisma } from "@/lib/prisma";
+import { apiError } from "@/lib/http-error";
 
 export async function GET() {
   const start = Date.now();
@@ -28,7 +27,7 @@ export async function GET() {
   };
 
   if (dbStatus !== "connected") {
-    return NextResponse.json(payload, { status: 503 });
+    return apiError.unavailable();
   }
 
   return NextResponse.json(payload, { status: 200 });

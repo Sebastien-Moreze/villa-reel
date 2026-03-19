@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import Stripe from "stripe";
 import { prisma } from "@/lib/prisma";
+import { logger } from "@/lib/logger";
+import { apiError } from "@/lib/http-error";
 
 export async function POST(request: NextRequest) {
   // ── Authentification CRON_SECRET ─────────────────────────────────────────
@@ -10,15 +12,12 @@ export async function POST(request: NextRequest) {
   const authHeader = request.headers.get("x-cron-secret");
 
   if (!cronSecret || authHeader !== cronSecret) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    return apiError.unauthorized();
   }
 
   const secret = process.env.STRIPE_SK;
   if (!secret) {
-    return NextResponse.json(
-      { error: "Stripe secret key not configured" },
-      { status: 500 },
-    );
+    return apiError.serverError("Stripe secret key not configured");
   }
 
   const stripe = new Stripe(secret, {
@@ -71,7 +70,12 @@ export async function POST(request: NextRequest) {
         data: { stripePaymentIntentId: intent.id },
       });
     } catch (error) {
-      console.error("Failed to create balance payment intent", error);
+      logger.error("Failed to create balance payment intent", {
+        route: "/api/stripe/schedule-balance",
+        reservationId: reservation.id,
+        villaId: reservation.villaId,
+        error,
+      });
     }
   }
 

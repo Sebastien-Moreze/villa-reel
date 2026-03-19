@@ -5,6 +5,7 @@ import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 import { useTranslations } from "next-intl";
 import { LanguageSwitcher } from "@/components/layout/LanguageSwitcher";
+import { useReservation } from "@/components/reservation/ReservationContext";
 
 const NAV_KEYS = [
   { href: "",               key: "nav.home" },
@@ -25,6 +26,7 @@ export function Navbar({ locale }: Props) {
   const pathname = usePathname();
   const [scrolled, setScrolled] = useState(false);
   const [open, setOpen] = useState(false);
+  const { openDrawer } = useReservation();
 
   useEffect(() => {
     const onScroll = () => { setScrolled(window.scrollY > 80); };
@@ -72,12 +74,13 @@ export function Navbar({ locale }: Props) {
 
           <div className="hidden items-center gap-4 md:flex">
             <LanguageSwitcher />
-            <Link
-              href={buildHref("/reservation")}
-              className="sticky top-2 rounded-full bg-cta px-5 py-2 text-sm font-semibold text-white shadow-md transition hover:opacity-90"
+            <button
+              type="button"
+              onClick={openDrawer}
+              className="rounded-full bg-cta px-5 py-2 text-sm font-semibold text-white shadow-md transition hover:opacity-90"
             >
               {t("nav.book")}
-            </Link>
+            </button>
           </div>
 
           <button
@@ -123,12 +126,13 @@ export function Navbar({ locale }: Props) {
 
           <div className="mt-6 flex items-center justify-between">
             <LanguageSwitcher />
-            <Link
-              href={buildHref("/reservation")}
+            <button
+              type="button"
+              onClick={() => { setOpen(false); openDrawer(); }}
               className="rounded-full bg-cta px-4 py-2 text-xs font-semibold text-white shadow-md"
             >
               {t("nav.book")}
-            </Link>
+            </button>
           </div>
         </div>
       </div>

@@ -14,7 +14,7 @@ const CSP = [
   "style-src 'self' 'unsafe-inline'",
   "img-src 'self' data: blob: https:",
   "font-src 'self' data:",
-  "frame-src https://hcaptcha.com https://*.hcaptcha.com https://js.stripe.com https://*.stripe.com",
+  "frame-src https://hcaptcha.com https://*.hcaptcha.com https://js.stripe.com https://*.stripe.com https://www.google.com https://maps.google.com",
   "connect-src 'self' https://hcaptcha.com https://*.hcaptcha.com https://api.stripe.com",
   "object-src 'none'",
   "base-uri 'self'",
@@ -44,6 +44,12 @@ const securityHeaders = [
 const nextConfig: NextConfig = {
   reactCompiler: true,
   output: "standalone",
+  images: {
+    remotePatterns: [
+      { protocol: "https", hostname: "images.unsplash.com" },
+      { protocol: "https", hostname: "images.pexels.com" },
+    ],
+  },
   async headers() {
     return [
       {

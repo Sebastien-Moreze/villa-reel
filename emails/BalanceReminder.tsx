@@ -98,7 +98,7 @@ function Footer() {
         Villa R.E.E.L – 1281 route de Moussy, 74930 Reigner-Esery, France
       </Text>
       <Text style={styles.footerText}>
-        contact@villareel.fr • +33 (0)6 00 00 00 00
+        contact@villareel.com • +33 (0)6 00 00 00 00
       </Text>
     </Section>
   );

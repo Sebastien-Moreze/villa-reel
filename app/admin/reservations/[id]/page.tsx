@@ -3,9 +3,10 @@ import { requireAuth, isAdmin } from "@/lib/auth";
 import { revalidatePath } from "next/cache";
 import { sendBalanceReminderEmail } from "@/lib/emails";
 import Link from "next/link";
+import { CautionActions } from "./CautionActions";
 
 type PageProps = {
-  params: { id: string };
+  params: Promise<{ id: string }>;
 };
 
 export default async function ReservationDetailPage({ params }: PageProps) {
@@ -19,7 +20,8 @@ export default async function ReservationDetailPage({ params }: PageProps) {
     );
   }
 
-  const id = Number(params.id);
+  const { id: idStr } = await params;
+  const id = Number(idStr);
   const reservation = await prisma.reservation.findUnique({
     where: { id },
     include: { villa: true, promoCode: true, review: true },
@@ -111,12 +113,14 @@ export default async function ReservationDetailPage({ params }: PageProps) {
               <Row label="Remise" value={`−${Number(reservation.discount).toLocaleString("fr-FR")} €`} highlight />
             )}
             <Row label="Total TTC"    value={`${Number(reservation.totalAmount).toLocaleString("fr-FR")} €`} bold />
-            <Row label="Acompte (30%)" value={`${Number(reservation.depositAmount ?? 0).toLocaleString("fr-FR")} €`} />
-            <Row label="Solde"        value={`${Number(reservation.balanceAmount ?? 0).toLocaleString("fr-FR")} €`} />
+            <Row label="Solde dû"     value={`${Number(reservation.balanceAmount ?? reservation.totalAmount).toLocaleString("fr-FR")} €`} />
             {reservation.stripePaymentIntentId && (
               <Row label="Stripe ID" value={reservation.stripePaymentIntentId} mono />
             )}
           </Card>
+
+          {/* ── Bloc Caution ──────────────────────────────────────────── */}
+          <CautionCard reservation={reservation as unknown as AnyReservation} />
 
           <Card title="Actions">
             <div className="flex flex-wrap gap-2 pt-1">
@@ -308,6 +312,112 @@ async function processRefund(formData: FormData) {
     console.error("Stripe refund error", err);
   }
   revalidatePath(`/admin/reservations/${id}`);
+}
+
+// ── Server Actions Caution ─────────────────────────────────────────────────
+
+async function captureCaution(formData: FormData) {
+  "use server";
+  const id = Number(formData.get("id"));
+  const res = await fetch(`${process.env.NEXT_PUBLIC_APP_URL}/api/admin/caution/capture`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ reservationId: id }),
+  }).catch(() => null);
+  if (res?.ok) revalidatePath(`/admin/reservations/${id}`);
+}
+
+async function releaseCaution(formData: FormData) {
+  "use server";
+  const id = Number(formData.get("id"));
+  const res = await fetch(`${process.env.NEXT_PUBLIC_APP_URL}/api/admin/caution/release`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ reservationId: id }),
+  }).catch(() => null);
+  if (res?.ok) revalidatePath(`/admin/reservations/${id}`);
+}
+
+// ── CautionCard (Server Component) ───────────────────────────────────────
+
+type AnyReservation = Record<string, unknown> & {
+  id: number;
+  checkOut: Date;
+  cautionStatus: string;
+  cautionDeadline: Date | null;
+  cautionAmount: { toString: () => string } | null;
+  cautionIntentId: string | null;
+};
+
+function CautionCard({ reservation }: { reservation: AnyReservation }) {
+  const now = new Date();
+  const cautionDeadlineExpired = reservation.cautionDeadline ? now > reservation.cautionDeadline : false;
+  const hoursLeft = reservation.cautionDeadline && !cautionDeadlineExpired
+    ? Math.max(0, Math.round((reservation.cautionDeadline.getTime() - now.getTime()) / 3_600_000))
+    : null;
+
+  const badge: Record<string, { label: string; cls: string }> = {
+    NONE:     { label: "Non provisionnée",      cls: "bg-neutral-800 text-neutral-400" },
+    HELD:     { label: "⏳ Provisionnée",        cls: "bg-amber-900/50 text-amber-300" },
+    CAPTURED: { label: "⚡ Encaissée",           cls: "bg-red-900/50 text-red-300" },
+    RELEASED: { label: "✓ Libérée",             cls: "bg-emerald-900/50 text-emerald-300" },
+    EXPIRED:  { label: "Expirée",               cls: "bg-neutral-800 text-neutral-500" },
+  };
+
+  const b = badge[reservation.cautionStatus] ?? badge.NONE;
+
+  return (
+    <div className="rounded-2xl border border-neutral-800 bg-[#0c0c0c] p-4 space-y-3">
+      {/* Header */}
+      <div className="flex items-center justify-between">
+        <p className="text-xs font-semibold text-neutral-100">Caution</p>
+        <span className={`rounded-full px-2.5 py-0.5 text-[10px] font-semibold ${b.cls}`}>
+          {b.label}
+        </span>
+      </div>
+
+      {/* Montant */}
+      <div className="flex items-center justify-between text-[11px]">
+        <span className="text-neutral-500">Montant provisonné</span>
+        <span className="font-semibold text-neutral-100">
+          {reservation.cautionAmount
+            ? `${Number(reservation.cautionAmount).toLocaleString("fr-FR")} €`
+            : "—"}
+        </span>
+      </div>
+
+      {/* Deadline */}
+      {reservation.cautionDeadline && reservation.cautionStatus === "HELD" && (
+        <div className={`rounded-lg px-3 py-2 text-[11px] ${
+          cautionDeadlineExpired
+            ? "border border-red-800 bg-red-950 text-red-300"
+            : hoursLeft !== null && hoursLeft < 6
+            ? "border border-amber-700 bg-amber-950 text-amber-300"
+            : "border border-neutral-700 bg-neutral-900 text-neutral-400"
+        }`}>
+          {cautionDeadlineExpired
+            ? "⚠ Délai dépassé — capture impossible."
+            : `⏱ Agir avant le ${reservation.cautionDeadline.toLocaleString("fr-FR")} — ${hoursLeft}h restantes`}
+        </div>
+      )}
+
+      {/* Instructions */}
+      {reservation.cautionStatus === "HELD" && !cautionDeadlineExpired && (
+        <p className="text-[10px] text-neutral-500 leading-relaxed">
+          La caution est bloquée sur la carte du client. Encaissez-la en cas de dégradation, ou libérez-la si tout est en ordre.
+        </p>
+      )}
+
+      {/* Boutons */}
+      {reservation.cautionStatus === "HELD" && !cautionDeadlineExpired && (
+        <CautionActions reservationId={reservation.id} cautionAmount={Number(reservation.cautionAmount ?? 0)} />
+      )}
+
+      {reservation.cautionStatus === "NONE" && !reservation.cautionIntentId && (
+        <p className="text-[10px] text-neutral-600">Aucune autorisation de caution enregistrée.</p>
+      )}
+    </div>
+  );
 }
 
 // ── Composants ───────────────────────────────────────────────────────────

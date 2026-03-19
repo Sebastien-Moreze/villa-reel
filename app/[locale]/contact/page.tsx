@@ -42,8 +42,8 @@ export default async function ContactPage({ params }: PageProps) {
               </p>
               <p className="mt-2 text-[11px] text-neutral-300">
                 {t("contact.email")}{" "}
-                <a href="mailto:contact@villareel.fr" className="text-secondary hover:text-white">
-                  contact@villareel.fr
+                <a href="mailto:contact@villareel.com" className="text-secondary hover:text-white">
+                  contact@villareel.com
                 </a>
                 <br />
                 {t("contact.phone")}{" "}

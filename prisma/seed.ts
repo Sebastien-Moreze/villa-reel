@@ -7,13 +7,13 @@ async function main() {
 
   // Admin user
   const admin = await prisma.adminUser.upsert({
-    where: { email: "admin@villareel.fr" },
+    where: { email: "admin@villareel.com" },
     update: {},
     create: {
-      email: "admin@villareel.fr",
+      email: "admin@villareel.com",
       // Hash bcrypt (rounds=12) du mot de passe initial : VillaREEL_Admin2026!
       // À changer immédiatement après le premier déploiement
-      hashedPassword: "$2b$12$aB.py.1H8apo/Vkntym2mO.F.MCzmq/EZjJ.TiC4jge4DkvRp6DHa",
+      hashedPassword: "$2b$12$Im2eTqWZVP9mOWaiqe.fc.CrqqgAdKSK7K5RHd9wKD1FtODZ15fyy",
       name: "Admin Villa R.E.E.L",
       role: AdminRole.SUPER_ADMIN,
     },
@@ -70,9 +70,9 @@ async function main() {
       bathrooms: 3,
       surface: 180,
       pricePerNight: 350,
-      cleaningFee: 80,
+      cleaningFee: 0,
       deposit: 500,
-      minStay: 3,
+      minStay: 2,
       maxStay: 21,
       checkInTime: "16:00",
       checkOutTime: "10:00",
@@ -97,9 +97,9 @@ async function main() {
       bathrooms: 3,
       surface: 180,
       pricePerNight: 350,
-      cleaningFee: 80,
+      cleaningFee: 0,
       deposit: 500,
-      minStay: 3,
+      minStay: 2,
       maxStay: 21,
       checkInTime: "16:00",
       checkOutTime: "10:00",

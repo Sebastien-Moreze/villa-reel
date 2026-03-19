@@ -3,6 +3,8 @@ import Stripe from "stripe";
 import { prisma } from "@/lib/prisma";
 import { Resend } from "resend";
 import { escapeHtml } from "@/lib/html";
+import { logger } from "@/lib/logger";
+import { apiError } from "@/lib/http-error";
 
 export const runtime = "nodejs";
 
@@ -13,10 +15,7 @@ export async function POST(request: Request) {
   const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET;
 
   if (!secret || !webhookSecret) {
-    return NextResponse.json(
-      { error: "Stripe webhook not configured" },
-      { status: 500 },
-    );
+    return apiError.serverError("Stripe webhook not configured");
   }
 
   const stripe = new Stripe(secret, {
@@ -37,8 +36,11 @@ export async function POST(request: Request) {
   } catch (err: unknown) {
     const message =
       err instanceof Error ? err.message : "Unknown Stripe webhook error";
-    console.error("Stripe webhook signature error", message);
-    return NextResponse.json({ error: "Invalid signature" }, { status: 400 });
+    logger.error("Stripe webhook signature error", {
+      route: "/api/stripe/webhooks",
+      detail: message,
+    });
+    return apiError.badRequest("Invalid signature");
   }
 
   try {
@@ -106,11 +108,12 @@ export async function POST(request: Request) {
 
     return NextResponse.json({ received: true });
   } catch (error) {
-    console.error("Stripe webhook handling error", error);
-    return NextResponse.json(
-      { error: "Webhook handling failed" },
-      { status: 500 },
-    );
+    logger.error("Stripe webhook handling error", {
+      route: "/api/stripe/webhooks",
+      eventType: event.type,
+      error,
+    });
+    return apiError.serverError("Webhook handling failed");
   }
 }
 

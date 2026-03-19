@@ -21,6 +21,14 @@ enum PaymentStatus {
   REFUNDED
 }
 
+enum CautionStatus {
+  NONE
+  HELD
+  CAPTURED
+  RELEASED
+  EXPIRED
+}
+
 enum BlockedReason {
   OWNER
   MAINTENANCE
@@ -149,6 +157,12 @@ model Reservation {
 
   stripePaymentIntentId String?
   stripeDepositIntentId String?
+
+  // ── Caution (autorisation Stripe, capture manuelle par l'admin) ──────────
+  cautionAmount         Decimal?          @db.Decimal(10, 2)
+  cautionIntentId       String?
+  cautionStatus         CautionStatus     @default(NONE)
+  cautionDeadline       DateTime?         // checkOut + 48h
 
   cancellationReason    String?
   cancelledAt           DateTime?

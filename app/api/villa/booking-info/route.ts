@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
+import { apiError } from "@/lib/http-error";
 
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
@@ -7,10 +8,7 @@ export async function GET(request: Request) {
   const villaId = villaIdParam ? Number(villaIdParam) : NaN;
 
   if (!villaId || Number.isNaN(villaId)) {
-    return NextResponse.json(
-      { error: "Missing or invalid villaId" },
-      { status: 400 },
-    );
+    return apiError.badRequest("Missing or invalid villaId");
   }
 
   const villa = await prisma.villa.findUnique({
@@ -26,7 +24,7 @@ export async function GET(request: Request) {
   });
 
   if (!villa) {
-    return NextResponse.json({ error: "Villa not found" }, { status: 404 });
+    return apiError.notFound("Villa not found");
   }
 
   return NextResponse.json({

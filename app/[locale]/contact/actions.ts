@@ -74,13 +74,13 @@ async function sendEmails(input: z.infer<typeof contactSchema>) {
 
   await Promise.all([
     resend.emails.send({
-      from: "Villa R.E.E.L <no-reply@villareel.fr>",
+      from: "Villa R.E.E.L <no-reply@villareel.com>",
       to: [toOwner],
       subject: subjectOwner,
       html: ownerHtml,
     }),
     resend.emails.send({
-      from: "Villa R.E.E.L <no-reply@villareel.fr>",
+      from: "Villa R.E.E.L <no-reply@villareel.com>",
       to: [input.email],
       subject: subjectGuest,
       html: guestHtml,

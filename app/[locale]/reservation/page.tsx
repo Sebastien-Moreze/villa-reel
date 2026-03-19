@@ -31,10 +31,41 @@ export default function ReservationPage() {
   const [total, setTotal] = useState(0);
   const [depositAmount, setDepositAmount] = useState(0);
 
-  const [maxGuests] = useState(20);
   const [reservationId, setReservationId] = useState<number | null>(null);
-  const [confirmationCode, setConfirmationCode] = useState<string | null>(null);
-  const [bookingError, setBookingError] = useState<string | null>(null);
+  const [reelCode, setReelCode] = useState<string | null>(null); // code REEL-XXXXXX
+  const [bookingError, setBookingError] = useState<{ message: string; action?: "back-to-dates" } | null>(null);
+
+  function getFriendlyError(raw: string): { message: string; action?: "back-to-dates" } {
+    const msg = (raw ?? "").toLowerCase();
+    if (msg.includes("dates not available") || msg.includes("unavailable") || msg.includes("conflict")) {
+      return {
+        message: "Ces dates ne sont malheureusement plus disponibles. Elles viennent peut-être d'être réservées par quelqu'un d'autre. Veuillez choisir de nouvelles dates.",
+        action: "back-to-dates",
+      };
+    }
+    if (msg.includes("minimum stay") || msg.includes("min_stay")) {
+      return { message: "La durée minimale de séjour n'est pas respectée. Veuillez sélectionner au moins 2 nuits.", action: "back-to-dates" };
+    }
+    if (msg.includes("maximum stay") || msg.includes("max_stay")) {
+      return { message: "La durée maximale de séjour est dépassée. Veuillez choisir une période plus courte.", action: "back-to-dates" };
+    }
+    if (msg.includes("too many guests")) {
+      return { message: "Le nombre de voyageurs dépasse la capacité de la villa.", action: "back-to-dates" };
+    }
+    if (msg.includes("invalid dates") || msg.includes("check-out")) {
+      return { message: "Les dates saisies ne sont pas valides. Vérifiez que la date de départ est bien après la date d'arrivée.", action: "back-to-dates" };
+    }
+    if (msg.includes("formulaire") || msg.includes("invalide") || msg.includes("vérifiez")) {
+      return { message: "Certaines informations sont manquantes ou incorrectes. Veuillez revenir à l'étape des dates et recommencer.", action: "back-to-dates" };
+    }
+    if (msg.includes("villa not found") || msg.includes("not found")) {
+      return { message: "La villa est introuvable. Veuillez recharger la page et réessayer.", action: "back-to-dates" };
+    }
+    if (msg.includes("network") || msg.includes("fetch")) {
+      return { message: "Une erreur de connexion s'est produite. Vérifiez votre connexion internet et réessayez." };
+    }
+    return { message: "Une erreur inattendue s'est produite. Veuillez réessayer ou nous contacter à r.jedonne@gmail.com." };
+  }
 
   const progress = ((step + 1) / STEPS.length) * 100;
 
@@ -114,9 +145,19 @@ export default function ReservationPage() {
             )}
             {step === 2 && (
               <ReservationStep3
-                maxGuests={maxGuests}
+                guests={guests}
                 onValid={async (guestData) => {
                   setBookingError(null);
+
+                  // Vérification préalable : dates obligatoires
+                  if (!checkIn || !checkOut) {
+                    setBookingError({
+                      message: "Vos dates de séjour sont manquantes. Veuillez retourner à l'étape 1 et sélectionner vos dates d'arrivée et de départ.",
+                      action: "back-to-dates",
+                    });
+                    return;
+                  }
+
                   try {
                     const res = await fetch("/api/reservations/create", {
                       method: "POST",
@@ -135,42 +176,52 @@ export default function ReservationPage() {
                     });
                     if (!res.ok) {
                       const err = (await res.json()) as { error?: string };
-                      setBookingError(err.error ?? t("reservation.errorGeneric"));
+                      setBookingError(getFriendlyError(err.error ?? ""));
                       return;
                     }
                     const result = (await res.json()) as {
                       reservationId: number;
                       confirmationCode: string;
-                      depositAmount: number;
+                      totalAmount: number;
                     };
                     setReservationId(result.reservationId);
-                    // Mettre à jour l'acompte avec la valeur calculée côté serveur
-                    setDepositAmount(result.depositAmount);
+                    setReelCode(result.confirmationCode); // stocke le code REEL
                     setStep(3);
                   } catch {
-                    setBookingError(t("reservation.errorNetwork"));
+                    setBookingError(getFriendlyError("network"));
                   }
                 }}
               />
             )}
-            {step === 3 && reservationId && (
+            {step === 3 && reservationId && reelCode && (
               <ReservationStep4
                 reservationId={reservationId}
-                depositAmount={depositAmount}
-                onPaid={(code) => {
-                  setConfirmationCode(code);
-                  setStep(4);
-                }}
+                totalAmount={total}
+                confirmationCode={reelCode}
+                onPaid={() => setStep(4)}
               />
             )}
             {step === 3 && !reservationId && (
-              <p className="text-xs text-red-600">
-                {t("reservation.errorNoReservation")}
-              </p>
+              <div className="rounded-xl border border-red-200 bg-red-50 p-5 text-center space-y-3">
+                <div className="flex justify-center">
+                  <div className="flex h-10 w-10 items-center justify-center rounded-full bg-red-100 text-xl">⚠️</div>
+                </div>
+                <p className="text-sm font-semibold text-red-800">Session expirée</p>
+                <p className="text-xs text-red-700 leading-relaxed">
+                  Votre session de réservation a expiré ou une erreur s&apos;est produite. Veuillez recommencer depuis le début.
+                </p>
+                <button
+                  type="button"
+                  onClick={() => { setBookingError(null); setReservationId(null); setStep(0); }}
+                  className="inline-flex items-center gap-1.5 rounded-full bg-red-700 px-5 py-2 text-[11px] font-semibold text-white transition hover:bg-red-800"
+                >
+                  ← Recommencer la réservation
+                </button>
+              </div>
             )}
-            {step === 4 && confirmationCode && (
+            {step === 4 && reelCode && (
               <ReservationStep5
-                confirmationCode={confirmationCode}
+                confirmationCode={reelCode}
                 summary={{
                   checkIn,
                   checkOut,
@@ -183,9 +234,30 @@ export default function ReservationPage() {
 
             {/* Erreur de réservation */}
             {bookingError && (
-              <p className="mt-3 text-[11px] font-semibold text-red-600">
-                {bookingError}
-              </p>
+              <div className="mt-4 rounded-xl border border-red-200 bg-red-50 p-4">
+                <div className="flex items-start gap-3">
+                  <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-red-100 text-base">
+                    ⚠️
+                  </div>
+                  <div className="flex-1">
+                    <p className="text-sm font-semibold text-red-800">
+                      Oups, quelque chose s&apos;est passé
+                    </p>
+                    <p className="mt-1 text-xs text-red-700 leading-relaxed">
+                      {bookingError.message}
+                    </p>
+                    {bookingError.action === "back-to-dates" && (
+                      <button
+                        type="button"
+                        onClick={() => { setBookingError(null); setStep(0); }}
+                        className="mt-3 inline-flex items-center gap-1.5 rounded-full bg-red-700 px-4 py-1.5 text-[11px] font-semibold text-white transition hover:bg-red-800"
+                      >
+                        ← Modifier mes dates
+                      </button>
+                    )}
+                  </div>
+                </div>
+              </div>
             )}
 
             {/* Navigation */}
@@ -193,16 +265,19 @@ export default function ReservationPage() {
               <button
                 type="button"
                 disabled={step === 0}
-                onClick={() => setStep((s) => Math.max(0, s - 1))}
+                onClick={() => { setBookingError(null); setStep((s) => Math.max(0, s - 1)); }}
                 className="rounded-full border border-neutral-300 bg-white px-4 py-1.5 text-[11px] font-semibold text-neutral-700 disabled:opacity-40"
               >
                 {t("reservation.back")}
               </button>
-              {step < 3 && (
+              {/* Bouton Suivant uniquement sur les étapes 0 et 1 — l'étape 2 (voyageur) a son propre bouton de soumission */}
+              {step < 2 && (
                 <button
                   type="button"
-                  onClick={() => setStep((s) => Math.min(STEPS.length - 1, s + 1))}
-                  className="rounded-full bg-primary px-4 py-1.5 text-[11px] font-semibold text-white shadow-md hover:opacity-90"
+                  disabled={step === 0 && (!checkIn || !checkOut)}
+                  onClick={() => { setBookingError(null); setStep((s) => Math.min(STEPS.length - 1, s + 1)); }}
+                  className="rounded-full bg-primary px-4 py-1.5 text-[11px] font-semibold text-white shadow-md hover:opacity-90 disabled:opacity-40 disabled:cursor-not-allowed"
+                  title={step === 0 && (!checkIn || !checkOut) ? "Veuillez d'abord sélectionner vos dates" : undefined}
                 >
                   {t("reservation.next")}
                 </button>

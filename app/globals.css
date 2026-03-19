@@ -1,4 +1,5 @@
 @import "tailwindcss";
+@import "react-day-picker/style.css";
 
 /* Charte CDC Villa R.E.E.L */
 :root {
@@ -23,6 +24,45 @@ body {
   background: var(--background);
   color: var(--foreground);
   font-family: var(--font-montserrat), system-ui, sans-serif;
+}
+
+/* ── React-Day-Picker — couleurs Villa R.E.E.L ─────────────────────────── */
+.rdp-root {
+  --rdp-accent-color: #1A6B3A;
+  --rdp-accent-background-color: rgb(26 107 58 / 0.08);
+  --rdp-day-height: 2.25rem;
+  --rdp-day-width: 2.25rem;
+  --rdp-day_button-height: 2rem;
+  --rdp-day_button-width: 2rem;
+  font-size: 0.75rem;
+  font-family: var(--font-montserrat), system-ui, sans-serif;
+  width: 100%;
+}
+
+.rdp-month_caption {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: #171717;
+}
+
+.rdp-day.rdp-disabled .rdp-day_button {
+  color: #d1d5db;
+  text-decoration: line-through;
+  cursor: not-allowed;
+  pointer-events: none;
+}
+
+.rdp-day.rdp-outside {
+  opacity: 0;
+  pointer-events: none;
+}
+
+.rdp-weekday {
+  font-size: 0.65rem;
+  font-weight: 700;
+  color: #9ca3af;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
 }
 
 /* Titres en Playfair Display */

@@ -5,7 +5,7 @@
     "gallery": "Galerie",
     "business": "Entreprises",
     "events": "Événements",
-    "partners": "Collaborateurs",
+    "partners": "Partenaires",
     "contact": "Contact",
     "book": "Réserver"
   },
@@ -16,7 +16,8 @@
     "subtitle": "Entre Alpes et Tropiques",
     "description": "Une villa d'exception entre montagnes et jardin tropical, conçue pour vos séjours, événements d'entreprise et collaborations créatives.",
     "ctaPrimary": "Réserver maintenant",
-    "ctaSecondary": "Découvrir la villa",
+    "ctaSecondary": "Vérifier la disponibilité",
+    "ctaTertiary": "Découvrir la villa",
     "checkIn": "Arrivée",
     "checkOut": "Départ",
     "guests": "Voyageurs",
@@ -136,12 +137,17 @@
     "formulesTitle": "Imaginez vos temps forts professionnels à la Villa R.E.E.L",
     "formule": {
       "seminaires": "Séminaires",
+      "seminairesDesc": "Tableaux, projecteurs, connexion haut débit et espaces modulables pour des sessions de travail productives, loin des salles de réunion anonymes.",
       "teambuilding": "Team Building",
+      "teambuildingDesc": "Jardin tropical, piscine et grands espaces verts pour des activités cohésion qui renforcent les liens et la dynamique d'équipe.",
       "incentive": "Incentive",
+      "incentiveDesc": "Récompensez vos meilleurs collaborateurs avec une expérience d'exception : villa exclusive, chef privé et découvertes locales au cœur des Alpes.",
       "formations": "Formations",
+      "formationsDesc": "Un cadre inspirant loin de l'agitation urbaine pour des journées de formation concentrées, des ateliers créatifs et des coachings individuels.",
       "soirees": "Soirées d'entreprise",
+      "soireesDesc": "De l'apéritif dinatoire au dîner de gala, la villa se transforme en scène idéale pour vos événements festifs, conviviaux et mémorables.",
       "lancements": "Lancements produit",
-      "desc": "Un cadre chaleureux pour des sessions de travail, ateliers créatifs ou présentations inspirantes, avec des espaces intérieurs et extérieurs modulables."
+      "lancementsDesc": "Présentez vos nouveautés dans un décor premium qui marque les esprits et positionne votre marque dans un univers d'excellence et d'exclusivité."
     },
     "whyEyebrow": "Pourquoi choisir la Villa",
     "why1": {
@@ -229,18 +235,32 @@
   "collaborateurs": {
     "eyebrow": "Villa R.E.E.L",
     "title": "Nos Collaborateurs",
-    "subtitle": "Des partenaires de confiance pour enrichir votre séjour : dégustation de vins, gastronomie, expériences sur mesure.",
+    "subtitle": "Des partenaires d'exception pour sublimer votre séjour : gastronomie étoilée, œnologie de prestige, expériences sur mesure.",
     "vinilux": {
       "name": "ViniLux",
-      "desc": "Caviste et partenaire œnologique, ViniLux propose des sélections de vins, ateliers de dégustation et accords mets-vins pour vos soirées, séminaires ou événements privés à la villa.",
-      "cta": "Découvrir ViniLux"
+      "tag": "Caviste & Partenaire Œnologique",
+      "desc": "ViniLux est votre expert en vins pour la Villa R.E.E.L. Sélections de grands crus, ateliers de dégustation et accords mets-vins, ViniLux compose pour vous une expérience œnologique à la hauteur du cadre exceptionnel de la villa.",
+      "cta": "Découvrir ViniLux",
+      "services": "Sélection de vins · Ateliers dégustation · Accords mets-vins"
     },
     "chef": {
       "name": "Félicien Christe",
-      "desc": "Chef privé, Félicien Christe élabore des menus personnalisés, dîners intimistes, brunchs et dîners cocktails pour vos séjours et événements à la Villa R.E.E.L.",
-      "note": "Sur demande, il peut intervenir pour vos séjours privés, événements d'entreprise ou célébrations particulières."
+      "tag": "Chef Étoilé · Executive Chef",
+      "role": "Chef privé & Partenaire gastronomique",
+      "bio1": "Originaire de la région lyonnaise, Félicien Christe a débuté sa carrière en pâtisserie dès l'âge de 17 ans, animé par une passion absolue pour les saveurs et la création culinaire. Après s'être formé dans un restaurant étoilé Michelin en Chamonix, il part perfectionner son anglais en Australie avant de rejoindre l'institution londonienne The Savoy.",
+      "bio2": "En 2015, il prend la tête des cuisines du Guarda Golf Hotel & Residences à Crans-Montana, établissement 5 étoiles des Alpes suisses, où son restaurant FIVE obtient 14 points au Gault & Millau 2022. Maître d'une cuisine créative et exigeante, Félicien s'adapte à chaque occasion pour offrir une expérience gastronomique unique.",
+      "award": "14 pts Gault & Millau 2022",
+      "awardLabel": "Restaurant FIVE — Guarda Golf Hotel & Residences, Crans-Montana",
+      "careerTitle": "Parcours",
+      "career1": "Apprenti pâtissier, Région lyonnaise",
+      "career2": "Restaurant étoilé Michelin, Chamonix",
+      "career3": "The Savoy, Londres",
+      "career4": "Executive Chef, Guarda Golf Hotel & Residences, Crans-Montana (depuis 2015)",
+      "note": "Sur réservation, Félicien intervient pour vos dîners privés, séminaires d'entreprise, brunchs festifs ou célébrations exclusives à la Villa R.E.E.L.",
+      "ctaLinkedIn": "Profil LinkedIn",
+      "ctaRestaurant": "Restaurant FIVE"
     },
-    "disclaimer": "Ces services sont optionnels et indépendants du prix de location de la villa. Ils font l'objet de devis et facturation séparés de chaque prestataire."
+    "disclaimer": "Ces services sont optionnels et indépendants du tarif de location de la villa. Ils font l'objet de devis et de facturation séparés directement auprès de chaque prestataire."
   },
 
   "reviews": {
@@ -260,13 +280,14 @@
     "gallery": "Galerie",
     "business": "Entreprises",
     "events": "Événements",
-    "partners": "Collaborateurs",
+    "partners": "Partenaires",
     "contact": "Contact",
     "booking": "Réservation",
     "copyright": "Villa R.E.E.L. Tous droits réservés.",
     "legalNotice": "Mentions légales",
     "terms": "CGV",
-    "privacy": "Confidentialité"
+    "privacy": "Confidentialité",
+    "houseRules": "Règlement intérieur"
   },
 
   "forms": {

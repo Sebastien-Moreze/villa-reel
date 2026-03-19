@@ -3,6 +3,10 @@ import { prisma } from "@/lib/prisma";
 import { z } from "zod";
 import type { Prisma } from "@prisma/client";
 import { rateLimit, getClientIp } from "@/lib/rate-limit";
+import { logger } from "@/lib/logger";
+import { apiError } from "@/lib/http-error";
+import { revalidateTag } from "next/cache";
+import { sendReservationConfirmationEmail } from "@/lib/emails";
 
 // ── Schéma d'entrée — AUCUNE donnée financière acceptée du client ─────────────
 // Les prix (pricePerNight, cleaningFee, deposit, totalAmount, etc.) sont
@@ -17,7 +21,7 @@ const reservationSchema = z.object({
   guestEmail: z.string().email().max(200),
   guestPhone: z.string().max(30).optional(),
   guestAddress: z.string().max(500).optional(),
-  promoCode: z.string().max(50).optional(),
+  promoCode: z.string().max(50).nullish(),
   locale: z.enum(["fr", "en"]).default("fr"),
 });
 
@@ -31,30 +35,26 @@ function overlaps(
 }
 
 export async function POST(request: Request) {
-  // ── Rate limiting : 3 créations par IP par 10 minutes ───────────────────
-  const ip = getClientIp(request);
-  if (!rateLimit(`reservations-create:${ip}`, 3, 10 * 60_000)) {
-    return NextResponse.json(
-      { error: "Too many requests. Please try again later." },
-      { status: 429 },
-    );
+  // ── Rate limiting : 3 créations par IP par 10 minutes (désactivé en dev) ──
+  if (process.env.NODE_ENV !== "development") {
+    const ip = getClientIp(request);
+    if (!rateLimit(`reservations-create:${ip}`, 3, 10 * 60_000)) {
+      return apiError.tooManyRequests();
+    }
   }
 
   let json: unknown;
   try {
     json = await request.json();
   } catch {
-    return NextResponse.json({ error: "Invalid JSON" }, { status: 400 });
+    return apiError.badRequest("Invalid JSON");
   }
 
   const parsed = reservationSchema.safeParse(json);
 
   if (!parsed.success) {
     // Ne pas exposer les détails internes de validation
-    return NextResponse.json(
-      { error: "Formulaire invalide. Vérifiez vos informations." },
-      { status: 400 },
-    );
+    return apiError.badRequest("Formulaire invalide. Vérifiez vos informations.");
   }
 
   const data = parsed.data;
@@ -63,14 +63,11 @@ export async function POST(request: Request) {
   const checkOut = new Date(data.checkOut);
 
   if (Number.isNaN(checkIn.getTime()) || Number.isNaN(checkOut.getTime())) {
-    return NextResponse.json({ error: "Invalid dates" }, { status: 400 });
+    return apiError.badRequest("Invalid dates");
   }
 
   if (checkOut <= checkIn) {
-    return NextResponse.json(
-      { error: "Check-out must be after check-in" },
-      { status: 400 },
-    );
+    return apiError.badRequest("Check-out must be after check-in");
   }
 
   try {
@@ -80,6 +77,8 @@ export async function POST(request: Request) {
         where: { id: data.villaId },
         select: {
           id: true,
+          nameFr: true,
+          nameEn: true,
           pricePerNight: true,
           cleaningFee: true,
           deposit: true,
@@ -172,7 +171,8 @@ export async function POST(request: Request) {
         nights * pricePerNight + cleaningFee - discount,
         0,
       );
-      const balanceAmount = Math.max(totalAmount - depositAmount, 0);
+      // Pas d'acompte à la réservation — paiement intégral 30 jours avant l'arrivée
+      const balanceAmount = totalAmount;
 
       // ── 5. Créer la réservation ───────────────────────────────────────
       const confirmationCode = await generateUniqueConfirmationCode(tx);
@@ -193,7 +193,7 @@ export async function POST(request: Request) {
           cleaningFee,
           discount,
           totalAmount,
-          depositAmount,
+          depositAmount: 0, // Pas d'acompte — paiement intégral 30j avant arrivée
           balanceAmount,
           status: "PENDING",
           paymentStatus: "AWAITING",
@@ -202,37 +202,61 @@ export async function POST(request: Request) {
         },
       });
 
-      return reservation;
+      return { reservation, villaName: data.locale === "en" ? (villa.nameEn ?? villa.nameFr) : villa.nameFr };
     });
 
+    // ── Invalider le cache des disponibilités ────────────────────────────
+    revalidateTag("availability");
+
+    // ── Envoyer l'email de confirmation ─────────────────────────────────
+    try {
+      const balanceDue = new Date(result.reservation.checkIn);
+      balanceDue.setDate(balanceDue.getDate() - 30);
+
+      await sendReservationConfirmationEmail({
+        locale: data.locale,
+        to: result.reservation.guestEmail,
+        confirmationCode: result.reservation.confirmationCode,
+        checkIn: result.reservation.checkIn.toLocaleDateString("fr-FR"),
+        checkOut: result.reservation.checkOut.toLocaleDateString("fr-FR"),
+        villaName: result.villaName ?? "Villa R.E.E.L",
+        totalAmount: Number(result.reservation.totalAmount),
+        depositAmount: 0,
+        balanceAmount: Number(result.reservation.balanceAmount ?? result.reservation.totalAmount),
+        balanceDueDate: balanceDue.toLocaleDateString("fr-FR"),
+      });
+    } catch (emailErr) {
+      // L'email ne doit pas faire échouer la réservation
+      logger.error("Failed to send confirmation email", { error: emailErr });
+    }
+
     return NextResponse.json({
-      reservationId: result.id,
-      confirmationCode: result.confirmationCode,
-      // Retourner le depositAmount calculé côté serveur pour affichage
-      depositAmount: Number(result.depositAmount),
+      reservationId: result.reservation.id,
+      confirmationCode: result.reservation.confirmationCode,
+      totalAmount: Number(result.reservation.totalAmount),
     });
   } catch (error: unknown) {
     if (error instanceof Error) {
       switch (error.message) {
         case "DATES_UNAVAILABLE":
-          return NextResponse.json({ error: "Dates not available" }, { status: 409 });
+          return apiError.conflict("Dates not available");
         case "VILLA_NOT_FOUND":
-          return NextResponse.json({ error: "Villa not found" }, { status: 404 });
+          return apiError.notFound("Villa not found");
         case "MIN_STAY":
-          return NextResponse.json({ error: "Minimum stay not met" }, { status: 400 });
+          return apiError.badRequest("Minimum stay not met");
         case "MAX_STAY":
-          return NextResponse.json({ error: "Maximum stay exceeded" }, { status: 400 });
+          return apiError.badRequest("Maximum stay exceeded");
         case "TOO_MANY_GUESTS":
-          return NextResponse.json({ error: "Too many guests for this villa" }, { status: 400 });
+          return apiError.badRequest("Too many guests for this villa");
         case "INVALID_DATES":
-          return NextResponse.json({ error: "Invalid dates" }, { status: 400 });
+          return apiError.badRequest("Invalid dates");
       }
     }
-    console.error("Reservation creation error:", error);
-    return NextResponse.json(
-      { error: "Failed to create reservation" },
-      { status: 500 },
-    );
+    logger.error("Reservation creation error", {
+      route: "/api/reservations/create",
+      error,
+    });
+    return apiError.serverError("Failed to create reservation");
   }
 }
 

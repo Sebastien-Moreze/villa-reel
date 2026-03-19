@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { unstable_cache } from "next/cache";
+import { apiError } from "@/lib/http-error";
 
 const getAvailability = unstable_cache(
   async (villaId: number, year?: number, month?: number) => {
@@ -33,7 +34,7 @@ const getAvailability = unstable_cache(
       prisma.reservation.findMany({
         where: {
           villaId,
-          status: { in: ["CONFIRMED", "COMPLETED"] },
+          status: { notIn: ["CANCELLED"] },
           ...(whereDateRange && {
             OR: [
               {
@@ -73,10 +74,7 @@ export async function GET(request: Request) {
   const villaId = villaIdParam ? Number(villaIdParam) : NaN;
 
   if (!villaId || Number.isNaN(villaId)) {
-    return NextResponse.json(
-      { error: "Missing or invalid villaId" },
-      { status: 400 },
-    );
+    return apiError.badRequest("Missing or invalid villaId");
   }
 
   const yearParam = searchParams.get("year");
@@ -88,10 +86,7 @@ export async function GET(request: Request) {
     const data = await getAvailability(villaId, year, month);
     return NextResponse.json(data);
   } catch {
-    return NextResponse.json(
-      { error: "Failed to fetch availability" },
-      { status: 500 },
-    );
+    return apiError.serverError("Failed to fetch availability");
   }
 }
 

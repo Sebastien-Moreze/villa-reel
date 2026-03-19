@@ -5,6 +5,9 @@ import { Navbar } from "@/components/layout/Navbar";
 import { Footer } from "@/components/layout/Footer";
 import { BackToTop } from "@/components/layout/BackToTop";
 import { ToastProvider } from "@/components/providers/ToastProvider";
+import { ReservationProvider } from "@/components/reservation/ReservationContext";
+import { ReservationDrawer } from "@/components/reservation/ReservationDrawer";
+import { AvailabilityModal } from "@/components/availability/AvailabilityModal";
 
 export const metadata: Metadata = {
   title: "Villa R.E.E.L",
@@ -24,12 +27,16 @@ export default async function LocaleLayout({ children, params }: Props) {
   return (
     <NextIntlClientProvider locale={locale} messages={messages}>
       <ToastProvider>
-        <div className="flex min-h-screen flex-col bg-background text-neutral-900">
-          <Navbar locale={locale} />
-          <main className="flex-1 pt-20">{children}</main>
-          <Footer />
-          <BackToTop />
-        </div>
+        <ReservationProvider>
+          <div className="flex min-h-screen flex-col bg-background text-neutral-900">
+            <Navbar locale={locale} />
+            <main className="flex-1 pt-20">{children}</main>
+            <Footer />
+            <BackToTop />
+            <ReservationDrawer />
+            <AvailabilityModal />
+          </div>
+        </ReservationProvider>
       </ToastProvider>
     </NextIntlClientProvider>
   );
