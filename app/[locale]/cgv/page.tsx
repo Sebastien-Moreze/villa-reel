@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Link from "next/link";
 
 export const metadata: Metadata = {
   title: "Conditions Générales de Vente – Villa R.E.E.L",
@@ -153,9 +154,9 @@ export default async function CGVPage({ params }: PageProps) {
           </ul>
           <p className="mt-3 text-sm text-neutral-600">
             Le Locataire s&apos;engage également à respecter en tous points le{" "}
-            <a href="/fr/reglement-interieur" className="text-primary underline hover:text-primary/80">
+            <Link href="/fr/reglement-interieur" className="text-primary underline hover:text-primary/80">
               Règlement intérieur de la Villa R.E.E.L
-            </a>
+            </Link>
             , remis lors de la réservation et consultable sur le site villareel.com.
           </p>
         </section>

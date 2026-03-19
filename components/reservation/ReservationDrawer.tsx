@@ -23,7 +23,7 @@ export function ReservationDrawer() {
   const [baseTotal, setBaseTotal] = useState(0);
   const [promoCode, setPromoCode] = useState<string | null>(null);
   const [total, setTotal] = useState(0);
-  const [depositAmount, setDepositAmount] = useState(0);
+  const [_depositAmount, setDepositAmount] = useState(0);
   const [reservationId, setReservationId] = useState<number | null>(null);
   const [reelCode, setReelCode] = useState<string | null>(null);
   const [bookingError, setBookingError] = useState<string | null>(null);

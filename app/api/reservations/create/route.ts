@@ -136,7 +136,7 @@ export async function POST(request: Request) {
       // ── 4. Calculer les montants côté serveur (JAMAIS depuis le client) ─
       const pricePerNight = Number(villa.pricePerNight);
       const cleaningFee = Number(villa.cleaningFee);
-      const depositAmount = Number(villa.deposit);
+      const _depositAmount = Number(villa.deposit); // conservé pour référence future
 
       let discount = 0;
       let promoCodeRecord: { id: number } | null = null;
@@ -206,7 +206,7 @@ export async function POST(request: Request) {
     });
 
     // ── Invalider le cache des disponibilités ────────────────────────────
-    revalidateTag("availability");
+    revalidateTag("availability", "max");
 
     // ── Envoyer l'email de confirmation ─────────────────────────────────
     try {

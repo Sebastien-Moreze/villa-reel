@@ -1,4 +1,3 @@
-import { getTranslations } from "next-intl/server";
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
@@ -16,7 +15,7 @@ export default async function MentionsLegalesPage({ params }: PageProps) {
     <div className="mx-auto max-w-3xl px-4 py-16 md:px-6">
       <p className="text-xs uppercase tracking-[0.3em] text-primary/70">Villa R.E.E.L</p>
       <h1 className="font-display mt-2 text-3xl font-bold text-neutral-900">Mentions légales</h1>
-      <p className="mt-2 text-sm text-neutral-500">Conformément à la loi n° 2004-575 du 21 juin 2004 pour la confiance dans l'économie numérique (LCEN)</p>
+      <p className="mt-2 text-sm text-neutral-500">Conformément à la loi n° 2004-575 du 21 juin 2004 pour la confiance dans l&apos;économie numérique (LCEN)</p>
 
       <div className="mt-10 space-y-10 text-sm text-neutral-700 leading-relaxed">
 
@@ -64,10 +63,10 @@ export default async function MentionsLegalesPage({ params }: PageProps) {
         <section>
           <h2 className="text-base font-semibold text-neutral-900 mb-3">3. Propriété intellectuelle</h2>
           <p>
-            L'ensemble du contenu de ce site (textes, photographies, vidéos, logos, illustrations, architecture de la page) est la propriété exclusive de la société R.E.E.L. ou de ses partenaires, et est protégé par les lois françaises et internationales relatives à la propriété intellectuelle.
+            L&apos;ensemble du contenu de ce site (textes, photographies, vidéos, logos, illustrations, architecture de la page) est la propriété exclusive de la société R.E.E.L. ou de ses partenaires, et est protégé par les lois françaises et internationales relatives à la propriété intellectuelle.
           </p>
           <p className="mt-2">
-            Toute reproduction, représentation, modification, publication, adaptation ou exploitation de tout ou partie des éléments du site, sans l'accord préalable écrit de R.E.E.L., est strictement interdite.
+            Toute reproduction, représentation, modification, publication, adaptation ou exploitation de tout ou partie des éléments du site, sans l&apos;accord préalable écrit de R.E.E.L., est strictement interdite.
           </p>
         </section>
 
@@ -75,10 +74,10 @@ export default async function MentionsLegalesPage({ params }: PageProps) {
         <section>
           <h2 className="text-base font-semibold text-neutral-900 mb-3">4. Limitation de responsabilité</h2>
           <p>
-            R.E.E.L s'efforce de maintenir les informations publiées sur ce site aussi précises et à jour que possible. Toutefois, la société ne peut garantir l'exactitude, la complétude ou l'actualité de ces informations. R.E.E.L décline toute responsabilité pour tout préjudice direct ou indirect résultant de l'utilisation du site.
+            R.E.E.L s&apos;efforce de maintenir les informations publiées sur ce site aussi précises et à jour que possible. Toutefois, la société ne peut garantir l&apos;exactitude, la complétude ou l&apos;actualité de ces informations. R.E.E.L décline toute responsabilité pour tout préjudice direct ou indirect résultant de l&apos;utilisation du site.
           </p>
           <p className="mt-2">
-            Des liens vers des sites tiers peuvent être présents sur ce site. R.E.E.L n'exerce aucun contrôle sur ces sites et décline toute responsabilité quant à leur contenu.
+            Des liens vers des sites tiers peuvent être présents sur ce site. R.E.E.L n&apos;exerce aucun contrôle sur ces sites et décline toute responsabilité quant à leur contenu.
           </p>
         </section>
 
@@ -86,7 +85,7 @@ export default async function MentionsLegalesPage({ params }: PageProps) {
         <section>
           <h2 className="text-base font-semibold text-neutral-900 mb-3">5. Droit applicable et juridiction</h2>
           <p>
-            Les présentes mentions légales sont régies par le droit français. En cas de litige relatif à l'utilisation du site, les tribunaux français seront seuls compétents.
+            Les présentes mentions légales sont régies par le droit français. En cas de litige relatif à l&apos;utilisation du site, les tribunaux français seront seuls compétents.
           </p>
         </section>
 
@@ -94,7 +93,7 @@ export default async function MentionsLegalesPage({ params }: PageProps) {
         <section>
           <h2 className="text-base font-semibold text-neutral-900 mb-3">6. Cookies</h2>
           <p>
-            Ce site est susceptible d'utiliser des cookies techniques nécessaires à son fonctionnement. Aucun cookie publicitaire ou de traçage tiers n'est utilisé sans votre consentement. Pour en savoir plus, consultez notre{" "}
+            Ce site est susceptible d&apos;utiliser des cookies techniques nécessaires à son fonctionnement. Aucun cookie publicitaire ou de traçage tiers n&apos;est utilisé sans votre consentement. Pour en savoir plus, consultez notre{" "}
             <a href="./confidentialite" className="text-primary underline">politique de confidentialité</a>.
           </p>
         </section>

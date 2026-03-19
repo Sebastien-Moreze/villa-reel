@@ -33,7 +33,7 @@ export default async function ConfidentialitePage({ params }: PageProps) {
         {/* Article 2 */}
         <section>
           <h2 className="text-base font-semibold text-neutral-900 mb-3">2. Données collectées</h2>
-          <p>Dans le cadre de l'utilisation du site <strong>villareel.com</strong> et du processus de réservation, nous collectons les données suivantes :</p>
+          <p>Dans le cadre de l&apos;utilisation du site <strong>villareel.com</strong> et du processus de réservation, nous collectons les données suivantes :</p>
 
           <div className="mt-3 rounded-xl overflow-hidden border border-neutral-200">
             <table className="w-full text-xs">
@@ -57,7 +57,7 @@ export default async function ConfidentialitePage({ params }: PageProps) {
                 </tr>
                 <tr>
                   <td className="px-4 py-2.5">Numéro de téléphone</td>
-                  <td className="px-4 py-2.5">Contact en cas d'urgence</td>
+                  <td className="px-4 py-2.5">Contact en cas d&apos;urgence</td>
                   <td className="px-4 py-2.5">Intérêt légitime</td>
                 </tr>
                 <tr className="bg-neutral-50">
@@ -73,7 +73,7 @@ export default async function ConfidentialitePage({ params }: PageProps) {
               </tbody>
             </table>
           </div>
-          <p className="mt-3">Nous ne collectons aucune donnée sensible au sens de l'article 9 du RGPD (données de santé, origines ethniques, opinions politiques, etc.).</p>
+          <p className="mt-3">Nous ne collectons aucune donnée sensible au sens de l&apos;article 9 du RGPD (données de santé, origines ethniques, opinions politiques, etc.).</p>
         </section>
 
         {/* Article 3 */}
@@ -86,7 +86,7 @@ export default async function ConfidentialitePage({ params }: PageProps) {
             <li><strong>Vercel Inc.</strong> – hébergement du site web</li>
           </ul>
           <p className="mt-2">
-            Ces sous-traitants sont soumis à des obligations contractuelles de confidentialité et de sécurité conformes au RGPD. Aucune donnée n'est vendue ou cédée à des tiers à des fins commerciales.
+            Ces sous-traitants sont soumis à des obligations contractuelles de confidentialité et de sécurité conformes au RGPD. Aucune donnée n&apos;est vendue ou cédée à des tiers à des fins commerciales.
           </p>
         </section>
 
@@ -122,13 +122,13 @@ export default async function ConfidentialitePage({ params }: PageProps) {
           </div>
           <p className="mt-4">
             Pour exercer ces droits, adressez votre demande par email à{" "}
-            <span className="text-amber-700">[EMAIL À COMPLÉTER]</span> en joignant une copie de votre pièce d'identité.
+            <span className="text-amber-700">[EMAIL À COMPLÉTER]</span> en joignant une copie de votre pièce d&apos;identité.
             Nous vous répondrons dans un délai maximum de <strong>30 jours</strong>.
           </p>
           <p className="mt-2">
-            Vous avez également le droit d'introduire une réclamation auprès de la{" "}
+            Vous avez également le droit d&apos;introduire une réclamation auprès de la{" "}
             <a href="https://www.cnil.fr" target="_blank" rel="noreferrer" className="text-primary underline">
-              CNIL (Commission Nationale de l'Informatique et des Libertés)
+              CNIL (Commission Nationale de l&apos;Informatique et des Libertés)
             </a>.
           </p>
         </section>
@@ -136,7 +136,7 @@ export default async function ConfidentialitePage({ params }: PageProps) {
         {/* Article 6 */}
         <section>
           <h2 className="text-base font-semibold text-neutral-900 mb-3">6. Cookies</h2>
-          <p>Le site villareel.com utilise uniquement des <strong>cookies techniques essentiels</strong> au fonctionnement du site (session utilisateur, panier de réservation). Aucun cookie publicitaire ou de suivi comportemental tiers n'est déposé.</p>
+          <p>Le site villareel.com utilise uniquement des <strong>cookies techniques essentiels</strong> au fonctionnement du site (session utilisateur, panier de réservation). Aucun cookie publicitaire ou de suivi comportemental tiers n&apos;est déposé.</p>
           <div className="mt-3 rounded-xl overflow-hidden border border-neutral-200">
             <table className="w-full text-xs">
               <thead className="bg-neutral-100">
@@ -182,7 +182,7 @@ export default async function ConfidentialitePage({ params }: PageProps) {
         <section>
           <h2 className="text-base font-semibold text-neutral-900 mb-3">9. Modifications</h2>
           <p>
-            Nous nous réservons le droit de modifier la présente politique à tout moment. Toute modification substantielle sera notifiée aux utilisateurs par email ou via une notification sur le site. La version en vigueur est toujours accessible à l'adresse <strong>villareel.com/confidentialite</strong>.
+            Nous nous réservons le droit de modifier la présente politique à tout moment. Toute modification substantielle sera notifiée aux utilisateurs par email ou via une notification sur le site. La version en vigueur est toujours accessible à l&apos;adresse <strong>villareel.com/confidentialite</strong>.
           </p>
         </section>
 

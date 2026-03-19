@@ -65,6 +65,7 @@ export function AnimatedTitle({
       wrot:  Math.round(Math.random() * 400 - 200),
       delay: i * 45 + Math.round(Math.random() * 60),
     }));
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setLetters(data);
 
     /* Retire les styles d'animation une fois terminée (perf) */

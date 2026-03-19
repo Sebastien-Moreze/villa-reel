@@ -314,30 +314,6 @@ async function processRefund(formData: FormData) {
   revalidatePath(`/admin/reservations/${id}`);
 }
 
-// ── Server Actions Caution ─────────────────────────────────────────────────
-
-async function captureCaution(formData: FormData) {
-  "use server";
-  const id = Number(formData.get("id"));
-  const res = await fetch(`${process.env.NEXT_PUBLIC_APP_URL}/api/admin/caution/capture`, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ reservationId: id }),
-  }).catch(() => null);
-  if (res?.ok) revalidatePath(`/admin/reservations/${id}`);
-}
-
-async function releaseCaution(formData: FormData) {
-  "use server";
-  const id = Number(formData.get("id"));
-  const res = await fetch(`${process.env.NEXT_PUBLIC_APP_URL}/api/admin/caution/release`, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ reservationId: id }),
-  }).catch(() => null);
-  if (res?.ok) revalidatePath(`/admin/reservations/${id}`);
-}
-
 // ── CautionCard (Server Component) ───────────────────────────────────────
 
 type AnyReservation = Record<string, unknown> & {
