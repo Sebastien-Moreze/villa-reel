@@ -87,13 +87,13 @@ jobs:
             CONTAINER_NAME="${CONTAINER_NAME:-villa-reel-app}"
 
             echo "Ensuring .env file is up to date..."
-            cat > .env <<EOF
-DATABASE_URL=$DATABASE_URL
-NEXTAUTH_SECRET=$NEXTAUTH_SECRET
-STRIPE_SK=$STRIPE_SK
-STRIPE_WEBHOOK_SECRET=$STRIPE_WEBHOOK_SECRET
-RESEND_API_KEY=$RESEND_API_KEY
-EOF
+            {
+              echo "DATABASE_URL=$DATABASE_URL"
+              echo "NEXTAUTH_SECRET=$NEXTAUTH_SECRET"
+              echo "STRIPE_SK=$STRIPE_SK"
+              echo "STRIPE_WEBHOOK_SECRET=$STRIPE_WEBHOOK_SECRET"
+              echo "RESEND_API_KEY=$RESEND_API_KEY"
+            } > .env
 
             echo "Pulling latest images with Docker Compose..."
             docker compose -f docker-compose.prod.yml pull
