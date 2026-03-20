@@ -43,7 +43,7 @@ export function ContactForm({ locale }: ContactFormProps) {
           } else {
             setError(result.error);
             if (widgetIdRef.current !== null) {
-              window.hcaptcha.reset(widgetIdRef.current);
+              window.hcaptcha?.reset(widgetIdRef.current);
             }
           }
         });
