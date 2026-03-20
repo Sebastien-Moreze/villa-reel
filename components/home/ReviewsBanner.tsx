@@ -15,7 +15,14 @@ type Props = {
 
 export function ReviewsBanner({ reviews }: Props) {
   const t = useTranslations();
-  const score = 4.9;
+
+  /* Note moyenne dynamique — fallback 5.0 si aucun avis */
+  const score =
+    reviews.length > 0
+      ? reviews.reduce((sum, r) => sum + r.rating, 0) / reviews.length
+      : 5.0;
+
+  const filledStars = Math.round(score);
 
   return (
     <section className="bg-gradient-to-r from-primary via-secondary to-primary py-14 text-white">
@@ -27,19 +34,12 @@ export function ReviewsBanner({ reviews }: Props) {
             </p>
             <div className="mt-2 flex items-baseline gap-2">
               <span className="font-display text-3xl font-semibold">{score.toFixed(1)}</span>
-              <span className="text-lg">★★★★★</span>
+              <span className="text-lg">{"★".repeat(filledStars)}{"☆".repeat(5 - filledStars)}</span>
             </div>
             <p className="mt-1 text-xs text-white/90">
               {t("reviews.subtitle")}
             </p>
           </div>
-
-          <button
-            type="button"
-            className="rounded-full border border-white/40 bg-white/5 px-4 py-2 text-xs font-semibold text-white backdrop-blur transition hover:bg-white/15"
-          >
-            {t("reviews.leaveReview")}
-          </button>
         </div>
 
         {reviews.length > 0 && (

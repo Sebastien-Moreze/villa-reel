@@ -32,7 +32,7 @@ export default async function MentionsLegalesPage({ params }: PageProps) {
             <p><span className="font-medium text-neutral-800">Date de création :</span> 25 janvier 2024</p>
             <p><span className="font-medium text-neutral-800">Siège social :</span> 1281 Route de Moussy, 74930 Reignier-Esery, France</p>
             <p><span className="font-medium text-neutral-800">Dirigeants :</span> Mme Saban Estelle et M. Jedonne Rodrigue</p>
-            <p><span className="font-medium text-neutral-800">Contact :</span> <a href="mailto:r.jedonne@gmail.com" className="text-primary underline">r.jedonne@gmail.com</a></p>
+            <p><span className="font-medium text-neutral-800">Contact :</span> <a href="mailto:contact@villareel.com" className="text-primary underline">contact@villareel.com</a> — <a href="tel:+33688423052" className="text-primary">06 88 42 30 52</a> / <a href="tel:+33680215157" className="text-primary">06 80 21 51 57</a></p>
           </div>
         </section>
 

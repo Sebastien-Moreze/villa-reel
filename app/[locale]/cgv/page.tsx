@@ -124,7 +124,7 @@ export default async function CGVPage({ params }: PageProps) {
           </div>
 
           <p className="mt-3">
-            Toute demande d&apos;annulation doit être adressée par écrit (email) à <a href="mailto:r.jedonne@gmail.com" className="text-primary underline">r.jedonne@gmail.com</a>. La date de réception de l&apos;email fait foi.
+            Toute demande d&apos;annulation doit être adressée par écrit (email) à <a href="mailto:contact@villareel.com" className="text-primary underline">contact@villareel.com</a>. La date de réception de l&apos;email fait foi.
           </p>
           <p className="mt-2">
             Le dépôt de garantie est restitué intégralement en cas d&apos;annulation, quelle que soit la date.

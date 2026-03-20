@@ -268,7 +268,24 @@
     "subtitle": "Memorable stays between Alps and Tropics.",
     "leaveReview": "Leave a review",
     "defaultComment": "A remarkable stay at Villa R.E.E.L, between comfort and preserved nature.",
-    "guest": "Guest"
+    "guest": "Guest",
+    "count": "{count, plural, =0 {No reviews} one {# review} other {# reviews}}",
+    "form": {
+      "title": "How was your stay?",
+      "subtitle": "Thank you {name}, your feedback helps us improve.",
+      "ratings": "Your ratings",
+      "overall": "Overall rating",
+      "cleanliness": "Cleanliness",
+      "comfort": "Comfort",
+      "location": "Location",
+      "communication": "Communication",
+      "commentLabel": "Your comment (optional)",
+      "commentPlaceholder": "Share your experience at Villa R.E.E.L…",
+      "submit": "Submit my review",
+      "submitting": "Submitting…",
+      "successTitle": "Thank you for your review!",
+      "successText": "Your review will be published after verification by our team."
+    }
   },
 
   "footer": {

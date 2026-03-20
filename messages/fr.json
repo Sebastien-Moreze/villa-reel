@@ -268,7 +268,24 @@
     "subtitle": "Séjours mémorables entre Alpes et Tropiques.",
     "leaveReview": "Laisser un avis",
     "defaultComment": "Un séjour remarquable à la Villa R.E.E.L, entre confort et nature préservée.",
-    "guest": "Invité"
+    "guest": "Invité",
+    "count": "{count, plural, =0 {Aucun avis} one {# avis} other {# avis}}",
+    "form": {
+      "title": "Comment s'est passé votre séjour ?",
+      "subtitle": "Merci {name}, votre avis nous aide à nous améliorer.",
+      "ratings": "Vos notes",
+      "overall": "Note globale",
+      "cleanliness": "Propreté",
+      "comfort": "Confort",
+      "location": "Emplacement",
+      "communication": "Communication",
+      "commentLabel": "Votre commentaire (optionnel)",
+      "commentPlaceholder": "Partagez votre expérience à la Villa R.E.E.L…",
+      "submit": "Envoyer mon avis",
+      "submitting": "Envoi en cours…",
+      "successTitle": "Merci pour votre avis !",
+      "successText": "Votre avis sera publié après vérification par notre équipe."
+    }
   },
 
   "footer": {

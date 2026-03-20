@@ -47,8 +47,12 @@ export default async function ContactPage({ params }: PageProps) {
                 </a>
                 <br />
                 {t("contact.phone")}{" "}
-                <a href="tel:+33600000000" className="text-secondary hover:text-white">
-                  +33 (0)6 00 00 00 00
+                <a href="tel:+33688423052" className="text-secondary hover:text-white">
+                  +33 (0)6 88 42 30 52
+                </a>
+                {" / "}
+                <a href="tel:+33680215157" className="text-secondary hover:text-white">
+                  +33 (0)6 80 21 51 57
                 </a>
               </p>
 

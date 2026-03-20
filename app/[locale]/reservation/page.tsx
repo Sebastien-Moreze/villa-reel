@@ -64,7 +64,7 @@ export default function ReservationPage() {
     if (msg.includes("network") || msg.includes("fetch")) {
       return { message: "Une erreur de connexion s'est produite. Vérifiez votre connexion internet et réessayez." };
     }
-    return { message: "Une erreur inattendue s'est produite. Veuillez réessayer ou nous contacter à r.jedonne@gmail.com." };
+    return { message: "Une erreur inattendue s'est produite. Veuillez réessayer ou nous contacter à contact@villareel.com." };
   }
 
   const progress = ((step + 1) / STEPS.length) * 100;

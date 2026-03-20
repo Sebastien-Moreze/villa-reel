@@ -84,7 +84,8 @@ export function Footer() {
               </h3>
               <ul className="mt-3 space-y-2 text-xs text-neutral-400">
                 <li><a href="mailto:contact@villareel.com" className="hover:text-secondary">contact@villareel.com</a></li>
-                <li><a href="tel:+33600000000" className="hover:text-secondary">+33 (0)6 00 00 00 00</a></li>
+                <li><a href="tel:+33688423052" className="hover:text-secondary">+33 (0)6 88 42 30 52</a></li>
+                <li><a href="tel:+33680215157" className="hover:text-secondary">+33 (0)6 80 21 51 57</a></li>
               </ul>
             </div>
           </div>

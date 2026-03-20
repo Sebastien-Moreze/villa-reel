@@ -172,6 +172,7 @@ model Reservation {
 
   locale                Locale           @default(FR)
 
+  reviewToken           String?          @unique
   review                Review?
 
   createdAt             DateTime         @default(now())

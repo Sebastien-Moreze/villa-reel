@@ -474,23 +474,4 @@ export function ReservationStep3({ guests, onValid }: Props) {
     </>
   );
 }
-ine-flex w-full items-center justify-center rounded-full bg-primary px-5 py-2.5 text-xs font-semibold text-white shadow-md transition hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-40"
-        >
-          Continuer vers le paiement
-        </button>
-        {!reglementSigned && (
-          <p className="text-center text-[10px] text-neutral-400">
-            Signez le règlement intérieur pour débloquer cette étape.
-          </p>
-        )}
-      </form>
-    </>
-  );
-}
-ement intérieur pour débloquer cette étape.
-          </p>
-        )}
-      </form>
-    </>
-  );
-}
+
