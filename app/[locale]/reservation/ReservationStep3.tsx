@@ -346,7 +346,7 @@ export function ReservationStep3({ guests, onValid }: Props) {
       {/* Conteneur invisible pour le widget hCaptcha */}
       <div ref={captchaContainerRef} />
 
-      <form onSubmit={handleSubmit(handleFormSubmit)} className="space-y-4 text-xs text-neutral-800">
+      <form onSubmit={(e) => handleSubmit(handleFormSubmit)(e)} className="space-y-4 text-xs text-neutral-800">
         <p className="text-sm font-semibold text-neutral-900">Informations voyageur principal</p>
 
         <div className="grid gap-3 md:grid-cols-2">
