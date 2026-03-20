@@ -58,17 +58,32 @@ export default async function proxy(req: NextRequest) {
     }
   }
 
-  /* ── 3. Routes API — bypass total ─────────────────────────────── */
+  /* ── 3. Routes API admin — protection JWT → JSON 401 ──────────── */
+  if (pathname.startsWith("/api/admin/")) {
+    const token = await getToken({
+      req,
+      secret: process.env.NEXTAUTH_SECRET,
+    });
+    if (!token) {
+      return NextResponse.json(
+        { error: "Authentification requise", code: "UNAUTHORIZED" },
+        { status: 401 },
+      );
+    }
+    return NextResponse.next();
+  }
+
+  /* ── 4b. Autres routes API — bypass total ──────────────────────── */
   if (pathname.startsWith("/api/")) {
     return NextResponse.next();
   }
 
-  /* ── 4. Page maintenance — bypass intl ───────────────────────── */
+  /* ── 5. Page maintenance — bypass intl ───────────────────────── */
   if (pathname.startsWith("/maintenance")) {
     return NextResponse.next();
   }
 
-  /* ── 5. Routes admin — auth + bypass intl ─────────────────────── */
+  /* ── 6. Routes admin — auth + bypass intl ─────────────────────── */
   if (pathname.startsWith("/admin")) {
     /* Login accessible sans authentification */
     if (pathname.startsWith("/admin/login")) {
@@ -93,7 +108,7 @@ export default async function proxy(req: NextRequest) {
     return NextResponse.next();
   }
 
-  /* ── 6. Routing i18n pour les routes publiques ─────────────────── */
+  /* ── 7. Routing i18n pour les routes publiques ─────────────────── */
   return intlMiddleware(req);
 }
 
