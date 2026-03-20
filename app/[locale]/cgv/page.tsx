@@ -10,8 +10,6 @@ type PageProps = { params: Promise<{ locale: string }> };
 
 export default async function CGVPage({ params }: PageProps) {
   const { locale } = await params;
-  void locale;
-
   return (
     <div className="mx-auto max-w-3xl px-4 py-16 md:px-6">
       <p className="text-xs uppercase tracking-[0.3em] text-primary/70">Villa R.E.E.L</p>
@@ -154,7 +152,7 @@ export default async function CGVPage({ params }: PageProps) {
           </ul>
           <p className="mt-3 text-sm text-neutral-600">
             Le Locataire s&apos;engage également à respecter en tous points le{" "}
-            <Link href="/fr/reglement-interieur" className="text-primary underline hover:text-primary/80">
+            <Link href={`/${locale}/reglement-interieur`} className="text-primary underline hover:text-primary/80">
               Règlement intérieur de la Villa R.E.E.L
             </Link>
             , remis lors de la réservation et consultable sur le site villareel.com.

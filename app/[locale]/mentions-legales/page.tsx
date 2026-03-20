@@ -9,8 +9,6 @@ type PageProps = { params: Promise<{ locale: string }> };
 
 export default async function MentionsLegalesPage({ params }: PageProps) {
   const { locale } = await params;
-  void locale;
-
   return (
     <div className="mx-auto max-w-3xl px-4 py-16 md:px-6">
       <p className="text-xs uppercase tracking-[0.3em] text-primary/70">Villa R.E.E.L</p>
@@ -94,7 +92,7 @@ export default async function MentionsLegalesPage({ params }: PageProps) {
           <h2 className="text-base font-semibold text-neutral-900 mb-3">6. Cookies</h2>
           <p>
             Ce site est susceptible d&apos;utiliser des cookies techniques nécessaires à son fonctionnement. Aucun cookie publicitaire ou de traçage tiers n&apos;est utilisé sans votre consentement. Pour en savoir plus, consultez notre{" "}
-            <a href="./confidentialite" className="text-primary underline">politique de confidentialité</a>.
+            <a href={`/${locale}/confidentialite`} className="text-primary underline">politique de confidentialité</a>.
           </p>
         </section>
 

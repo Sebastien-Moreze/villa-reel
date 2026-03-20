@@ -58,6 +58,3 @@ export const GALLERY_PHOTOS: GalleryPhoto[] = [
   { id: 45, src: `${BASE}/gallery-abri-jardin.jpg`, alt: "Abri de jardin" },
   { id: 46, src: `${BASE}/gallery-borne-recharge-clim.jpg`, alt: "Borne de recharge et climatisation" },
 ];
-
-/** Nombre de photos affichées sur l'accueil (1 grande + N petites) */
-export const HOME_GALLERY_COUNT = 12;

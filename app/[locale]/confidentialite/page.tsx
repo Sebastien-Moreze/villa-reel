@@ -122,7 +122,7 @@ export default async function ConfidentialitePage({ params }: PageProps) {
           </div>
           <p className="mt-4">
             Pour exercer ces droits, adressez votre demande par email à{" "}
-            <span className="text-amber-700">[EMAIL À COMPLÉTER]</span> en joignant une copie de votre pièce d&apos;identité.
+            <a href="mailto:contact@villareel.com" className="text-primary underline hover:text-primary/80">contact@villareel.com</a> en joignant une copie de votre pièce d&apos;identité.
             Nous vous répondrons dans un délai maximum de <strong>30 jours</strong>.
           </p>
           <p className="mt-2">
