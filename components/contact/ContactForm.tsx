@@ -5,24 +5,7 @@ import Script from "next/script";
 import { useTranslations } from "next-intl";
 import { submitContact } from "@/app/[locale]/contact/actions";
 
-declare global {
-  interface Window {
-    hcaptcha: {
-      render: (
-        container: HTMLElement,
-        params: {
-          sitekey: string;
-          size: "invisible";
-          callback: (token: string) => void;
-          "expired-callback": () => void;
-          "error-callback": () => void;
-        },
-      ) => string;
-      execute: (widgetId: string) => void;
-      reset: (widgetId?: string) => void;
-    };
-  }
-}
+// La déclaration globale Window.hcaptcha est dans types/hcaptcha.d.ts
 
 type ContactFormProps = {
   locale: string;

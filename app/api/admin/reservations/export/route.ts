@@ -9,13 +9,16 @@ import { apiError } from "@/lib/http-error";
 export const dynamic = "force-dynamic";
 
 export async function GET(request: NextRequest) {
+  /* ── Auth avant le bloc try/catch pour retourner 401/403 corrects ── */
   try {
     await requireAuth();
-    const admin = await isAdmin();
-    if (!admin) {
-      return apiError.forbidden();
-    }
+  } catch {
+    return apiError.unauthorized();
+  }
+  const admin = await isAdmin();
+  if (!admin) return apiError.forbidden();
 
+  try {
     const { searchParams } = new URL(request.url);
     const status = searchParams.get("status") as ReservationStatus | null;
     const q = searchParams.get("q")?.trim();

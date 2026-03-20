@@ -4,6 +4,7 @@ import { z } from "zod";
 import { Resend } from "resend";
 import { prisma } from "@/lib/prisma";
 import { escapeHtml, escapeHtmlMultiline } from "@/lib/html";
+import { verifyHCaptcha } from "@/lib/hcaptcha";
 
 const contactSchema = z.object({
   firstName: z.string().min(1),
@@ -17,28 +18,6 @@ const contactSchema = z.object({
   consent: z.literal("on"),
   token: z.string().min(1),
 });
-
-async function verifyHCaptcha(token: string): Promise<boolean> {
-  const secret = process.env.HCAPTCHA_SECRET;
-
-  // Si pas de secret configuré (dev local), on laisse passer
-  if (!secret) {
-    console.warn("HCAPTCHA_SECRET non configuré — vérification ignorée");
-    return true;
-  }
-
-  try {
-    const res = await fetch("https://hcaptcha.com/siteverify", {
-      method: "POST",
-      headers: { "Content-Type": "application/x-www-form-urlencoded" },
-      body: new URLSearchParams({ secret, response: token }),
-    });
-    const data = (await res.json()) as { success?: boolean };
-    return !!data.success;
-  } catch {
-    return false;
-  }
-}
 
 async function sendEmails(input: z.infer<typeof contactSchema>) {
   const resendApiKey = process.env.RESEND_API_KEY;
@@ -137,3 +116,4 @@ export async function submitContact(
 
   return { success: true };
 }
+

@@ -3,6 +3,7 @@ import { prisma } from "@/lib/prisma";
 import { z } from "zod";
 import type { Prisma } from "@prisma/client";
 import { rateLimit, getClientIp } from "@/lib/rate-limit";
+import { verifyHCaptcha } from "@/lib/hcaptcha";
 import { logger } from "@/lib/logger";
 import { apiError } from "@/lib/http-error";
 import { revalidateTag } from "next/cache";
@@ -23,6 +24,7 @@ const reservationSchema = z.object({
   guestAddress: z.string().max(500).optional(),
   promoCode: z.string().max(50).nullish(),
   locale: z.enum(["fr", "en"]).default("fr"),
+  hcaptchaToken: z.string().optional(),
 });
 
 function overlaps(
@@ -58,6 +60,15 @@ export async function POST(request: Request) {
   }
 
   const data = parsed.data;
+
+  /* ── Vérification hCaptcha (désactivée en dev si HCAPTCHA_SECRET absent) ── */
+  const captchaOk = await verifyHCaptcha(data.hcaptchaToken);
+  if (!captchaOk) {
+    return apiError.badRequest(
+      "Vérification anti-spam échouée. Veuillez réessayer.",
+      "CAPTCHA_FAILED",
+    );
+  }
 
   const checkIn = new Date(data.checkIn);
   const checkOut = new Date(data.checkOut);

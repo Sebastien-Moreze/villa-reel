@@ -202,6 +202,7 @@ export function ReservationDrawer() {
                         guestPhone: guestData.phone,
                         promoCode: promoCode ?? undefined,
                         locale: "fr",
+                        hcaptchaToken: guestData.hcaptchaToken,
                       }),
                     });
                     if (!res.ok) {

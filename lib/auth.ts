@@ -5,6 +5,7 @@ import Credentials from "next-auth/providers/credentials";
 import bcrypt from "bcrypt";
 import { z } from "zod";
 import { prisma } from "@/lib/prisma";
+import { rateLimit } from "@/lib/rate-limit";
 
 type AdminRole = "SUPER_ADMIN" | "MANAGER";
 
@@ -48,7 +49,21 @@ export const authOptions: NextAuthOptions = {
         email: { label: "Email", type: "email" },
         password: { label: "Password", type: "password" },
       },
-      async authorize(credentials): Promise<AppUser | null> {
+      async authorize(credentials, req): Promise<AppUser | null> {
+        /* ── 0. Rate limiting : 5 tentatives / 15 min par IP ─── */
+        if (process.env.NODE_ENV !== "development") {
+          const headers = req?.headers as Record<string, unknown> | undefined;
+          const ip =
+            (headers?.["cf-connecting-ip"] as string | undefined) ??
+            ((headers?.["x-forwarded-for"] as string | undefined)
+              ?.split(",")[0]
+              ?.trim()) ??
+            "unknown";
+          if (!rateLimit(`login:${ip}`, 5, 15 * 60_000)) {
+            return null; // bloque silencieusement (pas d'info sur le rate-limit)
+          }
+        }
+
         /* ── 1. Validation Zod (avant toute requête DB) ──────── */
         const parsed = credentialsSchema.safeParse(credentials);
         if (!parsed.success) return null;

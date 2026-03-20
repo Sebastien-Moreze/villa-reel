@@ -10,7 +10,11 @@ import { logger } from "@/lib/logger";
  * L'admin doit agir dans les 48h suivant le checkout.
  */
 export async function POST(request: Request) {
-  await requireAuth();
+  try {
+    await requireAuth();
+  } catch {
+    return apiError.unauthorized();
+  }
   const admin = await isAdmin();
   if (!admin) return apiError.forbidden("Admin access required");
 
