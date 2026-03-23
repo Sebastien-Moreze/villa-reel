@@ -1,10 +1,13 @@
 "use server";
 
 import { z } from "zod";
-import { Resend } from "resend";
 import { prisma } from "@/lib/prisma";
-import { escapeHtml, escapeHtmlMultiline } from "@/lib/html";
 import { verifyHCaptcha } from "@/lib/hcaptcha";
+import {
+  sendContactNotificationEmail,
+  sendContactConfirmationEmail,
+} from "@/lib/emails";
+import { logger } from "@/lib/logger";
 
 const contactSchema = z.object({
   firstName: z.string().min(1),
@@ -20,51 +23,33 @@ const contactSchema = z.object({
 });
 
 async function sendEmails(input: z.infer<typeof contactSchema>) {
-  const resendApiKey = process.env.RESEND_API_KEY;
   const toOwner = process.env.CONTACT_EMAIL;
-  if (!resendApiKey || !toOwner) return;
+  if (!toOwner) return;
 
-  const resend = new Resend(resendApiKey);
-
-  const subjectOwner = `Nouveau message depuis le site Villa R.E.E.L – ${input.subject}`;
-  const subjectGuest =
-    input.locale === "en"
-      ? "We have received your message – Villa R.E.E.L"
-      : "Nous avons bien reçu votre message – Villa R.E.E.L";
-
-  const ownerHtml = `
-    <p>Nouveau message de contact sur le site Villa R.E.E.L :</p>
-    <ul>
-      <li><strong>Nom :</strong> ${escapeHtml(input.firstName)} ${escapeHtml(input.lastName)}</li>
-      <li><strong>Email :</strong> ${escapeHtml(input.email)}</li>
-      <li><strong>Téléphone :</strong> ${escapeHtml(input.phone ?? "-")}</li>
-      <li><strong>Adresse :</strong> ${escapeHtml(input.address ?? "-")}</li>
-      <li><strong>Objet :</strong> ${escapeHtml(input.subject)}</li>
-    </ul>
-    <p><strong>Message :</strong></p>
-    <p>${escapeHtmlMultiline(input.message)}</p>
-  `;
-
-  const safeName = escapeHtml(input.firstName);
-  const guestHtml =
-    input.locale === "en"
-      ? `<p>Hello ${safeName},</p><p>Thank you for contacting Villa R.E.E.L. We have received your message and will get back to you as soon as possible.</p><p>Best regards,<br/>Villa R.E.E.L</p>`
-      : `<p>Bonjour ${safeName},</p><p>Merci pour votre message. Nous l'avons bien reçu et reviendrons vers vous dans les plus brefs délais.</p><p>Cordialement,<br/>Villa R.E.E.L</p>`;
-
-  await Promise.all([
-    resend.emails.send({
-      from: "Villa R.E.E.L <no-reply@villareel.com>",
-      to: [toOwner],
-      subject: subjectOwner,
-      html: ownerHtml,
-    }),
-    resend.emails.send({
-      from: "Villa R.E.E.L <no-reply@villareel.com>",
-      to: [input.email],
-      subject: subjectGuest,
-      html: guestHtml,
-    }),
-  ]);
+  try {
+    await Promise.all([
+      sendContactNotificationEmail({
+        locale: input.locale,
+        to: toOwner,
+        firstName: input.firstName,
+        lastName: input.lastName,
+        email: input.email,
+        phone: input.phone,
+        subject: input.subject,
+        message: input.message,
+      }),
+      sendContactConfirmationEmail({
+        locale: input.locale,
+        to: input.email,
+        firstName: input.firstName,
+      }),
+    ]);
+  } catch (error) {
+    logger.error("Failed to send contact emails", {
+      module: "contact/actions",
+      detail: error,
+    });
+  }
 }
 
 export type ContactActionResult =

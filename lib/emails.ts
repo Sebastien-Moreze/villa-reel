@@ -5,6 +5,9 @@ import { logger } from "@/lib/logger";
 import ReservationConfirmationEmail from "@/emails/ReservationConfirmation";
 import BalanceReminderEmail from "@/emails/BalanceReminder";
 import ReviewRequestEmail from "@/emails/ReviewRequest";
+import ContactNotificationEmail from "@/emails/ContactNotification";
+import ContactConfirmationEmail from "@/emails/ContactConfirmation";
+import ArrivalReminderEmail from "@/emails/ArrivalReminder";
 
 type Locale = "fr" | "en";
 
@@ -136,6 +139,79 @@ export async function sendReviewRequestEmail(args: {
     args.locale === "fr"
       ? "Comment s'est passé votre séjour ?"
       : "How was your stay at Villa R.E.E.L?";
+
+  await sendWithRetry({ to: args.to, subject, react });
+}
+
+export async function sendContactNotificationEmail(args: {
+  locale: Locale;
+  to: string;
+  firstName: string;
+  lastName: string;
+  email: string;
+  phone?: string;
+  subject: string;
+  message: string;
+}) {
+  const react = React.createElement(ContactNotificationEmail, {
+    locale: args.locale,
+    firstName: args.firstName,
+    lastName: args.lastName,
+    email: args.email,
+    phone: args.phone,
+    subject: args.subject,
+    message: args.message,
+  });
+
+  const emailSubject = `Nouveau message de contact – ${args.subject}`;
+
+  await sendWithRetry({ to: args.to, subject: emailSubject, react });
+}
+
+export async function sendContactConfirmationEmail(args: {
+  locale: Locale;
+  to: string;
+  firstName: string;
+}) {
+  const react = React.createElement(ContactConfirmationEmail, {
+    locale: args.locale,
+    firstName: args.firstName,
+  });
+
+  const subject =
+    args.locale === "fr"
+      ? "Nous avons bien reçu votre message – Villa R.E.E.L"
+      : "We have received your message – Villa R.E.E.L";
+
+  await sendWithRetry({ to: args.to, subject, react });
+}
+
+export async function sendArrivalReminderEmail(args: {
+  locale: Locale;
+  to: string;
+  confirmationCode: string;
+  checkIn: string;
+  portalCode?: string;
+  wifiName?: string;
+  wifiPassword?: string;
+  contactPhone?: string;
+  contactEmail?: string;
+}) {
+  const react = React.createElement(ArrivalReminderEmail, {
+    locale: args.locale,
+    confirmationCode: args.confirmationCode,
+    checkIn: args.checkIn,
+    portalCode: args.portalCode,
+    wifiName: args.wifiName,
+    wifiPassword: args.wifiPassword,
+    contactPhone: args.contactPhone,
+    contactEmail: args.contactEmail,
+  });
+
+  const subject =
+    args.locale === "fr"
+      ? "Votre séjour commence dans 7 jours !"
+      : "Your stay starts in 7 days!";
 
   await sendWithRetry({ to: args.to, subject, react });
 }

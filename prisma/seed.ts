@@ -108,7 +108,7 @@ async function main() {
       images: {
         create: [
           {
-            url: "/images/villa/main.jpg",
+            url: "/images/villa/villa-facade-entree.jpg",
             altFr: "Vue extérieure de la villa",
             altEn: "Outside view of the villa",
             position: 1,
@@ -125,8 +125,8 @@ async function main() {
         create: [
           {
             name: "Haute saison été",
-            startDate: new Date("2025-07-01"),
-            endDate: new Date("2025-08-31"),
+            startDate: new Date("2026-07-01"),
+            endDate: new Date("2026-08-31"),
             pricePerNight: 450,
             minStay: 7,
           },
