@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState, useCallback } from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import {
   Wifi, Thermometer, Snowflake, Shirt, Wind, Lock, Flame, Coffee,
   Utensils, UtensilsCrossed, Waves, Mountain, Sun, Sofa, Umbrella,
@@ -102,8 +102,17 @@ export default function AdminAmenitiesPage() {
   }, []);
 
   useEffect(() => {
-    fetchAmenities();
-  }, [fetchAmenities]);
+    let cancelled = false;
+    (async () => {
+      setLoading(true);
+      const res = await fetch("/api/admin/amenities");
+      if (!cancelled && res.ok) {
+        setAmenities(await res.json());
+      }
+      if (!cancelled) setLoading(false);
+    })();
+    return () => { cancelled = true; };
+  }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -165,7 +174,7 @@ export default function AdminAmenitiesPage() {
     setShowIconPicker(false);
   };
 
-  const SelectedIcon = getIcon(form.icon);
+  const selectedIconElement = React.createElement(getIcon(form.icon), { className: "h-3.5 w-3.5" });
 
   const filtered = filterCat
     ? amenities.filter((a) => a.category === filterCat)
@@ -250,7 +259,7 @@ export default function AdminAmenitiesPage() {
               className="flex w-full items-center gap-2 rounded-lg border border-neutral-200 px-3 py-2 text-xs outline-none transition hover:border-primary focus:border-primary focus:ring-1 focus:ring-primary"
             >
               <span className="flex h-6 w-6 items-center justify-center rounded-md bg-primary/10 text-primary">
-                <SelectedIcon className="h-3.5 w-3.5" />
+                {selectedIconElement}
               </span>
               <span className="text-neutral-700">
                 {ICON_OPTIONS.find((i) => i.value === form.icon)?.label || "Choisir une icône…"}
