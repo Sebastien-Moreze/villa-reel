@@ -107,7 +107,7 @@ export default async function VillaPage({ params }: PageProps) {
       <section className="relative h-[340px] overflow-hidden md:h-[420px]">
         <div
           className="absolute inset-0 bg-cover bg-center"
-          style={{ backgroundImage: "url('/images/villa/hero.jpg')" }}
+          style={{ backgroundImage: "url('/images/gallery/gallery-vue-montagnes.jpg')" }}
         />
         <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/30 to-black/20" />
 
@@ -121,7 +121,7 @@ export default async function VillaPage({ params }: PageProps) {
               {locale === "en" ? villa.nameEn : villa.nameFr}
             </h1>
             <p className="mt-2 text-xs text-neutral-100/90 md:text-sm">
-              1281 route de Moussy, 74930 Reigner-Esery, France
+              {t("villa.heroSubtitle")}
             </p>
           </div>
         </div>

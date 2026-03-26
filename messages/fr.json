@@ -49,6 +49,7 @@
 
   "villa": {
     "badge": "Villa d'exception",
+    "heroSubtitle": "Villa de luxe avec vue sur les Alpes — Haute-Savoie, France",
     "descriptionTitle": "Description de la villa",
     "descriptionBody": "Entre montagnes et jardin luxuriant, la Villa R.E.E.L est une propriété haut de gamme offrant plusieurs espaces de vie, une piscine chauffée, un jardin tropical et des vues dégagées sur les Aravis. Un lieu d'exception pensé pour les vacances en famille, les retrouvailles entre amis, les retraites d'équipe et les célébrations intimistes.",
     "bedrooms": "Chambres",
@@ -119,7 +120,7 @@
     "stat": {
       "capacity": {
         "label": "Capacité",
-        "value": "20 en journée · 13 couchages"
+        "value": "13 couchages"
       },
       "surface": {
         "label": "Surface totale",
@@ -277,6 +278,13 @@
       "desc": "Maison Sofya imagine et réalise des ambiances uniques pour sublimer vos événements. Décoration florale, scénographie de table, mise en lumière et création d'atmosphère : chaque projet est pensé sur mesure pour s'harmoniser avec le cadre exceptionnel de la Villa R.E.E.L.",
       "services": "Décoration florale · Scénographie · Mise en lumière · Création d'ambiance",
       "ctaInstagram": "Voir sur Instagram"
+    },
+    "saanesu": {
+      "name": "Saanesu",
+      "tag": "Développement Web & Solutions Digitales",
+      "desc": "Saanesu accompagne les PME, artisans et acteurs locaux dans la création de sites web professionnels et d'outils métier sur mesure. Des solutions fiables, claires et orientées résultats pour gagner en visibilité, structurer vos demandes et soutenir votre activité au quotidien.",
+      "services": "Sites web professionnels · Outils métier sur mesure · Hébergement · Solutions B2B",
+      "ctaSite": "Découvrir Saanesu"
     },
     "disclaimer": "Ces services sont optionnels et indépendants du tarif de location de la villa. Ils font l'objet de devis et de facturation séparés directement auprès de chaque prestataire."
   },

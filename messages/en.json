@@ -49,6 +49,7 @@
 
   "villa": {
     "badge": "Exceptional villa",
+    "heroSubtitle": "Luxury villa with Alpine views — Haute-Savoie, France",
     "descriptionTitle": "Villa description",
     "descriptionBody": "Between mountains and lush garden, Villa R.E.E.L is a premium property offering multiple living spaces, a heated pool, a tropical garden and unobstructed Aravis mountain views. An exceptional retreat designed for family holidays, friends gatherings, team retreats and intimate celebrations.",
     "bedrooms": "Bedrooms",
@@ -119,7 +120,7 @@
     "stat": {
       "capacity": {
         "label": "Capacity",
-        "value": "20 daytime · 13 sleeps"
+        "value": "13 sleeps"
       },
       "surface": {
         "label": "Total area",
@@ -277,6 +278,13 @@
       "desc": "Maison Sofya imagines and creates unique atmospheres to elevate your events. Floral decoration, table scenography, lighting design and ambiance creation: each project is tailor-made to harmonise with the exceptional setting of Villa R.E.E.L.",
       "services": "Floral decoration · Scenography · Lighting design · Ambiance creation",
       "ctaInstagram": "View on Instagram"
+    },
+    "saanesu": {
+      "name": "Saanesu",
+      "tag": "Web Development & Digital Solutions",
+      "desc": "Saanesu supports SMEs, artisans and local businesses in creating professional websites and custom business tools. Reliable, clear and results-driven solutions to boost your visibility, streamline your operations and support your day-to-day business.",
+      "services": "Professional websites · Custom business tools · Hosting · B2B solutions",
+      "ctaSite": "Discover Saanesu"
     },
     "disclaimer": "These services are optional and independent of the villa rental price. They are subject to separate quotes and invoicing directly from each service provider."
   },

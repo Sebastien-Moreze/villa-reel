@@ -322,6 +322,55 @@ export default async function CollaborateursPage({ params }: PageProps) {
             </div>
           </article>
 
+          {/* ── Saanesu ───────────────────────────────────────────────── */}
+          <article className="mt-6 overflow-hidden rounded-3xl bg-gradient-to-br from-amber-900 to-orange-800 shadow-lg">
+            <div className="flex flex-col md:flex-row">
+              {/* Logo area */}
+              <div className="flex flex-shrink-0 items-center justify-center p-6 md:w-72 lg:w-80">
+                <div className="relative h-48 w-48 overflow-hidden rounded-2xl bg-white p-4 shadow-md md:h-56 md:w-56">
+                  <Image
+                    src="/images/collaborators/saanesu.png"
+                    alt="Saanesu – Développement Web & Solutions Digitales"
+                    fill
+                    className="object-contain p-2"
+                    sizes="224px"
+                  />
+                </div>
+              </div>
+
+              {/* Content */}
+              <div className="flex flex-1 flex-col justify-between p-7 md:p-8 lg:p-10">
+                <div>
+                  <p className="text-[10px] font-semibold uppercase tracking-[0.25em] text-amber-300">
+                    {t("collaborateurs.saanesu.tag")}
+                  </p>
+                  <h2 className="mt-1 text-xl font-semibold text-white md:text-2xl">
+                    {t("collaborateurs.saanesu.name")}
+                  </h2>
+                  <p className="mt-3 max-w-2xl text-sm leading-relaxed text-amber-100">
+                    {t("collaborateurs.saanesu.desc")}
+                  </p>
+                  <p className="mt-2 text-[11px] text-amber-300">
+                    {t("collaborateurs.saanesu.services")}
+                  </p>
+                </div>
+                <div className="mt-6">
+                  <a
+                    href="https://www.saanesu.com/"
+                    target="_blank"
+                    rel="noreferrer"
+                    className="inline-flex items-center gap-2 rounded-full bg-white/15 px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-white/25"
+                  >
+                    <svg className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 6H5.25A2.25 2.25 0 003 8.25v10.5A2.25 2.25 0 005.25 21h10.5A2.25 2.25 0 0018 18.75V10.5m-10.5 6L21 3m0 0h-5.25M21 3v5.25" />
+                    </svg>
+                    {t("collaborateurs.saanesu.ctaSite")}
+                  </a>
+                </div>
+              </div>
+            </div>
+          </article>
+
           {/* Disclaimer */}
           <p className="mt-8 text-center text-[11px] text-neutral-500">
             {t("collaborateurs.disclaimer")}
