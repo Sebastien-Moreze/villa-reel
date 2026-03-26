@@ -30,13 +30,13 @@ export const metadata: Metadata = {
   },
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="fr">
+    <html suppressHydrationWarning>
       <body
         className={`${playfair.variable} ${montserrat.variable} antialiased bg-background text-neutral-900 font-sans`}
       >

@@ -115,6 +115,7 @@ model Amenity {
   labelFr     String
   labelEn     String
   icon        String?
+  category    String?
   villas      VillaAmenity[]
 }
 

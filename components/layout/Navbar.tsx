@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { useTranslations } from "next-intl";
 import { LanguageSwitcher } from "@/components/layout/LanguageSwitcher";
 import { useReservation } from "@/components/reservation/ReservationContext";
@@ -27,13 +27,23 @@ export function Navbar({ locale }: Props) {
   const [scrolled, setScrolled] = useState(false);
   const [open, setOpen] = useState(false);
   const { openDrawer } = useReservation();
+  const rafId = useRef<number>(0);
+
+  const handleScroll = useCallback(() => {
+    cancelAnimationFrame(rafId.current);
+    rafId.current = requestAnimationFrame(() => {
+      setScrolled(window.scrollY > 80);
+    });
+  }, []);
 
   useEffect(() => {
-    const onScroll = () => { setScrolled(window.scrollY > 80); };
-    onScroll();
-    window.addEventListener("scroll", onScroll);
-    return () => window.removeEventListener("scroll", onScroll);
-  }, []);
+    handleScroll();
+    window.addEventListener("scroll", handleScroll, { passive: true });
+    return () => {
+      window.removeEventListener("scroll", handleScroll);
+      cancelAnimationFrame(rafId.current);
+    };
+  }, [handleScroll]);
 
   const buildHref = (path: string) => {
     const base = `/${locale}`;

@@ -8,7 +8,7 @@ import { apiError } from "@/lib/http-error";
 export async function POST(request: Request) {
   // ── Rate limiting : 5 tentatives par IP par minute ───────────────────────
   const ip = getClientIp(request);
-  if (!rateLimit(`deposit-intent:${ip}`, 5, 60_000)) {
+  if (!rateLimit(`deposit-intent:${ip}`, 15, 60_000)) {
     return apiError.tooManyRequests();
   }
 
@@ -106,11 +106,13 @@ export async function POST(request: Request) {
       cautionAmount: cautionCents > 0 ? Number(villa!.deposit) : 0,
     });
   } catch (error) {
+    const stripeMsg = error instanceof Error ? error.message : String(error);
     logger.error("Failed to create payment intents", {
       route: "/api/stripe/create-deposit-intent",
       reservationId,
+      stripeMessage: stripeMsg,
       error,
     });
-    return apiError.serverError("Failed to create payment intent");
+    return apiError.serverError(`Failed to create payment intent: ${stripeMsg}`);
   }
 }

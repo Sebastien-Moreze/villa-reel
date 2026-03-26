@@ -39,6 +39,8 @@ export function FeaturesSection() {
             <div
               key={feature.key}
               className="group relative flex h-64 flex-col justify-end overflow-hidden rounded-2xl shadow-md transition hover:-translate-y-1 hover:shadow-xl"
+              role="img"
+              aria-label={t(`features.${feature.key}.title`)}
             >
               <div
                 className="absolute inset-0 bg-cover bg-center transition-transform duration-500 group-hover:scale-105"

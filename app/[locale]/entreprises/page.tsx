@@ -1,9 +1,28 @@
+import type { Metadata } from "next";
 import { getTranslations } from "next-intl/server";
 import Image from "next/image";
+import { BookingCtaBanner } from "@/components/shared/BookingCtaBanner";
+
+const BASE = "https://www.villareel.com";
 
 type PageProps = {
   params: Promise<{ locale: string }>;
 };
+
+export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
+  const { locale } = await params;
+  const isEn = locale === "en";
+  const title = isEn ? "Corporate Events – Villa R.E.E.L" : "Entreprises – Villa R.E.E.L";
+  const description = isEn
+    ? "Host your seminars, team-building and corporate retreats in a luxury villa near the Alps."
+    : "Organisez vos séminaires, team-buildings et séjours d'entreprise dans une villa de luxe près des Alpes.";
+  return {
+    title,
+    description,
+    alternates: { canonical: `${BASE}/${locale}/entreprises`, languages: { fr: `${BASE}/fr/entreprises`, en: `${BASE}/en/entreprises` } },
+    openGraph: { title, description, url: `${BASE}/${locale}/entreprises`, siteName: "Villa R.E.E.L", type: "website" },
+  };
+}
 
 // Photos Unsplash libres de droit — une par formule
 const FORMULE_PHOTOS: Record<string, string> = {
@@ -169,6 +188,13 @@ export default async function EntreprisesPage({ params }: PageProps) {
           </a>
         </div>
       </section>
+
+      <BookingCtaBanner
+        locale={locale}
+        title={t("ctaBanner.title")}
+        desc={t("ctaBanner.desc")}
+        btn={t("ctaBanner.btn")}
+      />
 
     </div>
   );

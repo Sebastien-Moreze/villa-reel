@@ -19,36 +19,98 @@ async function main() {
     },
   });
 
-  // Amenities
-  const wifi = await prisma.amenity.upsert({
-    where: { key: "wifi" },
-    update: {
-      labelFr: "Wi-Fi",
-      labelEn: "Wi-Fi",
-      icon: "wifi",
-    },
-    create: {
-      key: "wifi",
-      labelFr: "Wi-Fi",
-      labelEn: "Wi-Fi",
-      icon: "wifi",
-    },
-  });
+  // ── Amenities (50+) ──────────────────────────────────────────────────
+  const amenitiesData = [
+    // Essentiels
+    { key: "wifi", labelFr: "Wi-Fi haut débit", labelEn: "High-speed Wi-Fi", icon: "wifi", category: "essentials" },
+    { key: "heating", labelFr: "Chauffage central", labelEn: "Central heating", icon: "thermometer", category: "essentials" },
+    { key: "air-conditioning", labelFr: "Climatisation", labelEn: "Air conditioning", icon: "snowflake", category: "essentials" },
+    { key: "washing-machine", labelFr: "Lave-linge", labelEn: "Washing machine", icon: "shirt", category: "essentials" },
+    { key: "dryer", labelFr: "Sèche-linge", labelEn: "Dryer", icon: "wind", category: "essentials" },
+    { key: "iron", labelFr: "Fer à repasser", labelEn: "Iron", icon: "iron", category: "essentials" },
+    { key: "hangers", labelFr: "Cintres", labelEn: "Hangers", icon: "hanger", category: "essentials" },
+    { key: "bed-linen", labelFr: "Linge de lit", labelEn: "Bed linen", icon: "bed", category: "essentials" },
+    { key: "towels", labelFr: "Serviettes de bain", labelEn: "Bath towels", icon: "bath", category: "essentials" },
+    { key: "safe", labelFr: "Coffre-fort", labelEn: "Safe", icon: "lock", category: "essentials" },
 
-  const pool = await prisma.amenity.upsert({
-    where: { key: "pool" },
-    update: {
-      labelFr: "Piscine",
-      labelEn: "Swimming pool",
-      icon: "pool",
-    },
-    create: {
-      key: "pool",
-      labelFr: "Piscine",
-      labelEn: "Swimming pool",
-      icon: "pool",
-    },
-  });
+    // Cuisine
+    { key: "full-kitchen", labelFr: "Cuisine entièrement équipée", labelEn: "Fully equipped kitchen", icon: "cooking-pot", category: "kitchen" },
+    { key: "oven", labelFr: "Four", labelEn: "Oven", icon: "flame", category: "kitchen" },
+    { key: "microwave", labelFr: "Micro-ondes", labelEn: "Microwave", icon: "microwave", category: "kitchen" },
+    { key: "dishwasher", labelFr: "Lave-vaisselle", labelEn: "Dishwasher", icon: "utensils-crossed", category: "kitchen" },
+    { key: "fridge", labelFr: "Réfrigérateur", labelEn: "Refrigerator", icon: "refrigerator", category: "kitchen" },
+    { key: "freezer", labelFr: "Congélateur", labelEn: "Freezer", icon: "thermometer-snowflake", category: "kitchen" },
+    { key: "coffee-machine", labelFr: "Machine à café (Nespresso)", labelEn: "Coffee machine (Nespresso)", icon: "coffee", category: "kitchen" },
+    { key: "kettle", labelFr: "Bouilloire", labelEn: "Kettle", icon: "cup-soda", category: "kitchen" },
+    { key: "toaster", labelFr: "Grille-pain", labelEn: "Toaster", icon: "sandwich", category: "kitchen" },
+    { key: "wine-glasses", labelFr: "Verres à vin", labelEn: "Wine glasses", icon: "wine", category: "kitchen" },
+    { key: "cookware", labelFr: "Ustensiles de cuisine", labelEn: "Cookware & utensils", icon: "utensils", category: "kitchen" },
+    { key: "dining-table", labelFr: "Table à manger (12 pers.)", labelEn: "Dining table (12 guests)", icon: "armchair", category: "kitchen" },
+
+    // Extérieur & Piscine
+    { key: "heated-pool", labelFr: "Piscine chauffée", labelEn: "Heated swimming pool", icon: "waves", category: "outdoor" },
+    { key: "tropical-garden", labelFr: "Jardin tropical", labelEn: "Tropical garden", icon: "palm-tree", category: "outdoor" },
+    { key: "mountain-view", labelFr: "Vue sur les Aravis", labelEn: "Aravis mountain view", icon: "mountain", category: "outdoor" },
+    { key: "terrace", labelFr: "Grande terrasse", labelEn: "Large terrace", icon: "sun", category: "outdoor" },
+    { key: "outdoor-dining", labelFr: "Espace repas extérieur", labelEn: "Outdoor dining area", icon: "picnic-table", category: "outdoor" },
+    { key: "bbq", labelFr: "Barbecue / Plancha", labelEn: "BBQ / Plancha", icon: "flame-kindling", category: "outdoor" },
+    { key: "sun-loungers", labelFr: "Transats & bains de soleil", labelEn: "Sun loungers", icon: "rocking-chair", category: "outdoor" },
+    { key: "outdoor-lighting", labelFr: "Éclairage d'ambiance extérieur", labelEn: "Outdoor ambient lighting", icon: "lamp", category: "outdoor" },
+    { key: "garden-furniture", labelFr: "Mobilier de jardin", labelEn: "Garden furniture", icon: "sofa", category: "outdoor" },
+    { key: "parasol", labelFr: "Parasol", labelEn: "Parasol / Umbrella", icon: "umbrella", category: "outdoor" },
+
+    // Chambres & Confort
+    { key: "king-beds", labelFr: "Lits king-size", labelEn: "King-size beds", icon: "bed-double", category: "bedroom" },
+    { key: "blackout-curtains", labelFr: "Rideaux occultants", labelEn: "Blackout curtains", icon: "blinds", category: "bedroom" },
+    { key: "extra-pillows", labelFr: "Oreillers et couettes supplémentaires", labelEn: "Extra pillows & duvets", icon: "pillow", category: "bedroom" },
+    { key: "baby-cot", labelFr: "Lit bébé (sur demande)", labelEn: "Baby cot (on request)", icon: "baby", category: "bedroom" },
+    { key: "high-chair", labelFr: "Chaise haute bébé", labelEn: "Baby high chair", icon: "baby", category: "bedroom" },
+    { key: "dressing-room", labelFr: "Dressing / Penderie", labelEn: "Walk-in wardrobe", icon: "wardrobe", category: "bedroom" },
+
+    // Salle de bain
+    { key: "rain-shower", labelFr: "Douche à l'italienne", labelEn: "Walk-in rain shower", icon: "shower-head", category: "bathroom" },
+    { key: "bathtub", labelFr: "Baignoire", labelEn: "Bathtub", icon: "bath", category: "bathroom" },
+    { key: "hair-dryer", labelFr: "Sèche-cheveux", labelEn: "Hair dryer", icon: "wind", category: "bathroom" },
+    { key: "toiletries", labelFr: "Produits d'accueil", labelEn: "Welcome toiletries", icon: "pump-soap", category: "bathroom" },
+
+    // Divertissement
+    { key: "smart-tv", labelFr: "Smart TV (Netflix, Disney+)", labelEn: "Smart TV (Netflix, Disney+)", icon: "tv", category: "entertainment" },
+    { key: "billiard", labelFr: "Table de billard", labelEn: "Billiard table", icon: "circle-dot", category: "entertainment" },
+    { key: "bluetooth-speaker", labelFr: "Enceinte Bluetooth", labelEn: "Bluetooth speaker", icon: "speaker", category: "entertainment" },
+    { key: "board-games", labelFr: "Jeux de société", labelEn: "Board games", icon: "dice-5", category: "entertainment" },
+    { key: "books", labelFr: "Bibliothèque", labelEn: "Book library", icon: "book-open", category: "entertainment" },
+    { key: "outdoor-games", labelFr: "Jeux d'extérieur (pétanque, badminton)", labelEn: "Outdoor games (petanque, badminton)", icon: "target", category: "entertainment" },
+
+    // Sécurité
+    { key: "smoke-detector", labelFr: "Détecteur de fumée", labelEn: "Smoke detector", icon: "siren", category: "safety" },
+    { key: "fire-extinguisher", labelFr: "Extincteur", labelEn: "Fire extinguisher", icon: "flame", category: "safety" },
+    { key: "first-aid-kit", labelFr: "Trousse de premiers secours", labelEn: "First aid kit", icon: "heart-pulse", category: "safety" },
+    { key: "security-camera", labelFr: "Caméra extérieure", labelEn: "Outdoor security camera", icon: "cctv", category: "safety" },
+    { key: "gated-property", labelFr: "Propriété clôturée et portail", labelEn: "Gated & fenced property", icon: "fence", category: "safety" },
+
+    // Parking & Accès
+    { key: "free-parking", labelFr: "Parking privé gratuit", labelEn: "Free private parking", icon: "car", category: "parking" },
+    { key: "ev-charger", labelFr: "Borne de recharge véhicule électrique", labelEn: "EV charging station", icon: "plug-zap", category: "parking" },
+    { key: "step-free-access", labelFr: "Accès de plain-pied", labelEn: "Step-free access", icon: "accessibility", category: "parking" },
+
+    // Services & Extras
+    { key: "welcome-basket", labelFr: "Panier de bienvenue", labelEn: "Welcome basket", icon: "gift", category: "services" },
+    { key: "concierge", labelFr: "Service conciergerie", labelEn: "Concierge service", icon: "concierge-bell", category: "services" },
+    { key: "private-chef", labelFr: "Chef privé (sur demande)", labelEn: "Private chef (on request)", icon: "chef-hat", category: "services" },
+    { key: "wine-tasting", labelFr: "Dégustation de vins (ViniLux)", labelEn: "Wine tasting (ViniLux)", icon: "grape", category: "services" },
+    { key: "event-coordinator", labelFr: "Coordination événementielle", labelEn: "Event coordination", icon: "calendar-heart", category: "services" },
+    { key: "cleaning-service", labelFr: "Ménage inclus", labelEn: "Cleaning included", icon: "sparkles", category: "services" },
+  ];
+
+  const amenityRecords = [];
+  for (const a of amenitiesData) {
+    const record = await prisma.amenity.upsert({
+      where: { key: a.key },
+      update: { labelFr: a.labelFr, labelEn: a.labelEn, icon: a.icon, category: a.category },
+      create: a,
+    });
+    amenityRecords.push(record);
+  }
 
   // Villa
   const villa = await prisma.villa.upsert({
@@ -65,10 +127,10 @@ async function main() {
       zipCode: "74930",
       latitude: 46.1167,
       longitude: 6.2167,
-      maxGuests: 8,
-      bedrooms: 4,
+      maxGuests: 13,
+      bedrooms: 6,
       bathrooms: 3,
-      surface: 180,
+      surface: 250,
       pricePerNight: 350,
       cleaningFee: 0,
       deposit: 500,
@@ -92,10 +154,10 @@ async function main() {
       zipCode: "74930",
       latitude: 46.1167,
       longitude: 6.2167,
-      maxGuests: 8,
-      bedrooms: 4,
+      maxGuests: 13,
+      bedrooms: 6,
       bathrooms: 3,
-      surface: 180,
+      surface: 250,
       pricePerNight: 350,
       cleaningFee: 0,
       deposit: 500,
@@ -116,10 +178,9 @@ async function main() {
         ],
       },
       amenities: {
-        create: [
-          { amenity: { connect: { id: wifi.id } } },
-          { amenity: { connect: { id: pool.id } } },
-        ],
+        create: amenityRecords.map((a) => ({
+          amenity: { connect: { id: a.id } },
+        })),
       },
       seasonalPrices: {
         create: [
@@ -134,6 +195,15 @@ async function main() {
       },
     },
   });
+
+  // Sync all amenities to villa (handles both create and update cases)
+  for (const a of amenityRecords) {
+    await prisma.villaAmenity.upsert({
+      where: { villaId_amenityId: { villaId: villa.id, amenityId: a.id } },
+      update: {},
+      create: { villaId: villa.id, amenityId: a.id },
+    });
+  }
 
   // Promo code
   const promo = await prisma.promoCode.upsert({

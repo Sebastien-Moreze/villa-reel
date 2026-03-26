@@ -33,10 +33,6 @@ export function Footer() {
                 className="inline-flex h-9 w-9 items-center justify-center rounded-full border border-neutral-600 text-xs font-medium text-neutral-200 transition hover:border-primary hover:text-secondary">
                 IG
               </a>
-              <a href="https://facebook.com" target="_blank" rel="noreferrer"
-                className="inline-flex h-9 w-9 items-center justify-center rounded-full border border-neutral-600 text-xs font-medium text-neutral-200 transition hover:border-primary hover:text-secondary">
-                FB
-              </a>
             </div>
           </div>
 

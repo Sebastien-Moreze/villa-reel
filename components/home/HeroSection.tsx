@@ -2,7 +2,7 @@
 
 import React from "react";
 import Link from "next/link";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState, useCallback } from "react";
 import { useTranslations } from "next-intl";
 import { useReservation } from "@/components/reservation/ReservationContext";
 import { AnimatedTitle } from "@/components/home/AnimatedTitle";
@@ -23,16 +23,30 @@ function fadeUp(ready: boolean, delay: number): React.CSSProperties {
 
 export function HeroSection({ locale }: HeroSectionProps) {
   const t = useTranslations();
-  const [offset, setOffset] = useState(0);
   const [ready, setReady] = useState(false);
   const { openDrawer, openAvailability } = useReservation();
+  const parallaxRef = useRef<HTMLDivElement>(null);
+  const rafId = useRef<number>(0);
+
+  /* Parallax optimisé : écrit directement dans le DOM via ref + rAF (pas de re-render) */
+  const handleScroll = useCallback(() => {
+    cancelAnimationFrame(rafId.current);
+    rafId.current = requestAnimationFrame(() => {
+      if (parallaxRef.current) {
+        const y = window.scrollY * 0.075;
+        parallaxRef.current.style.transform = `translate3d(0,${y}px,0)`;
+      }
+    });
+  }, []);
 
   useEffect(() => {
-    const onScroll = () => { setOffset(window.scrollY * 0.15); };
-    onScroll();
-    window.addEventListener("scroll", onScroll);
-    return () => window.removeEventListener("scroll", onScroll);
-  }, []);
+    handleScroll();
+    window.addEventListener("scroll", handleScroll, { passive: true });
+    return () => {
+      window.removeEventListener("scroll", handleScroll);
+      cancelAnimationFrame(rafId.current);
+    };
+  }, [handleScroll]);
 
   /* Déclenche l'animation après le premier rendu */
   useEffect(() => {
@@ -45,12 +59,11 @@ export function HeroSection({ locale }: HeroSectionProps) {
   return (
     <section className="relative min-h-[80vh] overflow-hidden">
       <div
-        className="absolute inset-0 bg-cover bg-center"
-        style={{
-          backgroundImage: "url('/images/hero/hero-banner.jpg')",
-          transform: `translateY(${offset * 0.5}px)`,
-          transition: "transform 0.1s linear",
-        }}
+        ref={parallaxRef}
+        className="absolute inset-0 bg-cover bg-center will-change-transform"
+        style={{ backgroundImage: "url('/images/hero/hero-banner.jpg')" }}
+        role="img"
+        aria-label={t("hero.heroImageAlt")}
       />
       <div className="absolute inset-0 bg-gradient-to-b from-primary/80 via-primary/70 to-secondary/80" />
 

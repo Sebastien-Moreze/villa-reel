@@ -3,6 +3,7 @@ import { requireAuth, isAdmin, getCurrentUser } from "@/lib/auth";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import bcrypt from "bcrypt";
+import { PasswordInput } from "@/components/admin/PasswordInput";
 
 export default async function AdminSettingsPage() {
   await requireAuth();
@@ -82,18 +83,16 @@ export default async function AdminSettingsPage() {
         >
           <div className="flex flex-col gap-1">
             <label className="text-[10px] text-neutral-400">Mot de passe actuel *</label>
-            <input
+            <PasswordInput
               name="currentPassword"
-              type="password"
               required
               className="rounded-xl border border-neutral-700 bg-[#050505] px-3 py-2 text-[11px] text-neutral-100 outline-none focus:border-primary"
             />
           </div>
           <div className="flex flex-col gap-1">
             <label className="text-[10px] text-neutral-400">Nouveau mot de passe *</label>
-            <input
+            <PasswordInput
               name="newPassword"
-              type="password"
               required
               minLength={8}
               className="rounded-xl border border-neutral-700 bg-[#050505] px-3 py-2 text-[11px] text-neutral-100 outline-none focus:border-primary"
@@ -101,9 +100,8 @@ export default async function AdminSettingsPage() {
           </div>
           <div className="flex flex-col gap-1">
             <label className="text-[10px] text-neutral-400">Confirmer le nouveau mot de passe *</label>
-            <input
+            <PasswordInput
               name="confirmPassword"
-              type="password"
               required
               className="rounded-xl border border-neutral-700 bg-[#050505] px-3 py-2 text-[11px] text-neutral-100 outline-none focus:border-primary"
             />

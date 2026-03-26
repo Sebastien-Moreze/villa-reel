@@ -5,7 +5,7 @@
     "gallery": "Gallery",
     "business": "Business",
     "events": "Events",
-    "partners": "Partenaires",
+    "partners": "Partners",
     "contact": "Contact",
     "book": "Book now"
   },
@@ -14,7 +14,7 @@
     "eyebrow": "VILLA R.E.E.L",
     "title": "VILLA R.E.E.L",
     "subtitle": "Between Alps and Tropics",
-    "description": "An exceptional villa between mountains and tropical garden, designed for your stays, corporate events and creative collaborations.",
+    "description": "A premium villa between mountains and tropical garden. The perfect setting for family holidays, weekends with friends or exceptional events.",
     "ctaPrimary": "Book now",
     "ctaSecondary": "Check availability",
     "ctaTertiary": "Discover the villa",
@@ -22,7 +22,8 @@
     "checkOut": "Check-out",
     "guests": "Guests",
     "guestsPlaceholder": "2 adults",
-    "checkAvailability": "Check availability"
+    "checkAvailability": "Check availability",
+    "heroImageAlt": "Exterior view of Villa R.E.E.L with pool and tropical garden"
   },
 
   "features": {
@@ -30,26 +31,26 @@
     "title": "Between alpine elegance and tropical atmosphere",
     "pool": {
       "title": "Heated pool",
-      "desc": "A turquoise pool to relax from the very first morning."
+      "desc": "A heated turquoise pool for relaxing family or friends moments, from the very first morning."
     },
     "view": {
-      "title": "Mont-Blanc view",
-      "desc": "Unique panorama of the alpine range from the terrace."
+      "title": "Aravis mountain view",
+      "desc": "Unique panorama of the Aravis mountain range from the terrace."
     },
     "garden": {
       "title": "Tropical garden",
-      "desc": "Palm trees, banana trees and ambient lighting for your evenings."
+      "desc": "Palm trees, banana trees and ambient lighting for unforgettable outdoor evenings."
     },
     "billiard": {
       "title": "Billiard room",
-      "desc": "A convivial space for your evenings with friends or colleagues."
+      "desc": "A convivial space for your evenings with family, friends or colleagues."
     }
   },
 
   "villa": {
     "badge": "Exceptional villa",
     "descriptionTitle": "Villa description",
-    "descriptionBody": "Between mountains and lush garden, Villa R.E.E.L offers multiple living spaces, a heated pool, a tropical garden and unobstructed views of the alpine range. A place designed for families, team retreats and intimate events.",
+    "descriptionBody": "Between mountains and lush garden, Villa R.E.E.L is a premium property offering multiple living spaces, a heated pool, a tropical garden and unobstructed Aravis mountain views. An exceptional retreat designed for family holidays, friends gatherings, team retreats and intimate celebrations.",
     "bedrooms": "Bedrooms",
     "bathrooms": "Bathrooms",
     "maxGuests": "Max guests",
@@ -57,14 +58,14 @@
     "amenitiesTitle": "Amenities & atmosphere",
     "amenity": {
       "pool": "Heated pool",
-      "view": "Mont-Blanc view",
+      "view": "Aravis mountain view",
       "garden": "Tropical garden",
       "billiard": "Billiard & lounge area"
     },
     "availabilityTitle": "Availability",
     "availabilityDesc": "See at a glance the available periods to plan your stay.",
     "locationTitle": "Location",
-    "locationDesc": "The precise location is shared after booking confirmation. The map below shows the surrounding area.",
+    "locationDesc": "1281 route de Moussy, 74930 Reigner-Esery, France. The map below shows the villa's location.",
     "notFound": "Villa not found.",
     "perNight": "/ night",
     "bookingCheckIn": "Check-in",
@@ -118,7 +119,7 @@
     "stat": {
       "capacity": {
         "label": "Capacity",
-        "value": "Up to 20 people"
+        "value": "20 daytime · 13 sleeps"
       },
       "surface": {
         "label": "Total area",
@@ -126,7 +127,7 @@
       },
       "rooms": {
         "label": "Bedrooms",
-        "value": "4 double rooms"
+        "value": "6 bedrooms"
       },
       "pool": {
         "label": "Pool",
@@ -170,7 +171,7 @@
   "evenements": {
     "eyebrow": "Villa R.E.E.L",
     "title": "Events & celebrations",
-    "subtitle": "Engagements, intimate weddings, birthdays, bachelor/bachelorette parties... Villa R.E.E.L becomes the backdrop for your most precious moments.",
+    "subtitle": "Engagements, intimate weddings, birthdays, bachelor/bachelorette parties... Villa R.E.E.L, a premium setting between Alps and tropical garden, becomes the backdrop for your most precious moments with family and friends.",
     "event1": {
       "title": "Engagements",
       "desc": "An intimate setting to celebrate your engagement surrounded by loved ones, between a warm living room and a green terrace."
@@ -235,7 +236,7 @@
   "collaborateurs": {
     "eyebrow": "Villa R.E.E.L",
     "title": "Our Partners",
-    "subtitle": "Exceptional partners to elevate your stay: Michelin-star trained gastronomy, prestigious oenology, bespoke experiences.",
+    "subtitle": "Exceptional partners to elevate your stay and events: Michelin-star trained gastronomy, prestigious oenology, event planning and bespoke decoration.",
     "vinilux": {
       "name": "ViniLux",
       "tag": "Wine Merchant & Oenological Partner",
@@ -260,12 +261,30 @@
       "ctaLinkedIn": "LinkedIn Profile",
       "ctaRestaurant": "Restaurant FIVE"
     },
+    "elegance": {
+      "name": "Elegance Events Organisation",
+      "tag": "Event Planning & Wedding Planner",
+      "role": "Event Coordinator",
+      "desc": "Specialising in premium event planning, Elegance Events turns every celebration into an exceptional moment. Intimate weddings, engagements, birthdays or private parties: Hatice and her team orchestrate every detail with elegance and precision to make your event at Villa R.E.E.L an unforgettable memory.",
+      "services": "Weddings · Engagements · Birthdays · Private parties · Day-of coordination",
+      "contact": "Hatice OGUZ",
+      "ctaInstagram": "View on Instagram",
+      "ctaContact": "Contact"
+    },
+    "sofya": {
+      "name": "Maison Sofya",
+      "tag": "Decoration & Event Scenography",
+      "desc": "Maison Sofya imagines and creates unique atmospheres to elevate your events. Floral decoration, table scenography, lighting design and ambiance creation: each project is tailor-made to harmonise with the exceptional setting of Villa R.E.E.L.",
+      "services": "Floral decoration · Scenography · Lighting design · Ambiance creation",
+      "ctaInstagram": "View on Instagram"
+    },
     "disclaimer": "These services are optional and independent of the villa rental price. They are subject to separate quotes and invoicing directly from each service provider."
   },
 
   "reviews": {
     "eyebrow": "Guest reviews",
     "subtitle": "Memorable stays between Alps and Tropics.",
+    "starsOutOf5": "stars out of 5",
     "leaveReview": "Leave a review",
     "defaultComment": "A remarkable stay at Villa R.E.E.L, between comfort and preserved nature.",
     "guest": "Guest",
@@ -305,6 +324,12 @@
     "terms": "Terms & Conditions",
     "privacy": "Privacy Policy",
     "houseRules": "House Rules"
+  },
+
+  "ctaBanner": {
+    "title": "Ready to stay at Villa R.E.E.L?",
+    "desc": "Check availability and book your premium stay between Alps and tropical garden.",
+    "btn": "Book now"
   },
 
   "forms": {

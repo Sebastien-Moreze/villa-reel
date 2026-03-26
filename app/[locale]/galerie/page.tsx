@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { locales } from "@/i18n";
 import { GalerieGrid } from "@/components/galerie/GalerieGrid";
 import { getTranslations } from "next-intl/server";
+import { BookingCtaBanner } from "@/components/shared/BookingCtaBanner";
 
 type PageProps = {
   params: Promise<{ locale: string }>;
@@ -45,6 +46,14 @@ export default async function GaleriePage({ params }: PageProps) {
           <GalerieGrid />
         </div>
       </section>
+
+      <BookingCtaBanner
+        locale={locale}
+        title={t("ctaBanner.title")}
+        desc={t("ctaBanner.desc")}
+        btn={t("ctaBanner.btn")}
+      />
+
     </div>
   );
 }

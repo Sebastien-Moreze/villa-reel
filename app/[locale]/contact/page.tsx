@@ -1,9 +1,27 @@
+import type { Metadata } from "next";
 import { ContactForm } from "@/components/contact/ContactForm";
 import { getTranslations } from "next-intl/server";
+
+const BASE = "https://www.villareel.com";
 
 type PageProps = {
   params: Promise<{ locale: string }>;
 };
+
+export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
+  const { locale } = await params;
+  const isEn = locale === "en";
+  const title = isEn ? "Contact Us – Villa R.E.E.L" : "Contact – Villa R.E.E.L";
+  const description = isEn
+    ? "Get in touch with Villa R.E.E.L for bookings, events or any enquiry. We respond within 24 hours."
+    : "Contactez Villa R.E.E.L pour réservations, événements ou toute demande. Nous répondons sous 24 heures.";
+  return {
+    title,
+    description,
+    alternates: { canonical: `${BASE}/${locale}/contact`, languages: { fr: `${BASE}/fr/contact`, en: `${BASE}/en/contact` } },
+    openGraph: { title, description, url: `${BASE}/${locale}/contact`, siteName: "Villa R.E.E.L", type: "website" },
+  };
+}
 
 export default async function ContactPage({ params }: PageProps) {
   const { locale } = await params;

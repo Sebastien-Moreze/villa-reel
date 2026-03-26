@@ -34,7 +34,7 @@ export function ReviewsBanner({ reviews }: Props) {
             </p>
             <div className="mt-2 flex items-baseline gap-2">
               <span className="font-display text-3xl font-semibold">{score.toFixed(1)}</span>
-              <span className="text-lg">{"★".repeat(filledStars)}{"☆".repeat(5 - filledStars)}</span>
+              <span className="text-lg" role="img" aria-label={`${score.toFixed(1)} ${t("reviews.starsOutOf5")}`}>{"★".repeat(filledStars)}{"☆".repeat(5 - filledStars)}</span>
             </div>
             <p className="mt-1 text-xs text-white/90">
               {t("reviews.subtitle")}
@@ -53,7 +53,7 @@ export function ReviewsBanner({ reviews }: Props) {
                   <div className="font-semibold">
                     {review.guestName || t("reviews.guest")}
                   </div>
-                  <div className="text-[11px] text-white/90">
+                  <div className="text-[11px] text-white/90" role="img" aria-label={`${review.rating.toFixed(1)} / 5`}>
                     {review.rating.toFixed(1)} ★
                   </div>
                 </div>

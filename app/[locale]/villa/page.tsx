@@ -1,6 +1,25 @@
+import type { Metadata } from "next";
 import { prisma } from "@/lib/prisma";
 import { locales } from "@/i18n";
 import { getTranslations } from "next-intl/server";
+
+const BASE = "https://www.villareel.com";
+
+export async function generateMetadata({ params }: { params: Promise<{ locale: string }> }): Promise<Metadata> {
+  const { locale } = await params;
+  const isEn = locale === "en";
+  const title = isEn ? "The Villa – Villa R.E.E.L" : "La Villa – Villa R.E.E.L";
+  const description = isEn
+    ? "Discover our luxury villa: 6 bedrooms, heated pool, tropical garden, mountain views and 50+ premium amenities."
+    : "Découvrez notre villa de luxe : 6 chambres, piscine chauffée, jardin tropical, vue montagne et 50+ équipements haut de gamme.";
+  return {
+    title,
+    description,
+    alternates: { canonical: `${BASE}/${locale}/villa`, languages: { fr: `${BASE}/fr/villa`, en: `${BASE}/en/villa` } },
+    openGraph: { title, description, url: `${BASE}/${locale}/villa`, siteName: "Villa R.E.E.L", type: "website", images: [{ url: `${BASE}/images/hero/hero-banner.jpg`, width: 1200, height: 630 }] },
+    twitter: { card: "summary_large_image", title, description, images: [`${BASE}/images/hero/hero-banner.jpg`] },
+  };
+}
 import { AvailabilityCalendar } from "@/components/villa/AvailabilityCalendar";
 import { ReviewsBanner } from "@/components/home/ReviewsBanner";
 import {
@@ -8,10 +27,41 @@ import {
   Bath,
   Users,
   Ruler,
+  Wifi,
+  Thermometer,
+  Snowflake,
+  Shirt,
+  Wind,
+  Lock,
+  Flame,
+  Coffee,
+  Utensils,
+  UtensilsCrossed,
   Waves,
   Mountain,
-  Trees,
-  CpuIcon,
+  Sun,
+  Sofa,
+  Umbrella,
+  Baby,
+  ShowerHead,
+  Tv,
+  Speaker,
+  Dice5,
+  BookOpen,
+  Target,
+  Siren,
+  HeartPulse,
+  Car,
+  PlugZap,
+  Accessibility,
+  Gift,
+  ConciergeBell,
+  ChefHat,
+  Grape,
+  CalendarHeart,
+  Sparkles,
+  CircleDot,
+  type LucideIcon,
 } from "lucide-react";
 
 export const dynamic = "force-dynamic";
@@ -128,7 +178,7 @@ export default async function VillaPage({ params }: PageProps) {
             </div>
           </section>
 
-          {/* Amenities */}
+          {/* Amenities — dynamic from DB */}
           <section aria-labelledby="amenities-title">
             <h2
               id="amenities-title"
@@ -136,12 +186,67 @@ export default async function VillaPage({ params }: PageProps) {
             >
               {t("villa.amenitiesTitle")}
             </h2>
-            <div className="mt-4 grid gap-3 text-xs text-neutral-700 sm:grid-cols-2">
-              <AmenityItem icon={<Waves className="h-4 w-4" />} label={t("villa.amenity.pool")} />
-              <AmenityItem icon={<Mountain className="h-4 w-4" />} label={t("villa.amenity.view")} />
-              <AmenityItem icon={<Trees className="h-4 w-4" />} label={t("villa.amenity.garden")} />
-              <AmenityItem icon={<CpuIcon className="h-4 w-4" />} label={t("villa.amenity.billiard")} />
-            </div>
+            {(() => {
+              const categoryLabels: Record<string, { fr: string; en: string }> = {
+                essentials: { fr: "Essentiels", en: "Essentials" },
+                kitchen: { fr: "Cuisine", en: "Kitchen" },
+                outdoor: { fr: "Extérieur & Piscine", en: "Outdoor & Pool" },
+                bedroom: { fr: "Chambres & Confort", en: "Bedrooms & Comfort" },
+                bathroom: { fr: "Salle de bain", en: "Bathroom" },
+                entertainment: { fr: "Divertissement", en: "Entertainment" },
+                safety: { fr: "Sécurité", en: "Safety" },
+                parking: { fr: "Parking & Accès", en: "Parking & Access" },
+                services: { fr: "Services & Extras", en: "Services & Extras" },
+              };
+
+              const grouped = villa.amenities.reduce<
+                Record<string, typeof villa.amenities>
+              >((acc, va) => {
+                const cat = va.amenity.category ?? "other";
+                if (!acc[cat]) acc[cat] = [];
+                acc[cat].push(va);
+                return acc;
+              }, {});
+
+              const categoryOrder = [
+                "essentials", "kitchen", "outdoor", "bedroom",
+                "bathroom", "entertainment", "safety", "parking", "services",
+              ];
+
+              return (
+                <div className="mt-4 space-y-6">
+                  {categoryOrder
+                    .filter((cat) => grouped[cat]?.length)
+                    .map((cat) => (
+                      <div key={cat}>
+                        <h3 className="mb-2 text-xs font-semibold uppercase tracking-wide text-neutral-500">
+                          {locale === "en"
+                            ? categoryLabels[cat]?.en ?? cat
+                            : categoryLabels[cat]?.fr ?? cat}
+                        </h3>
+                        <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
+                          {grouped[cat].map((va) => (
+                            <AmenityItem
+                              key={va.amenity.key}
+                              icon={
+                                <AmenityIcon
+                                  name={va.amenity.icon ?? "circle"}
+                                  className="h-4 w-4"
+                                />
+                              }
+                              label={
+                                locale === "en"
+                                  ? va.amenity.labelEn
+                                  : va.amenity.labelFr
+                              }
+                            />
+                          ))}
+                        </div>
+                      </div>
+                    ))}
+                </div>
+              );
+            })()}
           </section>
 
           {/* Calendar & availability */}
@@ -227,6 +332,72 @@ export default async function VillaPage({ params }: PageProps) {
       </div>
     </div>
   );
+}
+
+const iconMap: Record<string, LucideIcon> = {
+  wifi: Wifi,
+  thermometer: Thermometer,
+  snowflake: Snowflake,
+  shirt: Shirt,
+  wind: Wind,
+  lock: Lock,
+  flame: Flame,
+  coffee: Coffee,
+  utensils: Utensils,
+  "utensils-crossed": UtensilsCrossed,
+  waves: Waves,
+  mountain: Mountain,
+  sun: Sun,
+  sofa: Sofa,
+  umbrella: Umbrella,
+  baby: Baby,
+  "shower-head": ShowerHead,
+  bath: Bath,
+  tv: Tv,
+  speaker: Speaker,
+  "dice-5": Dice5,
+  "book-open": BookOpen,
+  target: Target,
+  siren: Siren,
+  "heart-pulse": HeartPulse,
+  car: Car,
+  "plug-zap": PlugZap,
+  accessibility: Accessibility,
+  gift: Gift,
+  "concierge-bell": ConciergeBell,
+  "chef-hat": ChefHat,
+  grape: Grape,
+  "calendar-heart": CalendarHeart,
+  sparkles: Sparkles,
+  "circle-dot": CircleDot,
+  "bed-double": BedDouble,
+  "palm-tree": Sun,
+  "cooking-pot": Flame,
+  microwave: Flame,
+  refrigerator: Snowflake,
+  "thermometer-snowflake": Snowflake,
+  "cup-soda": Coffee,
+  sandwich: Flame,
+  wine: Grape,
+  armchair: Sofa,
+  "picnic-table": Sofa,
+  "flame-kindling": Flame,
+  "rocking-chair": Sofa,
+  lamp: Sun,
+  blinds: Wind,
+  pillow: BedDouble,
+  wardrobe: Lock,
+  "pump-soap": Sparkles,
+  hanger: Shirt,
+  bed: BedDouble,
+  iron: Flame,
+  cctv: Siren,
+  fence: Lock,
+};
+
+function AmenityIcon({ name, className }: { name: string; className?: string }) {
+  const Icon = iconMap[name] ?? CircleDot;
+  return <Icon className={className} />;
 }
 
 type AmenityItemProps = {

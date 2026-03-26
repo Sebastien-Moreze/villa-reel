@@ -40,7 +40,7 @@ export async function POST(request: Request) {
   // ── Rate limiting : 3 créations par IP par 10 minutes (désactivé en dev) ──
   if (process.env.NODE_ENV !== "development") {
     const ip = getClientIp(request);
-    if (!rateLimit(`reservations-create:${ip}`, 3, 10 * 60_000)) {
+    if (!rateLimit(`reservations-create:${ip}`, 10, 10 * 60_000)) {
       return apiError.tooManyRequests();
     }
   }

@@ -20,9 +20,18 @@
 # production
 /build
 
+# deployment archives
+*.tar.gz
+
 # misc
 .DS_Store
 *.pem
+Thumbs.db
+
+# IDE
+.idea/
+*.swp
+*.swo
 
 # debug
 npm-debug.log*

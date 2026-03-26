@@ -1,9 +1,28 @@
+import type { Metadata } from "next";
 import { getTranslations } from "next-intl/server";
 import Image from "next/image";
+import { BookingCtaBanner } from "@/components/shared/BookingCtaBanner";
+
+const BASE = "https://www.villareel.com";
 
 type PageProps = {
   params: Promise<{ locale: string }>;
 };
+
+export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
+  const { locale } = await params;
+  const isEn = locale === "en";
+  const title = isEn ? "Private Events – Villa R.E.E.L" : "Événements – Villa R.E.E.L";
+  const description = isEn
+    ? "Celebrate weddings, birthdays and private events in a luxury villa with pool and tropical garden near the Alps."
+    : "Célébrez mariages, anniversaires et événements privés dans une villa de luxe avec piscine et jardin tropical près des Alpes.";
+  return {
+    title,
+    description,
+    alternates: { canonical: `${BASE}/${locale}/evenements`, languages: { fr: `${BASE}/fr/evenements`, en: `${BASE}/en/evenements` } },
+    openGraph: { title, description, url: `${BASE}/${locale}/evenements`, siteName: "Villa R.E.E.L", type: "website" },
+  };
+}
 
 /**
  * Photos Pexels — IDs numériques vérifiés directement depuis les URLs pexels.com
@@ -147,6 +166,13 @@ export default async function EvenementsPage({ params }: PageProps) {
           </a>
         </div>
       </section>
+
+      <BookingCtaBanner
+        locale={locale}
+        title={t("ctaBanner.title")}
+        desc={t("ctaBanner.desc")}
+        btn={t("ctaBanner.btn")}
+      />
 
     </div>
   );

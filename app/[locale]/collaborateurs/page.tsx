@@ -1,9 +1,28 @@
+import type { Metadata } from "next";
 import { getTranslations } from "next-intl/server";
 import Image from "next/image";
+import { BookingCtaBanner } from "@/components/shared/BookingCtaBanner";
+
+const BASE = "https://www.villareel.com";
 
 type PageProps = {
   params: Promise<{ locale: string }>;
 };
+
+export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
+  const { locale } = await params;
+  const isEn = locale === "en";
+  const title = isEn ? "Our Partners – Villa R.E.E.L" : "Nos Partenaires – Villa R.E.E.L";
+  const description = isEn
+    ? "Discover our trusted partners: event planning with Elegance Events and premium decoration with Maison Sofya."
+    : "Découvrez nos partenaires de confiance : organisation événementielle avec Elegance Events et décoration premium avec Maison Sofya.";
+  return {
+    title,
+    description,
+    alternates: { canonical: `${BASE}/${locale}/collaborateurs`, languages: { fr: `${BASE}/fr/collaborateurs`, en: `${BASE}/en/collaborateurs` } },
+    openGraph: { title, description, url: `${BASE}/${locale}/collaborateurs`, siteName: "Villa R.E.E.L", type: "website" },
+  };
+}
 
 export default async function CollaborateursPage({ params }: PageProps) {
   const { locale } = await params;
@@ -193,12 +212,130 @@ export default async function CollaborateursPage({ params }: PageProps) {
             </div>
           </article>
 
+          {/* ── Elegance Events Organisation ────────────────────────────── */}
+          <article className="mt-6 overflow-hidden rounded-3xl bg-gradient-to-br from-rose-900 to-pink-800 shadow-lg">
+            <div className="flex flex-col md:flex-row">
+              {/* Logo area */}
+              <div className="flex flex-shrink-0 items-center justify-center bg-black/40 md:w-72 lg:w-80">
+                <div className="relative h-48 w-48 md:h-56 md:w-56">
+                  <Image
+                    src="/images/collaborators/elegance-events.jpg"
+                    alt="Elegance Events Organisation"
+                    fill
+                    className="object-contain"
+                    sizes="224px"
+                  />
+                </div>
+              </div>
+
+              {/* Content */}
+              <div className="flex flex-1 flex-col justify-between p-7 md:p-8 lg:p-10">
+                <div>
+                  <p className="text-[10px] font-semibold uppercase tracking-[0.25em] text-rose-300">
+                    {t("collaborateurs.elegance.tag")}
+                  </p>
+                  <h2 className="mt-1 text-xl font-semibold text-white md:text-2xl">
+                    {t("collaborateurs.elegance.name")}
+                  </h2>
+                  <p className="mt-0.5 text-sm text-rose-200">
+                    {t("collaborateurs.elegance.contact")}
+                  </p>
+                  <p className="mt-3 max-w-2xl text-sm leading-relaxed text-rose-100">
+                    {t("collaborateurs.elegance.desc")}
+                  </p>
+                  <p className="mt-2 text-[11px] text-rose-300">
+                    {t("collaborateurs.elegance.services")}
+                  </p>
+                </div>
+                <div className="mt-6 flex flex-wrap gap-3">
+                  <a
+                    href="https://www.instagram.com/elegance_organisation_mariage"
+                    target="_blank"
+                    rel="noreferrer"
+                    className="inline-flex items-center gap-2 rounded-full bg-white/15 px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-white/25"
+                  >
+                    <svg className="h-4 w-4" fill="currentColor" viewBox="0 0 24 24">
+                      <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 100 12.324 6.162 6.162 0 000-12.324zM12 16a4 4 0 110-8 4 4 0 010 8zm6.406-11.845a1.44 1.44 0 100 2.881 1.44 1.44 0 000-2.881z" />
+                    </svg>
+                    {t("collaborateurs.elegance.ctaInstagram")}
+                  </a>
+                  <a
+                    href="mailto:haticeoguz@live.fr"
+                    className="inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/10 px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-white/20"
+                  >
+                    <svg className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M21.75 6.75v10.5a2.25 2.25 0 01-2.25 2.25h-15a2.25 2.25 0 01-2.25-2.25V6.75m19.5 0A2.25 2.25 0 0019.5 4.5h-15a2.25 2.25 0 00-2.25 2.25m19.5 0v.243a2.25 2.25 0 01-1.07 1.916l-7.5 4.615a2.25 2.25 0 01-2.36 0L3.32 8.91a2.25 2.25 0 01-1.07-1.916V6.75" />
+                    </svg>
+                    {t("collaborateurs.elegance.ctaContact")}
+                  </a>
+                </div>
+              </div>
+            </div>
+          </article>
+
+          {/* ── Maison Sofya ─────────────────────────────────────────────── */}
+          <article className="mt-6 overflow-hidden rounded-3xl bg-gradient-to-br from-emerald-900 to-teal-800 shadow-lg">
+            <div className="flex flex-col md:flex-row">
+              {/* Logo area */}
+              <div className="flex flex-shrink-0 items-center justify-center bg-black/40 md:w-72 lg:w-80">
+                <div className="relative h-48 w-48 md:h-56 md:w-56">
+                  <Image
+                    src="/images/collaborators/maison-sofya.jpg"
+                    alt="Maison Sofya – Décoration & Scénographie"
+                    fill
+                    className="object-contain"
+                    sizes="224px"
+                  />
+                </div>
+              </div>
+
+              {/* Content */}
+              <div className="flex flex-1 flex-col justify-between p-7 md:p-8 lg:p-10">
+                <div>
+                  <p className="text-[10px] font-semibold uppercase tracking-[0.25em] text-emerald-300">
+                    {t("collaborateurs.sofya.tag")}
+                  </p>
+                  <h2 className="mt-1 text-xl font-semibold text-white md:text-2xl">
+                    {t("collaborateurs.sofya.name")}
+                  </h2>
+                  <p className="mt-3 max-w-2xl text-sm leading-relaxed text-emerald-100">
+                    {t("collaborateurs.sofya.desc")}
+                  </p>
+                  <p className="mt-2 text-[11px] text-emerald-300">
+                    {t("collaborateurs.sofya.services")}
+                  </p>
+                </div>
+                <div className="mt-6">
+                  <a
+                    href="https://www.instagram.com/maison_sofya"
+                    target="_blank"
+                    rel="noreferrer"
+                    className="inline-flex items-center gap-2 rounded-full bg-white/15 px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-white/25"
+                  >
+                    <svg className="h-4 w-4" fill="currentColor" viewBox="0 0 24 24">
+                      <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 100 12.324 6.162 6.162 0 000-12.324zM12 16a4 4 0 110-8 4 4 0 010 8zm6.406-11.845a1.44 1.44 0 100 2.881 1.44 1.44 0 000-2.881z" />
+                    </svg>
+                    {t("collaborateurs.sofya.ctaInstagram")}
+                  </a>
+                </div>
+              </div>
+            </div>
+          </article>
+
           {/* Disclaimer */}
           <p className="mt-8 text-center text-[11px] text-neutral-500">
             {t("collaborateurs.disclaimer")}
           </p>
         </div>
       </section>
+
+      <BookingCtaBanner
+        locale={locale}
+        title={t("ctaBanner.title")}
+        desc={t("ctaBanner.desc")}
+        btn={t("ctaBanner.btn")}
+      />
+
     </div>
   );
 }

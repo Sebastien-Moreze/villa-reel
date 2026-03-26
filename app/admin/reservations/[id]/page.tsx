@@ -2,6 +2,7 @@ import { prisma } from "@/lib/prisma";
 import { requireAuth, isAdmin } from "@/lib/auth";
 import { revalidatePath } from "next/cache";
 import { sendBalanceReminderEmail } from "@/lib/emails";
+import { logger } from "@/lib/logger";
 import Link from "next/link";
 import { CautionActions } from "./CautionActions";
 
@@ -309,7 +310,7 @@ async function processRefund(formData: FormData) {
       data: { paymentStatus: "REFUNDED", status: "CANCELLED", cancellationReason: "Remboursement via backoffice", cancelledAt: new Date() },
     });
   } catch (err) {
-    console.error("Stripe refund error", err);
+    logger.error("Stripe refund error", { error: err });
   }
   revalidatePath(`/admin/reservations/${id}`);
 }

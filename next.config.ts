@@ -9,8 +9,8 @@ const withNextIntl = createNextIntlPlugin("./i18n.ts");
 const CSP = [
   "default-src 'self'",
   // Next.js requiert unsafe-inline pour l'hydratation React.
-  // unsafe-eval est nécessaire pour le React Compiler en dev ; retiré en prod si possible.
-  "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://js.hcaptcha.com https://js.stripe.com",
+  // unsafe-eval uniquement en dev pour le React Compiler (retiré en production).
+  `script-src 'self' 'unsafe-inline'${process.env.NODE_ENV !== "production" ? " 'unsafe-eval'" : ""} https://js.hcaptcha.com https://js.stripe.com`,
   "style-src 'self' 'unsafe-inline'",
   "img-src 'self' data: blob: https:",
   "font-src 'self' data:",

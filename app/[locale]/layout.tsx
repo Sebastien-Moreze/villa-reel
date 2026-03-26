@@ -36,7 +36,7 @@ export default async function LocaleLayout({ children, params }: Props) {
     <NextIntlClientProvider locale={locale} messages={messages}>
       <ToastProvider>
         <ReservationProvider>
-          <div className="flex min-h-screen flex-col bg-background text-neutral-900">
+          <div className="flex min-h-screen flex-col bg-background text-neutral-900" lang={locale}>
             <Navbar locale={locale} />
             <main className="flex-1 pt-20">{children}</main>
             <Footer />

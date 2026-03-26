@@ -11,6 +11,7 @@ const NAV_ITEMS = [
   { href: "/admin/calendar", label: "Calendrier" },
   { href: "/admin/reviews", label: "Avis" },
   { href: "/admin/promotions", label: "Promotions" },
+  { href: "/admin/amenities", label: "Équipements" },
   { href: "/admin/messages", label: "Messages" },
   { href: "/admin/content", label: "Contenu" },
   { href: "/admin/settings", label: "Paramètres" },
