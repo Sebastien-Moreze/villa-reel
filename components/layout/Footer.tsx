@@ -23,8 +23,7 @@ export function Footer() {
                 <span className="text-xs font-semibold tracking-[0.35em] text-secondary">R.E.E.L</span>
               </div>
               <p className="mt-3 max-w-xs text-xs text-neutral-400">
-                1281 route de Moussy,<br />
-                74930 Reigner-Esery, France
+                Haute-Savoie, France
               </p>
             </div>
 
