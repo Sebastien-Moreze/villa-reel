@@ -4,18 +4,18 @@ import createNextIntlPlugin from "next-intl/plugin";
 const withNextIntl = createNextIntlPlugin("./i18n.ts");
 
 // ── Content-Security-Policy ──────────────────────────────────────────────────
-// Autorise : scripts Next.js, Stripe.js, hCaptcha ; frames Stripe & hCaptcha ;
-// connexions API Stripe et hCaptcha ; images et fonts self + data URIs.
+// Autorise : scripts Next.js, Stripe.js ; frames Stripe ;
+// connexions API Stripe ; images et fonts self + data URIs.
 const CSP = [
   "default-src 'self'",
   // Next.js requiert unsafe-inline pour l'hydratation React.
   // unsafe-eval uniquement en dev pour le React Compiler (retiré en production).
-  `script-src 'self' 'unsafe-inline'${process.env.NODE_ENV !== "production" ? " 'unsafe-eval'" : ""} https://js.hcaptcha.com https://js.stripe.com`,
+  `script-src 'self' 'unsafe-inline'${process.env.NODE_ENV !== "production" ? " 'unsafe-eval'" : ""} https://js.stripe.com`,
   "style-src 'self' 'unsafe-inline'",
   "img-src 'self' data: blob: https:",
   "font-src 'self' data:",
-  "frame-src https://hcaptcha.com https://*.hcaptcha.com https://js.stripe.com https://*.stripe.com https://www.google.com https://maps.google.com",
-  "connect-src 'self' https://hcaptcha.com https://*.hcaptcha.com https://api.stripe.com",
+  "frame-src https://js.stripe.com https://*.stripe.com https://www.google.com https://maps.google.com",
+  "connect-src 'self' https://api.stripe.com",
   "object-src 'none'",
   "base-uri 'self'",
   "form-action 'self'",

@@ -2,7 +2,7 @@
 
 import { z } from "zod";
 import { prisma } from "@/lib/prisma";
-import { verifyHCaptcha } from "@/lib/hcaptcha";
+import { verifyHoneypot } from "@/lib/hcaptcha";
 import {
   sendContactNotificationEmail,
   sendContactConfirmationEmail,
@@ -19,7 +19,8 @@ const contactSchema = z.object({
   message: z.string().min(10),
   locale: z.enum(["fr", "en"]).default("fr"),
   consent: z.literal("on"),
-  token: z.string().min(1),
+  token: z.string(),
+  website: z.string().optional(),
 });
 
 async function sendEmails(input: z.infer<typeof contactSchema>) {
@@ -70,6 +71,7 @@ export async function submitContact(
     locale: (formData.get("locale") as string | null) ?? "fr",
     consent: formData.get("consent"),
     token: formData.get("h-captcha-response") ?? "",
+    website: formData.get("website") as string | null || undefined,
   };
 
   const parsed = contactSchema.safeParse(raw);
@@ -79,9 +81,9 @@ export async function submitContact(
 
   const valid = parsed.data;
 
-  const captchaOk = await verifyHCaptcha(valid.token);
-  if (!captchaOk) {
-    return { success: false, error: "Vérification anti-spam échouée. Veuillez réessayer." };
+  const honeypotOk = verifyHoneypot(valid.website);
+  if (!honeypotOk) {
+    return { success: false, error: "Formulaire invalide." };
   }
 
   await prisma.contactMessage.create({
@@ -101,4 +103,3 @@ export async function submitContact(
 
   return { success: true };
 }
-

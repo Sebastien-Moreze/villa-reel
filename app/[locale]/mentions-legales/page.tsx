@@ -28,7 +28,7 @@ export default async function MentionsLegalesPage({ params }: PageProps) {
             <p><span className="font-medium text-neutral-800">SIRET (siège) :</span> 984 156 794 00013</p>
             <p><span className="font-medium text-neutral-800">Code NAF/APE :</span> 68.10Z – Activités des marchands de biens immobiliers</p>
             <p><span className="font-medium text-neutral-800">Date de création :</span> 25 janvier 2024</p>
-            <p><span className="font-medium text-neutral-800">Siège social :</span> 1281 Route de Moussy, 74930 Reignier-Esery, France</p>
+            <p><span className="font-medium text-neutral-800">Siège social :</span> Reignier-Esery, Haute-Savoie, France</p>
             <p><span className="font-medium text-neutral-800">Dirigeants :</span> Mme Saban Estelle et M. Jedonne Rodrigue</p>
             <p><span className="font-medium text-neutral-800">Contact :</span> <a href="mailto:contact@villareel.com" className="text-primary underline">contact@villareel.com</a> — <a href="tel:+33688423052" className="text-primary">06 88 42 30 52</a> / <a href="tel:+33680215157" className="text-primary">06 80 21 51 57</a></p>
           </div>

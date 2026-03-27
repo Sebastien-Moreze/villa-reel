@@ -4,9 +4,6 @@ import { useState, useEffect, useRef, useCallback } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
-import Script from "next/script";
-
-// La déclaration globale Window.hcaptcha est dans types/hcaptcha.d.ts
 
 const schema = z.object({
   firstName: z.string().min(1),
@@ -264,15 +261,11 @@ export function ReservationStep3({ guests, onValid }: Props) {
   const [modalOpen, setModalOpen] = useState(false);
   const [reglementSigned, setReglementSigned] = useState(false);
 
-  /* ── hCaptcha refs ───────────────────────────────────────────────── */
-  const captchaContainerRef = useRef<HTMLDivElement>(null);
-  const widgetIdRef = useRef<string | null>(null);
-  const pendingDataRef = useRef<(FormValues & { guests: number }) | null>(null);
-  // Ref stable vers onValid pour éviter de ré-initialiser le widget à chaque render
+  // Ref stable vers onValid pour éviter de ré-initialiser à chaque render
   const onValidRef = useRef(onValid);
   useEffect(() => { onValidRef.current = onValid; }, [onValid]);
 
-  /* ── React Hook Form — doit précéder les callbacks qui utilisent setValue ── */
+  /* ── React Hook Form ── */
   const {
     register,
     handleSubmit,
@@ -287,43 +280,10 @@ export function ReservationStep3({ guests, onValid }: Props) {
     setValue("acceptReglement", true, { shouldValidate: true });
   };
 
-  // Initialise le widget hCaptcha quand le script JS est chargé
-  const initHCaptcha = useCallback(() => {
-    if (!captchaContainerRef.current || !window.hcaptcha) return;
-    const siteKey =
-      process.env.NEXT_PUBLIC_HCAPTCHA_SITE_KEY ??
-      "10000000-ffff-ffff-ffff-000000000001"; // clé de test hCaptcha
-    widgetIdRef.current = window.hcaptcha.render(captchaContainerRef.current, {
-      sitekey: siteKey,
-      size: "invisible",
-      callback: (token: string) => {
-        if (pendingDataRef.current) {
-          onValidRef.current({ ...pendingDataRef.current, hcaptchaToken: token });
-          pendingDataRef.current = null;
-        }
-        if (widgetIdRef.current !== null) {
-          window.hcaptcha?.reset(widgetIdRef.current);
-        }
-      },
-      "error-callback": () => {
-        pendingDataRef.current = null;
-        if (widgetIdRef.current !== null) {
-          window.hcaptcha?.reset(widgetIdRef.current);
-        }
-      },
-    });
-  }, []);
-
   const handleFormSubmit = useCallback(
     (data: FormValues) => {
       const payload = { ...data, guests };
-      if (window.hcaptcha && widgetIdRef.current !== null) {
-        pendingDataRef.current = payload;
-        window.hcaptcha.execute(widgetIdRef.current);
-      } else {
-        // Pas de widget hCaptcha (dev ou script non chargé) → on laisse passer
-        onValidRef.current({ ...payload, hcaptchaToken: undefined });
-      }
+      onValidRef.current({ ...payload, hcaptchaToken: "honeypot" });
     },
     [guests],
   );
@@ -336,15 +296,6 @@ export function ReservationStep3({ guests, onValid }: Props) {
           onClose={() => setModalOpen(false)}
         />
       )}
-
-      {/* Script hCaptcha — chargé une seule fois, après l'interactif */}
-      <Script
-        src="https://js.hcaptcha.com/1/api.js?render=explicit"
-        strategy="afterInteractive"
-        onLoad={initHCaptcha}
-      />
-      {/* Conteneur invisible pour le widget hCaptcha */}
-      <div ref={captchaContainerRef} />
 
       <form onSubmit={(e) => handleSubmit(handleFormSubmit)(e)} className="space-y-4 text-xs text-neutral-800">
         <p className="text-sm font-semibold text-neutral-900">Informations voyageur principal</p>
@@ -474,4 +425,3 @@ export function ReservationStep3({ guests, onValid }: Props) {
     </>
   );
 }
-

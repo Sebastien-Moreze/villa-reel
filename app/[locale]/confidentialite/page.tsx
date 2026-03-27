@@ -25,7 +25,7 @@ export default async function ConfidentialitePage({ params }: PageProps) {
           <div className="rounded-xl bg-neutral-50 p-5 space-y-1.5 text-sm">
             <p><span className="font-medium text-neutral-800">Société :</span> R.E.E.L.</p>
             <p><span className="font-medium text-neutral-800">SIRET :</span> 984 156 794 00013</p>
-            <p><span className="font-medium text-neutral-800">Adresse :</span> 1281 Route de Moussy, 74930 Reignier-Esery, France</p>
+            <p><span className="font-medium text-neutral-800">Adresse :</span> Reignier-Esery, Haute-Savoie, France</p>
             <p><span className="font-medium text-neutral-800">Contact DPO / responsable :</span> <a href="mailto:contact@villareel.com" className="text-primary underline">contact@villareel.com</a></p>
           </div>
         </section>

@@ -28,7 +28,7 @@ export default async function CGVPage({ params }: PageProps) {
             <div>
               <p className="font-medium text-neutral-800">Le bailleur :</p>
               <p>R.E.E.L., société civile au capital de 1 000 €, immatriculée sous le SIRET 984 156 794 00013,
-              dont le siège est situé au 1281 Route de Moussy, 74930 Reignier-Esery, France,
+              dont le siège est situé à Reignier-Esery, Haute-Savoie, France,
               représentée par Mme Saban Estelle et M. Jedonne Rodrigue,
               ci-après dénommée « le Bailleur ».</p>
             </div>
@@ -43,7 +43,7 @@ export default async function CGVPage({ params }: PageProps) {
         <section>
           <h2 className="text-base font-semibold text-neutral-900 mb-3">Article 2 – Objet</h2>
           <p>
-            Les présentes CGV ont pour objet de définir les conditions dans lesquelles la Villa R.E.E.L, propriété de la société R.E.E.L., est mise en location saisonnière à usage privatif. La villa est située au 1281 Route de Moussy, 74930 Reignier-Esery, France.
+            Les présentes CGV ont pour objet de définir les conditions dans lesquelles la Villa R.E.E.L, propriété de la société R.E.E.L., est mise en location saisonnière à usage privatif. La villa est située à Reignier-Esery, Haute-Savoie, France.
           </p>
           <p className="mt-2">
             La villa est proposée pour des séjours privés, des événements d&apos;entreprise et des collaborations. Sa capacité maximale d&apos;accueil est de 8 personnes.

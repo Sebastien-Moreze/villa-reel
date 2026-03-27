@@ -55,8 +55,7 @@ export default async function ContactPage({ params }: PageProps) {
                 {t("contact.infoTitle")}
               </h2>
               <p className="mt-2 text-[11px] text-neutral-300">
-                1281 route de Moussy<br />
-                74930 Reigner-Esery, France
+                Reignier-Esery, France
               </p>
               <p className="mt-2 text-[11px] text-neutral-300">
                 {t("contact.email")}{" "}
