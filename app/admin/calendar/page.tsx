@@ -81,11 +81,16 @@ export default async function AdminCalendarPage({ searchParams }: PageProps) {
     return { type: "available" as const, label: null };
   };
 
-  // Liste des blocages futurs ou en cours
+  // Liste des blocages : futurs, en cours, et dates inversées (startDate > endDate)
   const today = new Date();
   today.setHours(0, 0, 0, 0);
   const allBlocked = await prisma.blockedDate.findMany({
-    where: { endDate: { gte: today } },
+    where: {
+      OR: [
+        { endDate: { gte: today } },
+        { startDate: { gte: today } },
+      ],
+    },
     orderBy: { startDate: "asc" },
   });
 
