@@ -1,5 +1,6 @@
 // Charge jest-dom uniquement quand le DOM est disponible (tests jsdom)
 if (typeof document !== "undefined") {
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
   require("@testing-library/jest-dom");
 }
 

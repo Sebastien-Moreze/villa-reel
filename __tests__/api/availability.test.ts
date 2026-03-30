@@ -19,6 +19,7 @@ jest.mock("@/lib/prisma", () => ({
 
 // Mock unstable_cache — exécute directement la fonction sans mise en cache
 jest.mock("next/cache", () => ({
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-function-type
   unstable_cache: (fn: Function) => fn,
 }));
 
