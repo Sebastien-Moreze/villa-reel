@@ -3,7 +3,7 @@ import { prisma } from "@/lib/prisma";
 import { z } from "zod";
 import type { Prisma } from "@prisma/client";
 import { rateLimit, getClientIp } from "@/lib/rate-limit";
-import { verifyHoneypot } from "@/lib/hcaptcha";
+import { verifyHoneypot } from "@/lib/honeypot";
 import { logger } from "@/lib/logger";
 import { apiError } from "@/lib/http-error";
 import { revalidateTag } from "next/cache";

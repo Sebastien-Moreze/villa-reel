@@ -2,7 +2,7 @@
 
 import { z } from "zod";
 import { prisma } from "@/lib/prisma";
-import { verifyHoneypot } from "@/lib/hcaptcha";
+import { verifyHoneypot } from "@/lib/honeypot";
 import {
   sendContactNotificationEmail,
   sendContactConfirmationEmail,
