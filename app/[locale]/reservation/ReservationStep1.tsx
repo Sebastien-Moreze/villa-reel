@@ -64,18 +64,23 @@ export function ReservationStep1({ villaId, onChange }: Props) {
     fetchData();
   }, [villaId]);
 
+  // ── Filter out invalid ranges (startDate > endDate) ───────────────────
+  const validBlockedRanges = useMemo(
+    () => blockedRanges.filter((r) => r.startDate <= r.endDate),
+    [blockedRanges],
+  );
+
   // ── Build disabled-day function ────────────────────────────────────────
   const isDateDisabled = useCallback(
     (date: Date): boolean => {
       if (isBefore(date, today)) return true;
-      return blockedRanges.some((r) =>
-        isWithinInterval(date, {
-          start: parseISO(r.startDate),
-          end: parseISO(r.endDate),
-        }),
-      );
+      return validBlockedRanges.some((r) => {
+        const start = parseISO(r.startDate);
+        const end = parseISO(r.endDate);
+        return isWithinInterval(date, { start, end });
+      });
     },
-    [blockedRanges, today],
+    [validBlockedRanges, today],
   );
 
   // ── Range selection handler — reset if selection spans a blocked day ───
@@ -88,7 +93,7 @@ export function ReservationStep1({ villaId, onChange }: Props) {
       const { from, to } = newRange;
       if (from && to) {
         // Check for blocked dates overlapping the selected range
-        const hasBlocked = blockedRanges.some((r) => {
+        const hasBlocked = validBlockedRanges.some((r) => {
           const bStart = parseISO(r.startDate);
           const bEnd = parseISO(r.endDate);
           // Overlap: blocked range intersects selection
@@ -102,7 +107,7 @@ export function ReservationStep1({ villaId, onChange }: Props) {
       }
       setRange(newRange);
     },
-    [blockedRanges],
+    [validBlockedRanges],
   );
 
   // ── Derived values ─────────────────────────────────────────────────────

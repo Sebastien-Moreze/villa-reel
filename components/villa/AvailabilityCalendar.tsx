@@ -43,7 +43,12 @@ export function AvailabilityCalendar({ villaId }: AvailabilityCalendarProps) {
 
   const isBlocked = (date: Date) => {
     const d = date.toISOString().split("T")[0];
-    return blocked.some((range) => d >= range.startDate && d <= range.endDate);
+    return blocked.some(
+      (range) =>
+        range.startDate <= range.endDate &&
+        d >= range.startDate &&
+        d <= range.endDate,
+    );
   };
 
   const days = Array.from({ length: daysInMonth }, (_, i) => {
