@@ -1,0 +1,16 @@
+{
+  "crons": [
+    {
+      "path": "/api/stripe/schedule-balance",
+      "schedule": "0 8 * * *"
+    },
+    {
+      "path": "/api/stripe/catch-up-balance",
+      "schedule": "30 8 * * *"
+    },
+    {
+      "path": "/api/reservations/catch-up-house-rules",
+      "schedule": "0 9 * * *"
+    }
+  ]
+}
