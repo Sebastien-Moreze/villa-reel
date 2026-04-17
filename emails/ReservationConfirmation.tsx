@@ -1,5 +1,6 @@
 import {
   Body,
+  Button,
   Container,
   Head,
   Html,
@@ -97,14 +98,28 @@ export function ReservationConfirmationEmail({
               </Text>
               <Text style={styles.text}>
                 {isFr
-                  ? `Le solde de votre séjour sera à régler au plus tard le ${balanceDueDate}. Vous recevrez un rappel et un lien de paiement sécurisé quelques jours avant cette échéance.`
-                  : `The remaining balance is due by ${balanceDueDate}. You will receive a reminder and a secure payment link a few days before this date.`}
+                  ? `Le solde de votre séjour sera à régler au plus tard le ${balanceDueDate}. Vous recevrez un email avec un lien de paiement sécurisé 30 jours avant votre arrivée.`
+                  : `The remaining balance is due by ${balanceDueDate}. You will receive an email with a secure payment link 30 days before your arrival.`}
+              </Text>
+            </Section>
+
+            <Section style={{ ...styles.section, paddingTop: 0 }}>
+              <Text style={styles.subTitle}>
+                {isFr ? "Règlement intérieur" : "House rules"}
               </Text>
               <Text style={styles.text}>
                 {isFr
-                  ? "Le règlement intérieur de la villa est joint en pièce jointe (PDF). Nous vous invitons à en prendre connaissance avant votre arrivée."
-                  : "The house rules are attached as a PDF. Please review them carefully before your arrival."}
+                  ? "Nous vous invitons à consulter le règlement intérieur avant votre arrivée."
+                  : "Please review the villa house rules before your arrival."}
               </Text>
+              <Section style={{ marginTop: 14, textAlign: "center" as const }}>
+                <Button
+                  href={`https://villareel.com/${locale}/reglement-interieur`}
+                  style={styles.button}
+                >
+                  {isFr ? "Lire le règlement intérieur" : "Read house rules"}
+                </Button>
+              </Section>
             </Section>
           </Section>
 
@@ -210,6 +225,16 @@ const styles: Record<string, React.CSSProperties> = {
     color: "#064e3b",
     marginTop: "6px",
     marginBottom: 0,
+  },
+  button: {
+    display: "inline-block",
+    padding: "10px 20px",
+    borderRadius: "9999px",
+    background: "linear-gradient(135deg, #047857, #059669)",
+    color: "#ffffff",
+    textDecoration: "none",
+    fontSize: "12px",
+    fontWeight: 600,
   },
   footer: {
     backgroundColor: "#111827",

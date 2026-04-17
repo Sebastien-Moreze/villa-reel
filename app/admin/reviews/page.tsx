@@ -4,7 +4,7 @@ import { ReviewStatus } from "@prisma/client";
 import { revalidatePath } from "next/cache";
 
 type PageProps = {
-  searchParams: { status?: ReviewStatus | "ALL" };
+  searchParams: Promise<{ status?: ReviewStatus | "ALL" }>;
 };
 
 export default async function AdminReviewsPage({ searchParams }: PageProps) {
@@ -18,8 +18,10 @@ export default async function AdminReviewsPage({ searchParams }: PageProps) {
     );
   }
 
-  const filter = searchParams.status && searchParams.status !== "ALL"
-    ? searchParams.status
+  // Next.js 15+ : searchParams est une Promise, il faut l'awaiter
+  const { status } = await searchParams;
+  const filter = status && status !== "ALL"
+    ? status
     : undefined;
 
   const reviews = await prisma.review.findMany({

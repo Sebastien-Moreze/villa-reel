@@ -3,7 +3,7 @@ import { requireAuth, isAdmin } from "@/lib/auth";
 import { revalidatePath } from "next/cache";
 
 type PageProps = {
-  searchParams: { filter?: "all" | "unread" | "read"; id?: string };
+  searchParams: Promise<{ filter?: "all" | "unread" | "read"; id?: string }>;
 };
 
 export default async function AdminMessagesPage({ searchParams }: PageProps) {
@@ -17,8 +17,10 @@ export default async function AdminMessagesPage({ searchParams }: PageProps) {
     );
   }
 
-  const filter = searchParams.filter ?? "all";
-  const selectedId = searchParams.id ? Number(searchParams.id) : null;
+  // Next.js 15+ : searchParams est une Promise, il faut l'awaiter
+  const { filter: filterParam, id: idParam } = await searchParams;
+  const filter = filterParam ?? "all";
+  const selectedId = idParam ? Number(idParam) : null;
 
   const messages = await prisma.contactMessage.findMany({
     where:
