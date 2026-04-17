@@ -11,8 +11,10 @@ function sanitizeCallbackUrl(raw: string | null): string {
   if (!raw) return "/admin/dashboard";
   try {
     const decoded = decodeURIComponent(raw);
-    /* N'autoriser que les chemins internes */
-    if (decoded.startsWith("/") && !decoded.startsWith("//")) {
+    // N'autoriser que les chemins internes commençant par /admin
+    // Si callbackUrl vaut /fr ou autre chose (injecté par next-intl),
+    // on force le retour sur /admin/dashboard
+    if (decoded.startsWith("/admin") && !decoded.startsWith("//")) {
       return decoded;
     }
   } catch {
