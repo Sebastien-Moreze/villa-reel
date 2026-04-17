@@ -57,7 +57,7 @@ export default async function AdminReviewsPage({ searchParams }: PageProps) {
             key={s}
             href={`?status=${s}`}
             className={`rounded-full border px-3 py-1 transition ${
-              (searchParams.status ?? "ALL") === s
+              (status ?? "ALL") === s
                 ? "border-primary bg-primary/20 text-primary"
                 : "border-neutral-700 text-neutral-400 hover:border-neutral-500"
             }`}
