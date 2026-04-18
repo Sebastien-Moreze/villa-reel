@@ -26,7 +26,9 @@ async function handleCatchUp() {
   const reservations = await prisma.reservation.findMany({
     where: {
       checkIn: { gt: now },
-      status: { in: ["PENDING", "CONFIRMED"] },    },
+      status: { in: ["PENDING", "CONFIRMED"] },
+      houseRulesSentAt: null, // Ne renvoyer qu'aux réservations qui n'ont pas encore reçu le règlement
+    },
   });
 
   if (reservations.length === 0) return NextResponse.json({ found: 0, sent: 0 });
@@ -57,6 +59,13 @@ async function handleCatchUp() {
           filename: isFr ? "reglement-interieur.pdf" : "house-rules.pdf",          content: isFr ? pdfFrBase64 : pdfEnBase64,
         }],
       });
+
+      // Marquer comme envoyé pour ne plus renvoyer les jours suivants
+      await prisma.reservation.update({
+        where: { id: reservation.id },
+        data: { houseRulesSentAt: new Date() },
+      });
+
       sent++;
       logger.info("Catch-up: house rules sent", { reservationId: reservation.id, guestEmail: reservation.guestEmail });
     } catch (error) {

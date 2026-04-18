@@ -178,6 +178,8 @@ model Reservation {
   reviewToken           String?          @unique
   review                Review?
 
+  houseRulesSentAt      DateTime?        // Date d'envoi du règlement intérieur (envoi unique)
+
   createdAt             DateTime         @default(now())
   updatedAt             DateTime         @updatedAt
 }
