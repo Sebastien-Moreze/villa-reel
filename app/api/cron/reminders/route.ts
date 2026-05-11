@@ -7,36 +7,42 @@ import {
 } from "@/lib/emails";
 import { format } from "date-fns";
 import { fr, enUS } from "date-fns/locale";
+import { randomBytes } from "crypto";
 
 /**
- * CRON endpoint — POST /api/cron/reminders
- * Protected by CRON_SECRET header.
+ * CRON endpoint — GET /api/cron/reminders
+ * Protégé par l'en-tête Authorization: Bearer ${CRON_SECRET}.
+ * Déclenché quotidiennement par Vercel (voir vercel.json).
  *
- * 1. Sends arrival reminders (J-7) for CONFIRMED reservations.
- * 2. Sends review requests (J+2 after checkout) for COMPLETED reservations
- *    that have a reviewToken but no review yet.
- *
- * Call daily via cPanel CRON:
- *   curl -s -X POST https://villareel.com/api/cron/reminders \
- *        -H "x-cron-secret: $CRON_SECRET"
+ * 1. Rappels d'arrivée (J-7) pour les réservations CONFIRMED.
+ * 2. Demandes d'avis (J+2 à J+7 après checkout) pour les CONFIRMED
+ *    dont le checkout est passé et sans avis encore soumis.
+ *    Génère automatiquement le reviewToken si absent.
  */
-export async function POST(request: NextRequest) {
-  // ── Auth ───────────────────────────────────────────────────────────────────
+export async function GET(request: NextRequest) {
+  // ── Auth ─────────────────────────────────────────────────────────────────
+  // Vercel Cron envoie : Authorization: Bearer ${CRON_SECRET}
   const cronSecret = process.env.CRON_SECRET;
-  const authHeader = request.headers.get("x-cron-secret");
+  const authHeader = request.headers.get("authorization");
 
-  if (!cronSecret || authHeader !== cronSecret) {
+  if (!cronSecret || authHeader !== `Bearer ${cronSecret}`) {
+    logger.warn("Unauthorized cron call", {
+      route: "/api/cron/reminders",
+      hasHeader: !!authHeader,
+    });
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
-  const appUrl = process.env.NEXT_PUBLIC_APP_URL ?? "https://villareel.com";
-  const contactEmail = process.env.CONTACT_EMAIL ?? "contact@villareel.com";
-
+  const appUrl =
+    process.env.NEXT_PUBLIC_APP_URL ?? "https://www.villareel.com";
+  const contactEmail =
+    process.env.CONTACT_EMAIL ?? "contact@villareel.com";
   const today = new Date();
+
   let arrivalsSent = 0;
   let reviewsSent = 0;
 
-  // ── 1. Arrival reminders (check-in in exactly 7 days) ────────────────────
+  // ── 1. Rappels d'arrivée (check-in dans exactement 7 jours) ─────────────
   try {
     const targetDate = new Date(
       today.getFullYear(),
@@ -87,40 +93,63 @@ export async function POST(request: NextRequest) {
     });
   }
 
-  // ── 2. Review requests (checkout was 2 days ago) ─────────────────────────
+  // ── 2. Demandes d'avis (checkout entre 1 et 7 jours dans le passé) ──────
+  //
+  // Fenêtre élargie pour rattraper les jours où le cron n'aurait pas tourné.
+  // Garde-fou : reviewToken IS NULL → on ne renvoie pas si déjà envoyé.
   try {
-    const targetCheckout = new Date(
+    // Borne haute : il y a 1 jour (laisser le client poser ses valises)
+    const targetCheckoutMax = new Date(
       today.getFullYear(),
       today.getMonth(),
-      today.getDate() - 2,
+      today.getDate() - 1,
     );
-    const nextDay = new Date(
-      targetCheckout.getFullYear(),
-      targetCheckout.getMonth(),
-      targetCheckout.getDate() + 1,
+    // Borne basse : il y a 7 jours (au-delà, c'est trop tard)
+    const targetCheckoutMin = new Date(
+      today.getFullYear(),
+      today.getMonth(),
+      today.getDate() - 7,
     );
 
     const completedReservations = await prisma.reservation.findMany({
       where: {
-        status: "COMPLETED",
-        checkOut: { gte: targetCheckout, lt: nextDay },
-        reviewToken: { not: null },
-        review: null, // No review submitted yet
+        status: "CONFIRMED",
+        checkOut: { gte: targetCheckoutMin, lt: targetCheckoutMax },
+        reviewToken: null,   // Pas encore envoyé
+        review: null,        // Pas d'avis soumis
       },
     });
 
     for (const reservation of completedReservations) {
       try {
-        const locale = reservation.locale === "EN" ? "en" : "fr";
-        const reviewUrl = `${appUrl}/${locale}/review/${reservation.reviewToken}`;
+        // 1. Générer un token unique (même format que generate-token)
+        const token = randomBytes(32).toString("hex");
 
+        // 2. L'enregistrer en DB
+        await prisma.reservation.update({
+          where: { id: reservation.id },
+          data: { reviewToken: token },
+        });
+
+        // 3. Construire le lien (URL /avis/ et pas /review/)
+        const locale = reservation.locale === "EN" ? "en" : "fr";
+        const reviewUrl = `${appUrl}/${locale}/avis/${token}`;
+
+        // 4. Envoyer l'email
         await sendReviewRequestEmail({
           locale,
           to: reservation.guestEmail,
           guestName: reservation.guestName.split(" ")[0],
           reviewUrl,
         });
+
         reviewsSent++;
+
+        logger.info("Review request sent", {
+          route: "/api/cron/reminders",
+          reservationId: reservation.id,
+          confirmationCode: reservation.confirmationCode,
+        });
       } catch (error) {
         logger.error("Failed to send review request", {
           route: "/api/cron/reminders",
