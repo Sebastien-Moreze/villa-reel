@@ -141,11 +141,11 @@ export default async function ReservationDetailPage({ params }: PageProps) {
                   </button>
                 </form>
               )}
-              {reservation.paymentStatus === "DEPOSIT_PAID" && (
+              {["DEPOSIT_PAID", "AWAITING"].includes(reservation.paymentStatus) && reservation.status === "CONFIRMED" && (
                 <form action={sendBalanceReminder}>
                   <input type="hidden" name="id" value={id} />
                   <button className="rounded-full border border-secondary px-3 py-1.5 text-[11px] text-secondary hover:bg-secondary/10">
-                    Envoyer rappel solde
+                    Envoyer lien paiement solde
                   </button>
                 </form>
               )}
@@ -265,17 +265,67 @@ async function sendBalanceReminder(formData: FormData) {
   const reservation = await prisma.reservation.findUnique({ where: { id } });
   if (!reservation) return;
 
+  const balanceAmount = Number(reservation.balanceAmount ?? 0);
+  if (balanceAmount <= 0) return;
+
+  const appUrl = process.env.NEXT_PUBLIC_APP_URL ?? "https://villareel.com";
+  const locale = reservation.locale === "EN" ? "en" : "fr";
+
+  // Crée une nouvelle Checkout Session Stripe (fraîche, 72h de validité)
+  const StripeLib = (await import("stripe")).default;
+  const stripe = new StripeLib(process.env.STRIPE_SK ?? "", {
+    apiVersion: "2026-02-25.clover" as const,
+  });
+
+  const session = await stripe.checkout.sessions.create({
+    mode: "payment",
+    payment_method_types: ["card"],
+    line_items: [
+      {
+        price_data: {
+          currency: "eur",
+          product_data: {
+            name: `Solde séjour Villa R.E.E.L – ${reservation.confirmationCode}`,
+          },
+          unit_amount: Math.round(balanceAmount * 100),
+        },
+        quantity: 1,
+      },
+    ],
+    payment_intent_data: {
+      metadata: {
+        reservationId: String(reservation.id),
+        villaId: String(reservation.villaId),
+        type: "balance",
+      },
+    },
+    success_url: `${appUrl}/${locale}/reservation/merci?code=${reservation.confirmationCode}`,
+    cancel_url: `${appUrl}/${locale}/reservation?annule=1`,
+    expires_at: Math.floor(Date.now() / 1000) + 72 * 60 * 60,
+  });
+
+  // Sauvegarde le nouvel intent en DB
+  await prisma.reservation.update({
+    where: { id },
+    data: {
+      stripePaymentIntentId: session.payment_intent
+        ? String(session.payment_intent)
+        : session.id,
+    },
+  });
+
   const balanceDue = new Date(reservation.checkIn);
   balanceDue.setDate(balanceDue.getDate() - 30);
 
   await sendBalanceReminderEmail({
-    locale: reservation.locale === "EN" ? "en" : "fr",
+    locale,
     to: reservation.guestEmail,
     confirmationCode: reservation.confirmationCode,
-    balanceAmount: Number(reservation.balanceAmount ?? 0),
+    balanceAmount,
     balanceDueDate: balanceDue.toLocaleDateString("fr-FR"),
-    paymentUrl: `${process.env.NEXT_PUBLIC_APP_URL}/reservation/solde/${reservation.confirmationCode}`,
+    paymentUrl: session.url ?? `${appUrl}/${locale}/reservation`,
   });
+
   revalidatePath(`/admin/reservations/${id}`);
 }
 

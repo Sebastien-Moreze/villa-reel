@@ -75,8 +75,8 @@ async function handleScheduleBalance() {
             type: "balance",
           },
         },
-        success_url: `${appUrl}/reservation/merci?code=${reservation.confirmationCode}`,
-        cancel_url: `${appUrl}/reservation?annule=1`,
+        success_url: `${appUrl}/${locale}/reservation/merci?code=${reservation.confirmationCode}`,
+        cancel_url: `${appUrl}/${locale}/reservation?annule=1`,
         expires_at: Math.floor(Date.now() / 1000) + 72 * 60 * 60,
       });
       await prisma.reservation.update({
