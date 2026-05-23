@@ -53,6 +53,7 @@ async function handleScheduleBalance() {
     const balanceAmount = Number(reservation.balanceAmount ?? 0);
     if (balanceAmount <= 0) continue;
     try {
+      const locale = reservation.locale === "EN" ? "en" : "fr";
       const session = await stripe.checkout.sessions.create({
         mode: "payment",
         payment_method_types: ["card"],
@@ -88,7 +89,6 @@ async function handleScheduleBalance() {
         },
       });
 
-      const locale = reservation.locale === "EN" ? "en" : "fr";
       const dateLocale = locale === "fr" ? fr : enUS;
 
       const balanceDue = new Date(reservation.checkIn);
