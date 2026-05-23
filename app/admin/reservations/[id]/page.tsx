@@ -262,69 +262,74 @@ async function cancelAction(formData: FormData) {
 async function sendBalanceReminder(formData: FormData) {
   "use server";
   const id = Number(formData.get("id"));
-  const reservation = await prisma.reservation.findUnique({ where: { id } });
-  if (!reservation) return;
 
-  const balanceAmount = Number(reservation.balanceAmount ?? 0);
-  if (balanceAmount <= 0) return;
+  try {
+    const reservation = await prisma.reservation.findUnique({ where: { id } });
+    if (!reservation) throw new Error(`Réservation ${id} introuvable`);
 
-  const appUrl = process.env.NEXT_PUBLIC_APP_URL ?? "https://villareel.com";
-  const locale = reservation.locale === "EN" ? "en" : "fr";
+    const balanceAmount = Number(reservation.balanceAmount ?? reservation.totalAmount ?? 0);
+    if (balanceAmount <= 0) throw new Error(`Montant solde invalide pour réservation ${id}`);
 
-  // Crée une nouvelle Checkout Session Stripe (fraîche, 72h de validité)
-  const StripeLib = (await import("stripe")).default;
-  const stripe = new StripeLib(process.env.STRIPE_SK ?? "", {
-    apiVersion: "2026-02-25.clover" as const,
-  });
+    const appUrl = process.env.NEXT_PUBLIC_APP_URL ?? "https://villareel.com";
+    const locale = reservation.locale === "EN" ? "en" : "fr";
 
-  const session = await stripe.checkout.sessions.create({
-    mode: "payment",
-    payment_method_types: ["card"],
-    line_items: [
-      {
-        price_data: {
-          currency: "eur",
-          product_data: {
-            name: `Solde séjour Villa R.E.E.L – ${reservation.confirmationCode}`,
+    const StripeLib = (await import("stripe")).default;
+    const stripe = new StripeLib(process.env.STRIPE_SK ?? "", {
+      apiVersion: "2026-02-25.clover" as const,
+    });
+
+    const session = await stripe.checkout.sessions.create({
+      mode: "payment",
+      payment_method_types: ["card"],
+      line_items: [
+        {
+          price_data: {
+            currency: "eur",
+            product_data: {
+              name: `Solde séjour Villa R.E.E.L – ${reservation.confirmationCode}`,
+            },
+            unit_amount: Math.round(balanceAmount * 100),
           },
-          unit_amount: Math.round(balanceAmount * 100),
+          quantity: 1,
         },
-        quantity: 1,
+      ],
+      payment_intent_data: {
+        metadata: {
+          reservationId: String(reservation.id),
+          villaId: String(reservation.villaId),
+          type: "balance",
+        },
       },
-    ],
-    payment_intent_data: {
-      metadata: {
-        reservationId: String(reservation.id),
-        villaId: String(reservation.villaId),
-        type: "balance",
+      success_url: `${appUrl}/${locale}/reservation/merci?code=${reservation.confirmationCode}`,
+      cancel_url: `${appUrl}/${locale}/reservation?annule=1`,
+      expires_at: Math.floor(Date.now() / 1000) + 23 * 60 * 60, // max 24h Stripe
+    });
+
+    await prisma.reservation.update({
+      where: { id },
+      data: {
+        stripePaymentIntentId: session.payment_intent
+          ? String(session.payment_intent)
+          : session.id,
       },
-    },
-    success_url: `${appUrl}/${locale}/reservation/merci?code=${reservation.confirmationCode}`,
-    cancel_url: `${appUrl}/${locale}/reservation?annule=1`,
-    expires_at: Math.floor(Date.now() / 1000) + 72 * 60 * 60,
-  });
+    });
 
-  // Sauvegarde le nouvel intent en DB
-  await prisma.reservation.update({
-    where: { id },
-    data: {
-      stripePaymentIntentId: session.payment_intent
-        ? String(session.payment_intent)
-        : session.id,
-    },
-  });
+    const balanceDue = new Date(reservation.checkIn);
+    balanceDue.setDate(balanceDue.getDate() - 30);
 
-  const balanceDue = new Date(reservation.checkIn);
-  balanceDue.setDate(balanceDue.getDate() - 30);
+    await sendBalanceReminderEmail({
+      locale,
+      to: reservation.guestEmail,
+      confirmationCode: reservation.confirmationCode,
+      balanceAmount,
+      balanceDueDate: balanceDue.toLocaleDateString("fr-FR"),
+      paymentUrl: session.url ?? `${appUrl}/${locale}/reservation`,
+    });
 
-  await sendBalanceReminderEmail({
-    locale,
-    to: reservation.guestEmail,
-    confirmationCode: reservation.confirmationCode,
-    balanceAmount,
-    balanceDueDate: balanceDue.toLocaleDateString("fr-FR"),
-    paymentUrl: session.url ?? `${appUrl}/${locale}/reservation`,
-  });
+  } catch (err) {
+    // Log l'erreur sans faire crasher la page
+    console.error("[sendBalanceReminder] Erreur:", err);
+  }
 
   revalidatePath(`/admin/reservations/${id}`);
 }
