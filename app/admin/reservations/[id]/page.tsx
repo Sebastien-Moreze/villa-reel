@@ -1,6 +1,6 @@
 import { prisma } from "@/lib/prisma";
 import { requireAuth, isAdmin } from "@/lib/auth";
-import { revalidatePath, revalidateTag } from "next/cache";
+import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { sendBalanceReminderEmail } from "@/lib/emails";
 import { logger } from "@/lib/logger";
