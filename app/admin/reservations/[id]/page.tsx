@@ -1,6 +1,7 @@
 import { prisma } from "@/lib/prisma";
 import { requireAuth, isAdmin } from "@/lib/auth";
-import { revalidatePath } from "next/cache";
+import { revalidatePath, revalidateTag } from "next/cache";
+import { redirect } from "next/navigation";
 import { sendBalanceReminderEmail } from "@/lib/emails";
 import { logger } from "@/lib/logger";
 import Link from "next/link";
@@ -8,9 +9,10 @@ import { CautionActions } from "./CautionActions";
 
 type PageProps = {
   params: Promise<{ id: string }>;
+  searchParams: Promise<{ action?: string }>;
 };
 
-export default async function ReservationDetailPage({ params }: PageProps) {
+export default async function ReservationDetailPage({ params, searchParams }: PageProps) {
   await requireAuth();
   const admin = await isAdmin();
   if (!admin) {
@@ -22,6 +24,7 @@ export default async function ReservationDetailPage({ params }: PageProps) {
   }
 
   const { id: idStr } = await params;
+  const { action } = await searchParams;
   const id = Number(idStr);
   const reservation = await prisma.reservation.findUnique({
     where: { id },
@@ -70,6 +73,19 @@ export default async function ReservationDetailPage({ params }: PageProps) {
 
   return (
     <div className="mx-auto max-w-5xl px-4 py-6 md:px-6">
+      {/* Bandeau feedback action */}
+      {action === "balance-sent" && (
+        <div className="mb-4 flex items-center gap-3 rounded-xl border border-emerald-700 bg-emerald-950 px-4 py-3 text-[12px] text-emerald-300">
+          <span className="text-base">✅</span>
+          <span>Lien de paiement envoyé avec succès à <strong>{reservation.guestEmail}</strong>.</span>
+        </div>
+      )}
+      {action === "balance-error" && (
+        <div className="mb-4 flex items-center gap-3 rounded-xl border border-red-700 bg-red-950 px-4 py-3 text-[12px] text-red-300">
+          <span className="text-base">❌</span>
+          <span>Échec de l&apos;envoi. Vérifiez les logs Vercel pour plus de détails.</span>
+        </div>
+      )}
       {/* Header */}
       <div className="flex flex-wrap items-start justify-between gap-3">
         <div>
@@ -327,11 +343,11 @@ async function sendBalanceReminder(formData: FormData) {
     });
 
   } catch (err) {
-    // Log l'erreur sans faire crasher la page
     console.error("[sendBalanceReminder] Erreur:", err);
+    redirect(`/admin/reservations/${id}?action=balance-error`);
   }
 
-  revalidatePath(`/admin/reservations/${id}`);
+  redirect(`/admin/reservations/${id}?action=balance-sent`);
 }
 
 async function sendReviewRequest(formData: FormData) {
