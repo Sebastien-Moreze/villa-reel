@@ -9,8 +9,12 @@
       "schedule": "30 8 * * *"
     },
     {
-      "path": "/api/reservations/catch-up-house-rules",
+      "path": "/api/stripe/balance-reminder-7days",
       "schedule": "0 9 * * *"
+    },
+    {
+      "path": "/api/reservations/catch-up-house-rules",
+      "schedule": "30 9 * * *"
     },
     {
       "path": "/api/cron/reminders",

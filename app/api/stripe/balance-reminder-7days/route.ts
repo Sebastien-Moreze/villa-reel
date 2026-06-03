@@ -7,11 +7,10 @@ import { format } from "date-fns";
 import { fr, enUS } from "date-fns/locale";
 
 /**
- * Cron catch-up 08h30 — Filet de sécurité pour le schedule-balance.
+ * Cron J-7 — Rappel unique de paiement du solde.
  *
- * Cible les réservations confirmées dans les 35 prochains jours
- * qui n'ont jamais reçu le lien de paiement (balanceLinkSentAt null).
- * Couvre les cas où le schedule-balance aurait raté un jour.
+ * Envoie un rappel aux clients qui n'ont pas encore payé leur solde
+ * 7 jours avant le check-in, et qui n'ont pas encore reçu ce rappel.
  */
 
 function verifyCronSecret(request: NextRequest): boolean {
@@ -24,24 +23,26 @@ function verifyCronSecret(request: NextRequest): boolean {
   return false;
 }
 
-async function handleCatchUp() {
+async function handleBalanceReminder7Days() {
   const appUrl = process.env.NEXT_PUBLIC_APP_URL ?? "https://villareel.com";
-  const now = new Date();
-  const cutoff = new Date(now.getFullYear(), now.getMonth(), now.getDate() + 35);
+  const today = new Date();
+  const target = new Date(today.getFullYear(), today.getMonth(), today.getDate() + 7);
 
-  const missed = await prisma.reservation.findMany({
+  const reservations = await prisma.reservation.findMany({
     where: {
-      checkIn: { gt: now, lte: cutoff },
+      checkIn: {
+        gte: new Date(target.getFullYear(), target.getMonth(), target.getDate()),
+        lt:  new Date(target.getFullYear(), target.getMonth(), target.getDate() + 1),
+      },
+      status: "CONFIRMED",
       paymentStatus: { in: ["AWAITING", "DEPOSIT_PAID"] },
-      status: { in: ["PENDING", "CONFIRMED"] },
-      balanceLinkSentAt: null, // Email jamais envoyé
+      balanceReminderSentAt: null,
     },
   });
 
-  let processed = 0;
-  const errors: { reservationId: number; error: string }[] = [];
+  let reminded = 0;
 
-  for (const reservation of missed) {
+  for (const reservation of reservations) {
     const balanceAmount = Number(reservation.balanceAmount ?? reservation.totalAmount ?? 0);
     if (balanceAmount <= 0) continue;
 
@@ -49,7 +50,7 @@ async function handleCatchUp() {
       const locale = reservation.locale === "EN" ? "en" : "fr";
       const dateLocale = locale === "fr" ? fr : enUS;
       const balanceDue = new Date(reservation.checkIn);
-      balanceDue.setDate(balanceDue.getDate() - 30);
+      balanceDue.setDate(balanceDue.getDate() - 7);
       const paymentUrl = `${appUrl}/${locale}/reservation/paiement-solde/${reservation.confirmationCode}`;
 
       await sendBalanceReminderEmail({
@@ -63,37 +64,27 @@ async function handleCatchUp() {
 
       await prisma.reservation.update({
         where: { id: reservation.id },
-        data: { balanceLinkSentAt: new Date() },
+        data: { balanceReminderSentAt: new Date() },
       });
 
-      processed++;
-      logger.info("catch-up-balance: lien envoyé", {
-        reservationId: reservation.id,
-        confirmationCode: reservation.confirmationCode,
-      });
+      reminded++;
     } catch (error) {
-      const msg = error instanceof Error ? error.message : String(error);
-      errors.push({ reservationId: reservation.id, error: msg });
-      logger.error("catch-up-balance: échec", {
+      logger.error("balance-reminder-7days: échec envoi", {
         reservationId: reservation.id,
         error,
       });
     }
   }
 
-  return NextResponse.json({
-    found: missed.length,
-    processed,
-    errors: errors.length > 0 ? errors : undefined,
-  });
+  return NextResponse.json({ reminded, total: reservations.length });
 }
 
 export async function GET(request: NextRequest) {
   if (!verifyCronSecret(request)) return apiError.unauthorized();
-  return handleCatchUp();
+  return handleBalanceReminder7Days();
 }
 
 export async function POST(request: NextRequest) {
   if (!verifyCronSecret(request)) return apiError.unauthorized();
-  return handleCatchUp();
+  return handleBalanceReminder7Days();
 }

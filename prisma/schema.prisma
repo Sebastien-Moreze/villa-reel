@@ -179,6 +179,8 @@ model Reservation {
   review                Review?
 
   houseRulesSentAt      DateTime?        // Date d'envoi du règlement intérieur (envoi unique)
+  balanceLinkSentAt     DateTime?        // Date d'envoi du lien de paiement solde (envoi unique J-30)
+  balanceReminderSentAt DateTime?        // Date d'envoi du rappel solde J-7
 
   createdAt             DateTime         @default(now())
   updatedAt             DateTime         @updatedAt

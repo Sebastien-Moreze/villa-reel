@@ -177,13 +177,51 @@ export async function POST(request: Request) {
 
       if (daysUntilCheckIn <= 35 && balanceAmount > 0) {
         const appUrl = process.env.NEXT_PUBLIC_APP_URL ?? "https://villareel.com";
+        const StripeLib = (await import("stripe")).default;
+        const stripe = new StripeLib(process.env.STRIPE_SK ?? "", {
+          apiVersion: "2026-02-25.clover" as const,
+        });
+        const session = await stripe.checkout.sessions.create({
+          mode: "payment",
+          payment_method_types: ["card"],
+          line_items: [
+            {
+              price_data: {
+                currency: "eur",
+                product_data: {
+                  name: `Solde séjour Villa R.E.E.L – ${result.reservation.confirmationCode}`,
+                },
+                unit_amount: Math.round(balanceAmount * 100),
+              },
+              quantity: 1,
+            },
+          ],
+          payment_intent_data: {
+            metadata: {
+              reservationId: String(result.reservation.id),
+              villaId: String(result.reservation.villaId),
+              type: "balance",
+            },
+          },
+          success_url: `${appUrl}/${data.locale}/reservation/merci?code=${result.reservation.confirmationCode}`,
+          cancel_url: `${appUrl}/${data.locale}/reservation?annule=1`,
+          expires_at: Math.floor(Date.now() / 1000) + 23 * 60 * 60,
+        });
+        await prisma.reservation.update({
+          where: { id: result.reservation.id },
+          data: {
+            stripePaymentIntentId: session.payment_intent
+              ? String(session.payment_intent)
+              : session.id,
+          },
+        });
         await sendBalanceReminderEmail({
           locale: data.locale,
           to: result.reservation.guestEmail,
           confirmationCode: result.reservation.confirmationCode,
           balanceAmount,
           balanceDueDate: balanceDue.toLocaleDateString("fr-FR"),
-          paymentUrl: `${appUrl}/reservation/solde/${result.reservation.confirmationCode}`,
+          paymentUrl: session.url ?? `${appUrl}/${data.locale}/reservation`,
         });
       }
     } catch (emailErr) {

@@ -69,7 +69,74 @@ export async function POST(request: Request) {
   try {
     switch (event.type) {
       // ════════════════════════════════════════════════════════════════
-      // PAIEMENT RÉUSSI
+      // CHECKOUT SESSION COMPLÉTÉ (safety net pour les paiements solde)
+      // payment_intent.succeeded suffit normalement, mais on double
+      // la sécurité ici en cas de race condition.
+      // ════════════════════════════════════════════════════════════════
+      case "checkout.session.completed": {
+        const session = event.data.object as Stripe.Checkout.Session;
+        const reservationId = session.metadata?.reservationId
+          ?? (session.payment_intent && typeof session.payment_intent !== "string"
+            ? session.payment_intent.metadata?.reservationId
+            : undefined);
+
+        if (!reservationId) break;
+
+        const type = session.metadata?.type ?? "balance";
+        const paymentStatus = mapPaymentType(type);
+        if (!paymentStatus) break;
+
+        await prisma.reservation.update({
+          where: { id: Number(reservationId) },
+          data: {
+            paymentStatus,
+            status: "CONFIRMED",
+            stripePaymentIntentId: session.payment_intent
+              ? String(session.payment_intent)
+              : String(session.id),
+          },
+        });
+
+        logger.info("Stripe webhook: checkout.session.completed", {
+          reservationId,
+          sessionId: session.id,
+        });
+        break;
+      }
+
+      // ════════════════════════════════════════════════════════════════
+      // CHECKOUT SESSION EXPIRÉE
+      // Remet stripePaymentIntentId à null → le catch-up du lendemain
+      // va créer une nouvelle session et renvoyer un email au client.
+      // ════════════════════════════════════════════════════════════════
+      case "checkout.session.expired": {
+        const session = event.data.object as Stripe.Checkout.Session;
+        const sessionId = session.id;
+
+        // On cherche la réservation via l'ID de session stocké en DB
+        const reservation = await prisma.reservation.findFirst({
+          where: {
+            stripePaymentIntentId: sessionId,
+            paymentStatus: { in: ["AWAITING", "DEPOSIT_PAID"] },
+          },
+        });
+
+        if (!reservation) break;
+
+        // Remet à null → le catch-up recrée une session demain matin
+        await prisma.reservation.update({
+          where: { id: reservation.id },
+          data: { stripePaymentIntentId: null },
+        });
+
+        logger.info("Stripe webhook: checkout.session.expired — stripePaymentIntentId réinitialisé", {
+          reservationId: reservation.id,
+          confirmationCode: reservation.confirmationCode,
+          sessionId,
+        });
+        break;
+      }
+
       // Concerne soit le séjour, soit la capture manuelle d'une caution
       // ════════════════════════════════════════════════════════════════
       case "payment_intent.succeeded": {
@@ -280,9 +347,12 @@ async function sendPaymentFailureEmail(reservationId: number, type: string) {
     ? "Échec du paiement du solde – Villa R.E.E.L"
     : "Échec du paiement de l'acompte – Villa R.E.E.L";
 
+  const locale = reservation.locale === "EN" ? "en" : "fr";
+  const appUrl = process.env.NEXT_PUBLIC_APP_URL ?? "https://villareel.com";
+
   const retryUrl = isBalance
-    ? `${process.env.NEXT_PUBLIC_APP_URL}/reservation/solde/${reservation.confirmationCode}`
-    : `${process.env.NEXT_PUBLIC_APP_URL}/reservation/acompte/${reservation.confirmationCode}`;
+    ? `${appUrl}/${locale}/reservation`
+    : `${appUrl}/${locale}/reservation/acompte/${reservation.confirmationCode}`;
 
   const html = `
     <p>Bonjour ${escapeHtml(reservation.guestName)},</p>
