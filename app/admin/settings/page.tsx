@@ -21,6 +21,10 @@ export default async function AdminSettingsPage() {
     ? await prisma.adminUser.findUnique({ where: { email: user.email } })
     : null;
 
+  const villa = await prisma.villa.findFirst({
+    select: { id: true, deposit: true, pricePerNight: true, cleaningFee: true, minStay: true },
+  });
+
   return (
     <div className="mx-auto max-w-2xl px-4 py-6 md:px-6">
       <h1 className="text-lg font-semibold text-neutral-50">Paramètres</h1>
@@ -117,6 +121,72 @@ export default async function AdminSettingsPage() {
         </form>
       </section>
 
+      {/* Configuration villa */}
+      <section className="mt-8">
+        <h2 className="text-xs font-semibold uppercase tracking-wider text-neutral-400">
+          Configuration de la villa
+        </h2>
+        <form
+          action={updateVillaSettings}
+          className="mt-3 rounded-2xl border border-neutral-800 bg-[#0c0c0c] p-5 space-y-4"
+        >
+          <input type="hidden" name="villaId" value={villa?.id ?? 1} />
+          <div className="grid grid-cols-2 gap-4">
+            <div className="flex flex-col gap-1">
+              <label className="text-[10px] text-neutral-400">Caution (€)</label>
+              <input
+                name="deposit"
+                type="number"
+                min="0"
+                step="10"
+                defaultValue={Number(villa?.deposit ?? 500)}
+                className="rounded-xl border border-neutral-700 bg-[#050505] px-3 py-2 text-[11px] text-neutral-100 outline-none focus:border-primary"
+              />
+              <p className="text-[10px] text-neutral-600">Empreinte bancaire — non débitée sauf dommage</p>
+            </div>
+            <div className="flex flex-col gap-1">
+              <label className="text-[10px] text-neutral-400">Prix / nuit (€)</label>
+              <input
+                name="pricePerNight"
+                type="number"
+                min="0"
+                step="5"
+                defaultValue={Number(villa?.pricePerNight ?? 0)}
+                className="rounded-xl border border-neutral-700 bg-[#050505] px-3 py-2 text-[11px] text-neutral-100 outline-none focus:border-primary"
+              />
+            </div>
+            <div className="flex flex-col gap-1">
+              <label className="text-[10px] text-neutral-400">Frais de ménage (€)</label>
+              <input
+                name="cleaningFee"
+                type="number"
+                min="0"
+                step="5"
+                defaultValue={Number(villa?.cleaningFee ?? 0)}
+                className="rounded-xl border border-neutral-700 bg-[#050505] px-3 py-2 text-[11px] text-neutral-100 outline-none focus:border-primary"
+              />
+            </div>
+            <div className="flex flex-col gap-1">
+              <label className="text-[10px] text-neutral-400">Séjour minimum (nuits)</label>
+              <input
+                name="minStay"
+                type="number"
+                min="1"
+                step="1"
+                defaultValue={villa?.minStay ?? 2}
+                className="rounded-xl border border-neutral-700 bg-[#050505] px-3 py-2 text-[11px] text-neutral-100 outline-none focus:border-primary"
+              />
+            </div>
+          </div>
+          <button
+            type="submit"
+            className="rounded-full bg-primary px-5 py-2 text-xs font-semibold text-white hover:opacity-90"
+          >
+            Enregistrer la configuration
+          </button>
+        </form>
+      </section>
+
       {/* Infos système */}
       <section className="mt-8">
         <h2 className="text-xs font-semibold uppercase tracking-wider text-neutral-400">
@@ -209,6 +279,23 @@ async function changePassword(formData: FormData) {
     data: { hashedPassword: hashed },
   });
   redirect("/admin/settings?success=1");
+}
+
+async function updateVillaSettings(formData: FormData) {
+  "use server";
+  const villaId = Number(formData.get("villaId"));
+  const deposit = parseFloat(formData.get("deposit") as string);
+  const pricePerNight = parseFloat(formData.get("pricePerNight") as string);
+  const cleaningFee = parseFloat(formData.get("cleaningFee") as string);
+  const minStay = parseInt(formData.get("minStay") as string, 10);
+
+  if (!villaId || isNaN(deposit) || isNaN(pricePerNight) || isNaN(cleaningFee) || isNaN(minStay)) return;
+
+  await prisma.villa.update({
+    where: { id: villaId },
+    data: { deposit, pricePerNight, cleaningFee, minStay },
+  });
+  revalidatePath("/admin/settings");
 }
 
 async function purgeOldLogs() {
