@@ -5,29 +5,38 @@ import { useState } from "react";
 type Props = {
   reservationId: number;
   cautionAmount: number;
+  cautionStatus: string;
 };
 
-export function CautionActions({ reservationId, cautionAmount }: Props) {
-  const [loading, setLoading] = useState<"capture" | "release" | null>(null);
-  const [done, setDone] = useState<"captured" | "released" | null>(null);
+export function CautionActions({ reservationId, cautionAmount, cautionStatus }: Props) {
+  const [loading, setLoading] = useState<"capture" | "release" | "request" | null>(null);
+  const [done, setDone] = useState<"captured" | "released" | "requested" | null>(null);
   const [error, setError] = useState<string | null>(null);
 
-  const call = async (action: "capture" | "release") => {
+  const call = async (action: "capture" | "release" | "request") => {
     setLoading(action);
     setError(null);
     try {
-      const res = await fetch(`/api/admin/caution/${action}`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ reservationId }),
-      });
+      const res = await fetch(
+        action === "request"
+          ? "/api/admin/caution/request"
+          : `/api/admin/caution/${action}`,
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ reservationId }),
+        }
+      );
       const data = (await res.json()) as { ok?: boolean; error?: string };
       if (!res.ok || !data.ok) {
         setError(data.error ?? "Une erreur est survenue.");
       } else {
-        setDone(action === "capture" ? "captured" : "released");
-        // Rechargement de la page pour rafraîchir les données Server Component
-        window.location.reload();
+        if (action === "request") {
+          setDone("requested");
+        } else {
+          setDone(action === "capture" ? "captured" : "released");
+          window.location.reload();
+        }
       }
     } catch {
       setError("Erreur réseau. Veuillez réessayer.");
@@ -36,12 +45,18 @@ export function CautionActions({ reservationId, cautionAmount }: Props) {
     }
   };
 
-  if (done) {
+  if (done === "requested") {
+    return (
+      <div className="rounded-lg border border-blue-800 bg-blue-950 px-3 py-2 text-[11px] text-blue-300">
+        ✉ Email envoyé au client — il recevra un lien pour autoriser la caution.
+      </div>
+    );
+  }
+
+  if (done === "captured" || done === "released") {
     return (
       <div className="rounded-lg border border-emerald-800 bg-emerald-950 px-3 py-2 text-[11px] text-emerald-300">
-        {done === "captured"
-          ? "✓ Caution encaissée avec succès."
-          : "✓ Caution libérée avec succès."}
+        {done === "captured" ? "✓ Caution encaissée avec succès." : "✓ Caution libérée avec succès."}
       </div>
     );
   }
@@ -49,39 +64,62 @@ export function CautionActions({ reservationId, cautionAmount }: Props) {
   return (
     <div className="space-y-2">
       <div className="flex flex-wrap gap-2">
-        {/* Capturer */}
-        <button
-          type="button"
-          disabled={loading !== null}
-          onClick={() => call("capture")}
-          className="flex items-center gap-1.5 rounded-full bg-cta px-4 py-1.5 text-[11px] font-semibold text-white transition hover:opacity-90 disabled:opacity-50 disabled:cursor-not-allowed"
-        >
-          {loading === "capture" ? (
-            <>
-              <span className="h-3 w-3 animate-spin rounded-full border-2 border-white border-t-transparent" />
-              Encaissement...
-            </>
-          ) : (
-            <>⚡ Encaisser {cautionAmount.toLocaleString("fr-FR")} €</>
-          )}
-        </button>
 
-        {/* Libérer */}
-        <button
-          type="button"
-          disabled={loading !== null}
-          onClick={() => call("release")}
-          className="flex items-center gap-1.5 rounded-full border border-emerald-700 px-4 py-1.5 text-[11px] font-semibold text-emerald-300 transition hover:bg-emerald-900/30 disabled:opacity-50 disabled:cursor-not-allowed"
-        >
-          {loading === "release" ? (
-            <>
-              <span className="h-3 w-3 animate-spin rounded-full border-2 border-emerald-300 border-t-transparent" />
-              Libération...
-            </>
-          ) : (
-            <>✓ Libérer la caution</>
-          )}
-        </button>
+        {/* Caution non provisionnée → envoyer la demande au client */}
+        {cautionStatus === "NONE" && (
+          <button
+            type="button"
+            disabled={loading !== null}
+            onClick={() => call("request")}
+            className="flex items-center gap-1.5 rounded-full border border-blue-700 px-4 py-1.5 text-[11px] font-semibold text-blue-300 transition hover:bg-blue-900/30 disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            {loading === "request" ? (
+              <>
+                <span className="h-3 w-3 animate-spin rounded-full border-2 border-blue-300 border-t-transparent" />
+                Envoi en cours...
+              </>
+            ) : (
+              <>✉ Demander la caution au client</>
+            )}
+          </button>
+        )}
+
+        {/* Caution provisionnée → encaisser ou libérer */}
+        {cautionStatus === "HELD" && (
+          <>
+            <button
+              type="button"
+              disabled={loading !== null}
+              onClick={() => call("capture")}
+              className="flex items-center gap-1.5 rounded-full bg-cta px-4 py-1.5 text-[11px] font-semibold text-white transition hover:opacity-90 disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              {loading === "capture" ? (
+                <>
+                  <span className="h-3 w-3 animate-spin rounded-full border-2 border-white border-t-transparent" />
+                  Encaissement...
+                </>
+              ) : (
+                <>⚡ Encaisser {cautionAmount.toLocaleString("fr-FR")} €</>
+              )}
+            </button>
+
+            <button
+              type="button"
+              disabled={loading !== null}
+              onClick={() => call("release")}
+              className="flex items-center gap-1.5 rounded-full border border-emerald-700 px-4 py-1.5 text-[11px] font-semibold text-emerald-300 transition hover:bg-emerald-900/30 disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              {loading === "release" ? (
+                <>
+                  <span className="h-3 w-3 animate-spin rounded-full border-2 border-emerald-300 border-t-transparent" />
+                  Libération...
+                </>
+              ) : (
+                <>✓ Libérer la caution</>
+              )}
+            </button>
+          </>
+        )}
       </div>
 
       {error && (

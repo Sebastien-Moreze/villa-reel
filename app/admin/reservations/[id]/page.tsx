@@ -395,6 +395,7 @@ type AnyReservation = Record<string, unknown> & {
   cautionDeadline: Date | null;
   cautionAmount: { toString: () => string } | null;
   cautionIntentId: string | null;
+  villa: { deposit: { toString: () => string } };
 };
 
 function CautionCard({ reservation }: { reservation: AnyReservation }) {
@@ -458,11 +459,19 @@ function CautionCard({ reservation }: { reservation: AnyReservation }) {
 
       {/* Boutons */}
       {reservation.cautionStatus === "HELD" && !cautionDeadlineExpired && (
-        <CautionActions reservationId={reservation.id} cautionAmount={Number(reservation.cautionAmount ?? 0)} />
+        <CautionActions
+          reservationId={reservation.id}
+          cautionAmount={Number(reservation.cautionAmount ?? 0)}
+          cautionStatus={reservation.cautionStatus}
+        />
       )}
 
-      {reservation.cautionStatus === "NONE" && !reservation.cautionIntentId && (
-        <p className="text-[10px] text-neutral-600">Aucune autorisation de caution enregistrée.</p>
+      {reservation.cautionStatus === "NONE" && (
+        <CautionActions
+          reservationId={reservation.id}
+          cautionAmount={Number(reservation.villa?.deposit ?? 0)}
+          cautionStatus="NONE"
+        />
       )}
     </div>
   );

@@ -182,6 +182,9 @@ model Reservation {
   balanceLinkSentAt     DateTime?        // Date d'envoi du lien de paiement solde (envoi unique J-30)
   balanceReminderSentAt DateTime?        // Date d'envoi du rappel solde J-7
 
+  cautionRequestToken   String?  @unique // Token one-use pour la page de pré-autorisation caution
+  cautionRequestSentAt  DateTime?        // Date d'envoi de la demande de caution manuelle
+
   createdAt             DateTime         @default(now())
   updatedAt             DateTime         @updatedAt
 }
